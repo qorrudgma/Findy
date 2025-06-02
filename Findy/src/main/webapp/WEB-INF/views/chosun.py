@@ -70,7 +70,7 @@ def fetch_article_content(article_url):
 # 실행 흐름
 # 카테고리 종류
 # categories = ["economy", "opinion", "society", "hanihealth", "sports", "culture"]
-categories = ["economy", "opinion", "society", "hanihealth"]
+categories = ["politics"]
 for category in categories:
     # 반복할 페이지 수
     for i in range(3):
