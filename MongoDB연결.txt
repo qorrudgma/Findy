@@ -4,7 +4,23 @@ https://www.mongodb.com/try/download/community
 다운 받은거 들어가다 complete선택
 쭉 next
 
+2. admin 추가
+MongoDB shell 들어가기
 
+use admin
+
+db.createUser({
+  user: "findyAdmin",
+  pwd: "findy1234",
+  roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+})
+
+mongod.cfg 파일에 
+security:
+  authorization: enabled 추가
+
+application.properties 에 아래 추가
+spring.data.mongodb.uri=mongodb://findyAdmin:findy1234@localhost:27017/findyDB?authSource=admin
 
 메서드명			역할 설명						반환 타입 예시
 findAll()			컬렉션 내 모든 문서 조회			List<T>
