@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 def fetch_headlines(category,page):
     page = (page*10)+1
     f_url = f"https://www.donga.com/news/{category}?p={page}&prod=news&ymd=&m="
-    # f_url = "https://www.donga.com/news/{0}?p={1}&prod=news&ymd=&m=".format(category, page)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
@@ -67,9 +66,8 @@ def fetch_article_content(article_url):
         return {
             "headline": headline,
             "content": clean_text,
-            # "content": clean_text,
             "url": article_url,
-            "source": "hani",
+            "source": "donga",
             "time": last_time
         }
 
@@ -106,7 +104,7 @@ for category in categories:
                 if article:
                     # 출력전에 교체
                     converted_category = category_mapping.get(category, category)
-                    print(f"카테고리: {category}, 페이지: {i+1}")
+                    print(f"카테고리: {converted_category}, 페이지: {i+1}")
                     print(f" 제목: {article['headline']}")
                     print(f" 내용: {article['content']}")
                     print(f" 보도일: {article['time']}")

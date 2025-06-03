@@ -5,9 +5,7 @@ from bs4 import BeautifulSoup
 
 # 링크 추출
 def fetch_headlines(category,page):
-    page = (page*10)+1
-    f_url = f"https://www.donga.com/news/{category}?p={page}&prod=news&ymd=&m="
-    # f_url = "https://www.donga.com/news/{0}?p={1}&prod=news&ymd=&m=".format(category, page)
+    f_url = f"https://www.khan.co.kr/{category}?page={page}"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
@@ -18,13 +16,13 @@ def fetch_headlines(category,page):
         soup = BeautifulSoup(response.text, "html.parser")
         news_headlines = []
 
-        articles = soup.select("div.news_body")
+        articles = soup.select("div.list > ul > li")
         for article in articles:
             link_tag = article.select_one("a")
             if link_tag:
                 url = link_tag.get("href")
                 if url and not url.startswith("http"):
-                    url = "https://www.donga.com" + url
+                    url = "https://www.khan.co.kr" + url
                 news_headlines.append({"url": url})
         return news_headlines
 
@@ -44,10 +42,7 @@ def fetch_article_content(article_url):
         soup = BeautifulSoup(response.text, "html.parser")
 
         # 제목 추출
-        # 모든 h1 태그를 리스트로 받음
         headline_tags = soup.select("h1")
-
-        # 두 번째 h1이 있으면 가져오고, 없으면 첫 번째 또는 기본값 사용
         if len(headline_tags) >= 2:
             headline = headline_tags[1].text.strip()
         elif len(headline_tags) == 1:
@@ -55,48 +50,47 @@ def fetch_article_content(article_url):
         else:
             headline = "제목 없음"
 
-        # 텍스트 내용이 태그들과 있어서 내용만 뽑아내기
-        content_tag = soup.select_one("section.news_view")
-        if content_tag:
-            clean_text = content_tag.get_text(separator=' ', strip=True)
+        # 텍스트
+        content_tag = soup.select_one("div.art_body")
+        content = content_tag.get_text(strip=True) if content_tag else "내용 없음"
 
         # 보도시간 추출
-        date_items = soup.select('span[aria-hidden="true"]')
-        last_time = date_items[-1].text.strip()
+        date_tag = soup.select_one("div.date p")
+        published_time = date_tag.get_text(strip=True) if date_tag else "시간 없음"
+        time = clean_datetime(published_time)
+        
 
         return {
             "headline": headline,
-            "content": clean_text,
+            "content": content,
             # "content": clean_text,
             "url": article_url,
-            "source": "hani",
-            "time": last_time
+            "source": "khan",
+            "time": time
         }
 
     except Exception as e:
         print(f"본문 크롤링 오류: {e}")
         return None
+    
+def clean_datetime(text):
+    text = text.replace("입력 ", "")
+    time = text.replace(".", "-")
+    return time
 
 # 실행 흐름
 # 카테고리 종류
-# categories = ["economy", "opinion", "society", "hanihealth", "sports", "culture"]
+# categories = ["economy", "opinion", "national", "hanihealth", "sports", "culture"]
 # donga 전용 매핑
 category_mapping = {
-    "Economy": "economy",
-    "Opinion": "opinion",
-    "Society": "society",
-    "Health": "hanihealth",
-    "Sports": "sports",
-    "Culture": "culture",
-    "Entertainment": "culture"
+    "life/health/articles": "hanihealth"
 }
-# categories = ["Economy", "Opinion", "Society", "Health", "Sports", "Culture", "Entertainment"]
-# categories = ["Economy", "Opinion", "Society", "Health"]
-categories = ["Economy"]
+# categories = ["economy", "opinion", "national", "life/health/articles", "culture"]
+categories = ["economy"]
 for category in categories:
     # 반복할 페이지 수
     for i in range(1):
-        headlines = fetch_headlines(category, i)
+        headlines = fetch_headlines(category, i+1)
 
         if headlines:
             for idx, item in enumerate(headlines, start=1):
