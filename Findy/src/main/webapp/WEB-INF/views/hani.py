@@ -1,6 +1,8 @@
 import requests
 import time
 from bs4 import BeautifulSoup
+from konlpy.tag import Okt
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # 링크 추출
 def fetch_headlines(category,page):
@@ -50,15 +52,35 @@ def fetch_article_content(article_url):
         paragraphs = [tag.get_text(strip=True) for tag in content_tag[:-1]]
         full_text = " ".join(paragraphs)
         # full_text = "!@#$!@#$".join(paragraphs)
+
+        # okt 형태소 분석
+        okt = Okt()
+        nouns = okt.nouns(full_text)
+
+        # 명사들을 모아 하나의 문서처럼 만듦듦
+        document = " ".join(nouns)
+
+        # 키워드 추출
+        # TF-IDF 적용
+        vectorizer = TfidfVectorizer()
+        tfidf_matrix = vectorizer.fit_transform([document])
+        # tfidf_matrix = vectorizer.fit_transform([full_text])
+        # 중요도 (TF-IDF 점수)
+        feature_names = vectorizer.get_feature_names_out()
+        tfidf_scores = tfidf_matrix.toarray()[0]
+        # 단어 점수 묶어서 내림차순 정렬
+        word_tfidf = sorted(zip(feature_names, tfidf_scores), key=lambda x: x[1], reverse=True)
+
         date_items = soup.select("li.ArticleDetailView_dateListItem__mRc3d")
         for item in date_items:
             if "등록" in item.text:
                 time = item.find("span").text.strip()
-        name = soup.select("div.ArticleDetailReporter_name__kXCEK strong")
+        # name = soup.select("div.ArticleDetailReporter_name__kXCEK strong")
 
         return {
             "headline": headline,
             "content": full_text,
+            "keyword": word_tfidf,
             "url": article_url,
             "source":"hani",
             "time":time
@@ -71,7 +93,8 @@ def fetch_article_content(article_url):
 # 실행 흐름
 # 카테고리 종류
 # categories = ["economy", "opinion", "society", "hanihealth", "sports", "culture"]
-categories = ["economy", "opinion", "society", "hanihealth"]
+# categories = ["economy", "opinion", "society", "hanihealth"]
+categories = ["economy"]
 for category in categories:
     # 반복할 페이지 수
     for i in range(1):
@@ -86,6 +109,7 @@ for category in categories:
                     print(f"카테고리: {category}, 페이지: {i+1}")
                     print(f" 제목: {article['headline']}")
                     print(f" 내용: {article['content']}")
+                    print(f" 키워드: {article['keyword']}")
                     print(f" 보도일: {article['time']}")
                     print(f" 출처: {article['source']}")
                     print(f" 링크: {article['url']}\n")
