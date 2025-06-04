@@ -2,11 +2,14 @@ import requests
 import time
 
 from bs4 import BeautifulSoup
-from konlpy.tag import Komoran
-from sklearn.feature_extraction.text import TfidfVectorizer
-from collections import defaultdict
-from mongo_save import save_to_mongodb
+# 형태소
+from komoran import komoran
+# TF-IDF
+from tfidf import tf_idf
+# TextRank
 from textrank import textrank_keywords, textrank_summarize
+# MongoDB
+from mongo_save import save_to_mongodb
 
 def fetch_headlines(category, page):
     f_url = f"https://www.hani.co.kr/arti/{category}?page={page}"
@@ -49,38 +52,10 @@ def fetch_article_content(article_url):
         full_text = " ".join(paragraphs)
 
         # 형태소
-        komoran = Komoran()
-        pos_result = komoran.pos(full_text)
-        nouns = [word for word, tag in pos_result if tag in ['NNG', 'NNP'] and len(word) > 1]
-
-        sentences = full_text.split('.')
-        first_sentence = sentences[1] if len(sentences) > 1 else ""
-        last_sentence = sentences[-1]
-        position_weights = defaultdict(float)
-
-        for word, tag in pos_result:
-            if len(word) <= 1 or tag not in ['NNG', 'NNP']:
-                continue
-            if word in headline:
-                position_weights[word] += 2.0
-            if word in first_sentence:
-                position_weights[word] += 1.5
-            if word in last_sentence:
-                position_weights[word] += 1.0
-            if tag == 'NNP':
-                position_weights[word] += 1.0
-
-        vectorizer = TfidfVectorizer()
-        tfidf_matrix = vectorizer.fit_transform([" ".join(nouns)])
-        feature_names = vectorizer.get_feature_names_out()
-        tfidf_scores = tfidf_matrix.toarray()[0]
-
-        tfidf_keywords = []
-        for word, score in zip(feature_names, tfidf_scores):
-            final_score = score + position_weights.get(word, 0)
-            tfidf_keywords.append((word, final_score))
-        tfidf_keywords = sorted(tfidf_keywords, key=lambda x: x[1], reverse=True)
-
+        nouns, pos_result = komoran(full_text)
+        # TF-IDF
+        tfidf_keywords = tf_idf(headline, full_text, pos_result, nouns)
+        # TextRank
         textrank_kw = textrank_keywords(nouns)
 
         # 날짜 정보 파싱 (오류 방지 로직 추가)
@@ -98,7 +73,7 @@ def fetch_article_content(article_url):
         return {
             "headline": headline,
             "content": full_text,
-            "tfidf_keywords": tfidf_keywords[:10],
+            "tfidf_keywords": tfidf_keywords,
             "textrank_keywords": textrank_kw,
             "url": article_url,
             "source": "hani",

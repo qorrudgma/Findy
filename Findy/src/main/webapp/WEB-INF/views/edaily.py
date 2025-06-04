@@ -10,43 +10,9 @@ from urllib.parse import urljoin
 # from pymongo import MongoClient
 from konlpy.tag import Komoran
 from sklearn.feature_extraction.text import TfidfVectorizer
+from collections import defaultdict
 from mongo_save import save_to_mongodb
 from textrank import textrank_keywords, textrank_summarize
-
-# MongoDB에 기사들을 저장하는 함수 정의
-# def save_to_mongodb(articles):
-#     try:
-#         client = MongoClient("mongodb://localhost:27017/")  # MongoDB 클라이언트 연결
-#         db = client["newsdata01"]                             # DB 이름
-#         collection = db["newsdata01"]                         # 컬렉션 이름
-
-#         total = len(articles)  # 전체 기사 수
-#         unique_post_ids = set()  # 중복 제거용 post_id 집합
-#         inserted = 0
-#         skipped = 0
-
-#         for article in articles:
-#             # print(f" !@#$ url: {article['url']}\n")
-#             url = article.get('url')
-#             if not url:
-#                 skipped += 1
-#                 continue
-
-#             unique_post_ids.add(url)
-
-#             result = collection.update_one(
-#                 {"url": url},
-#                 {"$set": article},
-#                 upsert=True
-#             )
-#             if result.upserted_id or result.modified_count:
-#                 inserted += 1
-
-#         print(f"\n📢 MongoDB 저장 완료 | 총 시도: {total}, 삽입: {inserted}, 중복 스킵: {skipped}")
-#     except Exception as e:
-#         print(f"❌ MongoDB 저장 실패: {e}")
-#         traceback.print_exc()
-
 
 # 일반 기사에서 본문과 날짜를 추출하는 함수
 def extract_article_content(article_url):
@@ -143,14 +109,57 @@ for category, url in category_urls.items():
             # content, published_at = extract_article_content(full_url)
             # post_id = hashlib.sha1(full_url.encode("utf-8")).hexdigest()
 
+            # 형태소
+            komoran = Komoran()
+            pos_result = komoran.pos(content)
+            nouns = [word for word, tag in pos_result if tag in ['NNG', 'NNP'] and len(word) > 1]
+
+            sentences = content.split('.')
+            first_sentence = sentences[1] if len(sentences) > 1 else ""
+            last_sentence = sentences[-1]
+            position_weights = defaultdict(float)
+
+            for word, tag in pos_result:
+                if len(word) <= 1 or tag not in ['NNG', 'NNP']:
+                    continue
+                if word in title:
+                    position_weights[word] += 2.0
+                if word in first_sentence:
+                    position_weights[word] += 1.5
+                if word in last_sentence:
+                    position_weights[word] += 1.0
+                if tag == 'NNP':
+                    position_weights[word] += 1.0
+
+            # TF-IDF
+            vectorizer = TfidfVectorizer()
+            tfidf_matrix = vectorizer.fit_transform([" ".join(nouns)])
+            feature_names = vectorizer.get_feature_names_out()
+            tfidf_scores = tfidf_matrix.toarray()[0]
+
+            tfidf_keywords = []
+            for word, score in zip(feature_names, tfidf_scores):
+                final_score = score + position_weights.get(word, 0)
+                tfidf_keywords.append((word, final_score))
+            tfidf_keywords = sorted(tfidf_keywords, key=lambda x: x[1], reverse=True)
+
+            # TextRank
+            textrank_kw = textrank_keywords(nouns)
+
+            # 중요 내용
+            sentences = [s.strip() for s in summary.split('.') if len(s.strip()) > 10]
+            summary_sentences = textrank_summarize(sentences, top_k=3)
+
             doc = {
                 # "id": post_id,
                 "headline": title,
-                # "summary": summary,
-                "content": summary,  # 분문 대신 요약 드림
+                "content": summary,
                 "url": full_url,
                 "category": category,
                 "time": published_at,
+                "summary": summary_sentences,
+                "tfidf_keywords": tfidf_keywords[:10],
+                "textrank_keywords": textrank_kw,
                 "source": "edaily"
             }
 
