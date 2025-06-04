@@ -2,14 +2,10 @@ import requests
 import time
 
 from bs4 import BeautifulSoup
-# 형태소
-from komoran import komoran
-# TF-IDF
-from tfidf import tf_idf
-# TextRank
-from textrank import textrank_keywords, textrank_summarize
-# MongoDB
-from mongo_save import save_to_mongodb
+from komoran import komoran # 형태소
+from tfidf import tf_idf # TF-IDF
+from textrank import textrank_keywords, textrank_summarize # TextRank
+from mongo_save import save_to_mongodb # MongoDB
 
 def fetch_headlines(category, page):
     f_url = f"https://www.hani.co.kr/arti/{category}?page={page}"
@@ -51,13 +47,6 @@ def fetch_article_content(article_url):
         paragraphs = [tag.get_text(strip=True) for tag in content_tag[:-1]]
         full_text = " ".join(paragraphs)
 
-        # 형태소
-        nouns, pos_result = komoran(full_text)
-        # TF-IDF
-        tfidf_keywords = tf_idf(headline, full_text, pos_result, nouns)
-        # TextRank
-        textrank_kw = textrank_keywords(nouns)
-
         # 날짜 정보 파싱 (오류 방지 로직 추가)
         time_str = "알 수 없음"
         date_items = soup.select("li.ArticleDetailView_dateListItem__mRc3d")
@@ -67,6 +56,14 @@ def fetch_article_content(article_url):
                 if time_tag:
                     time_str = time_tag.text.strip()
 
+        # 형태소
+        nouns, pos_result = komoran(full_text)
+        # TF-IDF
+        tfidf_keywords = tf_idf(headline, full_text, pos_result, nouns)
+        # TextRank
+        textrank_kw = textrank_keywords(nouns)
+
+        # 중요 내용
         sentences = [s.strip() for s in full_text.split('.') if len(s.strip()) > 10]
         summary_sentences = textrank_summarize(sentences, top_k=3)
 
@@ -86,7 +83,8 @@ def fetch_article_content(article_url):
         return None
 
 # 실행
-categories = ["economy"]
+categories = ["economy", "opinion", "society", "health", "sports", "culture"]
+# categories = ["economy"]
 data = []
 for category in categories:
     for i in range(1):

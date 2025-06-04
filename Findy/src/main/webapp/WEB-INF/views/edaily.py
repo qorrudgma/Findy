@@ -1,18 +1,15 @@
-# 필요한 라이브러리 임포트
-# import hashlib
+import hashlib
 import time
 import traceback
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-# from pymongo import MongoClient
-from konlpy.tag import Komoran
-from sklearn.feature_extraction.text import TfidfVectorizer
-from collections import defaultdict
-from mongo_save import save_to_mongodb
-from textrank import textrank_keywords, textrank_summarize
+from bs4 import BeautifulSoup
+from komoran import komoran # 형태소
+from tfidf import tf_idf # TF-IDF
+from textrank import textrank_keywords, textrank_summarize # TextRank
+from mongo_save import save_to_mongodb # MongoDB
 
 # 일반 기사에서 본문과 날짜를 추출하는 함수
 def extract_article_content(article_url):
@@ -22,7 +19,7 @@ def extract_article_content(article_url):
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
         # 본문 추출
-        content_tag = soup.select_one("#news_body_area")
+        content_tag = soup.select_one("div.news_body")
         content = content_tag.get_text(strip=True) if content_tag else "[본문 없음]"
 
         # 날짜 추출
@@ -106,60 +103,31 @@ for category, url in category_urls.items():
                 summary = a_tag.get_text(strip=True)
 
             content, published_at = extract_article_content(full_url)
-            # content, published_at = extract_article_content(full_url)
-            # post_id = hashlib.sha1(full_url.encode("utf-8")).hexdigest()
+            post_id = hashlib.sha1(full_url.encode("utf-8")).hexdigest()
 
             # 형태소
-            komoran = Komoran()
-            pos_result = komoran.pos(content)
-            nouns = [word for word, tag in pos_result if tag in ['NNG', 'NNP'] and len(word) > 1]
-
-            sentences = content.split('.')
-            first_sentence = sentences[1] if len(sentences) > 1 else ""
-            last_sentence = sentences[-1]
-            position_weights = defaultdict(float)
-
-            for word, tag in pos_result:
-                if len(word) <= 1 or tag not in ['NNG', 'NNP']:
-                    continue
-                if word in title:
-                    position_weights[word] += 2.0
-                if word in first_sentence:
-                    position_weights[word] += 1.5
-                if word in last_sentence:
-                    position_weights[word] += 1.0
-                if tag == 'NNP':
-                    position_weights[word] += 1.0
-
+            nouns, pos_result = komoran(content)
             # TF-IDF
-            vectorizer = TfidfVectorizer()
-            tfidf_matrix = vectorizer.fit_transform([" ".join(nouns)])
-            feature_names = vectorizer.get_feature_names_out()
-            tfidf_scores = tfidf_matrix.toarray()[0]
-
-            tfidf_keywords = []
-            for word, score in zip(feature_names, tfidf_scores):
-                final_score = score + position_weights.get(word, 0)
-                tfidf_keywords.append((word, final_score))
-            tfidf_keywords = sorted(tfidf_keywords, key=lambda x: x[1], reverse=True)
-
+            tfidf_keywords = tf_idf(title, content, pos_result, nouns)
             # TextRank
             textrank_kw = textrank_keywords(nouns)
 
             # 중요 내용
-            sentences = [s.strip() for s in summary.split('.') if len(s.strip()) > 10]
+            sentences = [s.strip() for s in content.split('.') if len(s.strip()) > 10]
             summary_sentences = textrank_summarize(sentences, top_k=3)
 
+            print(f"{content}\n{tfidf_keywords}\n{textrank_kw}\n{summary_sentences}\n")
+
             doc = {
-                # "id": post_id,
+                "id": post_id,
                 "headline": title,
-                "content": summary,
+                "content": content,
                 "url": full_url,
                 "category": category,
                 "time": published_at,
-                "summary": summary_sentences,
-                "tfidf_keywords": tfidf_keywords[:10],
+                "tfidf_keywords": tfidf_keywords,
                 "textrank_keywords": textrank_kw,
+                "summary": summary_sentences,
                 "source": "edaily"
             }
 

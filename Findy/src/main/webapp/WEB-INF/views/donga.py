@@ -2,14 +2,10 @@ import requests
 import time
 
 from bs4 import BeautifulSoup
-# 형태소
-from komoran import komoran
-# TF-IDF
-from tfidf import tf_idf
-# TextRank
-from textrank import textrank_keywords, textrank_summarize
-# MongoDB
-from mongo_save import save_to_mongodb
+from komoran import komoran # 형태소
+from tfidf import tf_idf # TF-IDF
+from textrank import textrank_keywords, textrank_summarize # TextRank
+from mongo_save import save_to_mongodb # MongoDB
 
 # 링크 추출
 def fetch_headlines(category,page):
@@ -25,8 +21,6 @@ def fetch_headlines(category,page):
         soup = BeautifulSoup(response.text, "html.parser")
         news_headlines = []
 
-        # articles = soup.select("ul.row_list a")
-        # articles = soup.select("section.sub_news_sec > a")
         articles_div = soup.select_one("div.divide_area > section.sub_news_sec")
         articles = articles_div.select("div.news_body > h4.tit > a")
         
@@ -70,16 +64,16 @@ def fetch_article_content(article_url):
         if content_tag:
             clean_text = content_tag.get_text(separator=' ', strip=True)
 
+        # 보도시간 추출
+        date_items = soup.select('span[aria-hidden="true"]')
+        last_time = date_items[-1].text.strip()
+
         # 형태소
         nouns, pos_result = komoran(clean_text)
         # TF-IDF
         tfidf_keywords = tf_idf(headline, clean_text, pos_result, nouns)
         # TextRank
         textrank_kw = textrank_keywords(nouns)
-
-        # 보도시간 추출
-        date_items = soup.select('span[aria-hidden="true"]')
-        last_time = date_items[-1].text.strip()
 
         # 중요 내용
         sentences = [s.strip() for s in clean_text.split('.') if len(s.strip()) > 10]
@@ -108,14 +102,14 @@ category_mapping = {
     "Economy": "economy",
     "Opinion": "opinion",
     "Society": "society",
-    "Health": "hanihealth",
+    "Health": "health",
     "Sports": "sports",
     "Culture": "culture",
     "Entertainment": "culture"
 }
-# categories = ["Economy", "Opinion", "Society", "Health", "Sports", "Culture", "Entertainment"]
+categories = ["Economy", "Opinion", "Society", "Health", "Sports", "Culture", "Entertainment"]
 # categories = ["Economy", "Opinion", "Society", "Health"]
-categories = ["Economy"]
+# categories = ["Economy"]
 data = []
 for category in categories:
     # 반복할 페이지 수

@@ -2,14 +2,10 @@ import requests
 import time
 
 from bs4 import BeautifulSoup
-# 형태소
-from komoran import komoran
-# TF-IDF
-from tfidf import tf_idf
-# TextRank
-from textrank import textrank_keywords, textrank_summarize
-# MongoDB
-from mongo_save import save_to_mongodb
+from komoran import komoran # 형태소
+from tfidf import tf_idf # TF-IDF
+from textrank import textrank_keywords, textrank_summarize # TextRank
+from mongo_save import save_to_mongodb # MongoDB
 
 # 링크 추출
 def fetch_headlines(category,page):
@@ -62,6 +58,10 @@ def fetch_article_content(article_url):
         content_tag = soup.select_one("div.art_body")
         content = content_tag.get_text(strip=True) if content_tag else "내용 없음"
 
+        # 보도시간 추출
+        date_tag = soup.select_one("div.date p")
+        published_time = date_tag.get_text(strip=True) if date_tag else "시간 없음"
+        time = clean_datetime(published_time)
         
         # 형태소
         nouns, pos_result = komoran(content)
@@ -69,11 +69,6 @@ def fetch_article_content(article_url):
         tfidf_keywords = tf_idf(headline, content, pos_result, nouns)
         # TextRank
         textrank_kw = textrank_keywords(nouns)
-
-        # 보도시간 추출
-        date_tag = soup.select_one("div.date p")
-        published_time = date_tag.get_text(strip=True) if date_tag else "시간 없음"
-        time = clean_datetime(published_time)
         
         # 중요 내용
         sentences = [s.strip() for s in content.split('.') if len(s.strip()) > 10]
@@ -104,7 +99,7 @@ def clean_datetime(text):
 # categories = ["economy", "opinion", "national", "hanihealth", "sports", "culture"]
 # donga 전용 매핑
 category_mapping = {
-    "life/health/articles": "hanihealth"
+    "life/health/articles": "health"
 }
 categories = ["economy", "opinion", "national", "life/health/articles", "culture"]
 # categories = ["economy"]

@@ -8,3 +8,4 @@ scikit-learn			TF-IDF 등 벡터화 도구 포함
 numpy			        sklearn 내부에서 사용됨
 networkx          파이썬의 그래프 이론 및 네트워크 분석 라이브러리
 pymongo           MongoDB
+komoran		komoran
