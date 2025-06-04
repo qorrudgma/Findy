@@ -48,7 +48,6 @@ def fetch_article_content(article_url):
         soup = BeautifulSoup(response.text, "html.parser")
 
         # 제목 추출
-        # 모든 h1 태그를 리스트로 받음
         headline_tags = soup.select("h1")
 
         # 두 번째 h1이 있으면 가져오고, 없으면 첫 번째 또는 기본값 사용
@@ -85,6 +84,7 @@ def fetch_article_content(article_url):
             "tfidf_keywords": tfidf_keywords,
             "textrank_keywords": textrank_kw,
             "url": article_url,
+            "category": category,
             "source": "donga",
             "summary": summary_sentences,
             "time": last_time
@@ -95,8 +95,6 @@ def fetch_article_content(article_url):
         return None
 
 # 실행 흐름
-# 카테고리 종류
-# categories = ["economy", "opinion", "society", "hanihealth", "sports", "culture"]
 # donga 전용 매핑
 category_mapping = {
     "Economy": "economy",
@@ -108,7 +106,6 @@ category_mapping = {
     "Entertainment": "culture"
 }
 categories = ["Economy", "Opinion", "Society", "Health", "Sports", "Culture", "Entertainment"]
-# categories = ["Economy", "Opinion", "Society", "Health"]
 # categories = ["Economy"]
 data = []
 for category in categories:

@@ -73,6 +73,7 @@ def fetch_article_content(article_url):
             "tfidf_keywords": tfidf_keywords,
             "textrank_keywords": textrank_kw,
             "url": article_url,
+            "category": category,
             "source": "hani",
             "summary": summary_sentences,
             "time": time_str

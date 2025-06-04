@@ -80,6 +80,7 @@ def fetch_article_content(article_url):
             "tfidf_keywords": tfidf_keywords,
             "textrank_keywords": textrank_kw,
             "url": article_url,
+            "category": category,
             "source": "khan",
             "summary": summary_sentences,
             "time": time
@@ -95,9 +96,7 @@ def clean_datetime(text):
     return time
 
 # 실행 흐름
-# 카테고리 종류
-# categories = ["economy", "opinion", "national", "hanihealth", "sports", "culture"]
-# donga 전용 매핑
+# khan 전용 매핑
 category_mapping = {
     "life/health/articles": "health"
 }
