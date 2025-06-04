@@ -12,7 +12,7 @@ def save_to_mongodb(articles):
         skipped = 0
 
         for article in articles:
-            print(f" !@#$ url: {article['url']}\n")
+            # print(f" !@#$ url: {article['url']}\n")
             url = article.get('url')
             if not url:
                 skipped += 1
