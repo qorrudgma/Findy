@@ -1,16 +1,30 @@
 # 필요한 모듈들을 니코니코니~
+
 import time  # 대기 시간 제어용
 import threading  # 스레드 간 동기화에 사용
-
 from concurrent.futures import ThreadPoolExecutor  # 병렬처리를 위한 ThreadPool
 from selenium import webdriver  # 웹 페이지 조작을 위한 Selenium
 from selenium.webdriver.chrome.options import Options  # Chrome 옵션 설정
 from bs4 import BeautifulSoup  # HTML 파싱 라이브러리
-from urllib.parse import urljoin  # URL 병합 및 파싱용
-from komoran import komoran # 형태소
-from tfidf import tf_idf # TF-IDF
-from textrank import textrank_keywords, textrank_summarize # TextRank
-from mongo_save import save_to_mongodb # MongoDB
+from urllib.parse import urljoin, urlparse  # URL 병합 및 파싱용
+from pymongo import MongoClient  # MongoDB와 연동
+from datetime import datetime  # 현재 시각 기록용
+
+
+# ======================
+# 카테고리 미리 선언해주자 
+# ======================
+CATEGORY_MAP = {
+    "economy": "경제",
+    "opinion": "오피니언",
+    "national": "사회",
+    "health": "건강",
+    "sports": "스포츠",
+    "culture": "문화/연예"
+}
+
+ALLOWED_CATEGORIES = set(CATEGORY_MAP.keys())
+
 
 # ======================
 # [1] Selenium 드라이버 설정 함수 정의
@@ -81,35 +95,21 @@ def extract_article_data(driver, article_url, category_name):
                 paragraphs = fallback.find_all("p")
                 content = "\n".join(p.get_text(strip=True) for p in paragraphs)
 
-        # 형태소
-        nouns, pos_result = komoran(content)
-        # TF-IDF
-        tfidf_keywords = tf_idf(title, content, pos_result, nouns)
-        # TextRank
-        textrank_kw = textrank_keywords(nouns)
-
-        # 중요 내용
-        sentences = [s.strip() for s in content.split('.') if len(s.strip()) > 10]
-        summary_sentences = textrank_summarize(sentences, top_k=3)
-
-        print(f"{content}\n{tfidf_keywords}\n{textrank_kw}\n{summary_sentences}\n")
-
-
         pub_time = soup.select_one("meta[property='article:published_time']")  # 발행일 추출
         published_at = pub_time["content"] if pub_time else None
+
+        # post_id = urlparse(article_url).path.rstrip("/").split("/")[-1]  # URL에서 post_id 추출
         post_id = article_url  # 걍 URL을 post_id 느낌으로 사용 
 
         return {
             "headline": title,
             "url": article_url,
             "content": content,
-            "post_id": post_id,
+            "url": post_id,
             "time": published_at,
+            # "scraped_at": datetime.now(),  # 수집 시각
             "category": category_name,
-            "source": "chosun",
-            "tfidf_keywords": tfidf_keywords,
-            "textrank_keywords": textrank_kw,
-            "summary": summary_sentences
+            "source": "chosun"
         }
 
     except Exception as e:
@@ -119,14 +119,20 @@ def extract_article_data(driver, article_url, category_name):
 # ======================
 # [4] 한 카테고리 내 기사 여러 페이지 수집
 # ======================
-
 def collect_articles_from_category(category_url, max_pages=3):
-    category_name = category_url.strip("/").split("/")[-1]  # 카테고리 이름 추출
-    collected = []  # 수집된 기사 저장 리스트
-    driver = get_driver()  # 드라이버 실행
+    path = urlparse(category_url).path
+    category_key = path.strip("/").split("/")[0]  # "economy" 등 추출
+
+    if category_key not in CATEGORY_MAP:
+        print(f"[스킵] '{category_url}'은 대상 카테고리가 아님")
+        return []
+
+    category_name = CATEGORY_MAP[category_key]
+    collected = []
+    driver = get_driver()
 
     try:
-        for page in range(1, max_pages + 1):  # 페이지 순회
+        for page in range(1, max_pages + 1):
             page_url = f"{category_url}?page={page}"
             print(f"[카테고리] {category_name} → {page_url}")
 
@@ -134,7 +140,7 @@ def collect_articles_from_category(category_url, max_pages=3):
             time.sleep(1)
             soup = BeautifulSoup(driver.page_source, "html.parser")
 
-            links = soup.select("a.story-card__headline")  # 기사 링크 추출
+            links = soup.select("a.story-card__headline")
             if not links:
                 print(" 기사 없음, 중단")
                 break
@@ -143,7 +149,7 @@ def collect_articles_from_category(category_url, max_pages=3):
                 href = a_tag.get("href")
                 if not href:
                     continue
-                article_url = urljoin(category_url, href)  # 절대경로
+                article_url = urljoin(category_url, href)
                 article_data = extract_article_data(driver, article_url, category_name)
                 if article_data:
                     collected.append(article_data)
@@ -153,7 +159,46 @@ def collect_articles_from_category(category_url, max_pages=3):
     finally:
         driver.quit()
 
-    return collected  # 수집된 기사 리스트 반환
+    return collected
+
+# ======================
+# [5] MongoDB에 저장
+# ======================
+def save_to_mongodb(articles):
+    try:
+        client = MongoClient("mongodb://localhost:27017/")  # MongoDB 연결
+        db = client["newsdata"]
+        collection = db["newsdata"]
+
+        total = len(articles)
+        unique_post_ids = set()
+        inserted = 0
+        skipped = 0
+
+        for article in articles:
+            post_id = article.get("post_id")
+            if not post_id:
+                skipped += 1
+                continue
+
+            unique_post_ids.add(post_id)  # post_id 중복 방지용
+
+            # 중복 여부 확인 후 upsert
+            result = collection.update_one(
+                {"post_id": post_id},
+                {"$set": article},
+                upsert=True
+            )
+            if result.upserted_id or result.modified_count:
+                inserted += 1
+
+        print(f"\n 전체 수집 기사 수: {total}건")
+        print(f" 고유 post_id 수: {len(unique_post_ids)}건")
+        print(f" 저장 또는 갱신: {inserted}건")
+        print(f" post_id 누락으로 스킵된 건수: {skipped}건")
+
+    except Exception as e:
+        print(f"[MongoDB 오류] {e}")
 
 # ======================
 # [6] 메인 함수: 병렬 수집 및 저장 실행

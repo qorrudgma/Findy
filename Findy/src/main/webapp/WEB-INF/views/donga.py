@@ -67,12 +67,16 @@ def fetch_article_content(article_url):
         date_items = soup.select('span[aria-hidden="true"]')
         last_time = date_items[-1].text.strip()
 
-        # 형태소
-        nouns, pos_result = komoran(clean_text)
-        # TF-IDF
-        tfidf_keywords = tf_idf(headline, clean_text, pos_result, nouns)
-        # TextRank
-        textrank_kw = textrank_keywords(nouns)
+        if clean_text:
+            # print(f"내용: {clean_text}\n")
+            # 형태소
+            nouns, pos_result = komoran(clean_text)
+            # TF-IDF
+            tfidf_keywords = tf_idf(headline, clean_text, pos_result, nouns)
+            # TextRank
+            textrank_kw = textrank_keywords(nouns)
+        else:
+            print(f"내용 없음{clean_text}")
 
         # 중요 내용
         sentences = [s.strip() for s in clean_text.split('.') if len(s.strip()) > 10]

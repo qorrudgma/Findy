@@ -23,14 +23,14 @@ public class TestController {
 
 	@GetMapping("/test")
 	public List<testDTO> getAllTests() {
-		log.info("!@#$ => " + testService.findAllTests());
+//		log.info("!@#$ => " + testService.findAllTests());
 
 		return testService.findAllTests();
 	}
 
 	@GetMapping("/save")
 	public String save(@RequestParam("name") String name, @RequestParam("age") int age) {
-		log.info("save()");
+//		log.info("save()");
 		testService.save(name, age);
 
 		return "saveOk";
@@ -39,7 +39,7 @@ public class TestController {
 	@GetMapping("/findByName")
 	public List<testDTO> findByName(@RequestParam String name) {
 //    	http://localhost:8485/findByName?name=test1
-		log.info("!@#$ => " + testService.findByName(name));
+//		log.info("!@#$ => " + testService.findByName(name));
 
 		return testService.findByName(name);
 	}

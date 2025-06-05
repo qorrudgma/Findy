@@ -22,8 +22,8 @@ public class testService {
 
 	public void save(String name, int age) {
 		testDTO dto = new testDTO();
-		dto.setName(name);
-		dto.setAge(age);
+//		dto.setName(name);
+//		dto.setAge(age);
 		testRepository.save(dto);
 	}
 
