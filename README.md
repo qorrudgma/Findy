@@ -14,11 +14,11 @@
 
 | 기능명 | 설명 | 기여도 |
 |--------|------|--------|
-| **웹 크롤러 기반 뉴스 수집** | Python 웹 로봇으로 다양한 뉴스 사이트에서 주기적으로 기사 수집 | 기여도 |
-| **형태소 분석 기반 키워드 처리** | OpenKoreanText 형태소 분석기로 키워드 추출 → 검색 정확도 향상 | 기여도 |
-| **TF-IDF 기반 뉴스 랭킹** | 검색어와 뉴스 간의 연관성 점수를 계산해 랭킹 정렬 | 기여도 |
-| **MongoDB 뉴스 저장소** | 크롤링한 뉴스 데이터 저장 및 관리 | 기여도 |
-| **Elasticsearch 검색 인덱싱** | 분석된 뉴스 데이터를 빠르게 검색할 수 있도록 색인 처리 | 기여도 |
+| **웹 크롤러 기반 뉴스 수집** | Python 웹 로봇으로 다양한 뉴스 사이트에서 주기적으로 기사 수집 | 상 ⭐ |
+| **형태소 분석 기반 키워드 처리** | Komoran 형태소 분석기로 키워드 추출 → 검색 정확도 향상 | 상 ⭐ |
+| **TF-IDF 및 TextRank 기반 뉴스 랭킹** | 검색어와 뉴스 간의 연관성 점수를 계산해 랭킹 정렬 | 상 ⭐ |
+| **MongoDB 뉴스 저장소** | 크롤링한 뉴스 데이터 저장 및 관리 | 상 ⭐ |
+| **Elasticsearch 검색 인덱싱** | 분석된 뉴스 데이터를 빠르게 검색할 수 있도록 색인 처리 | 상 ⭐ |
 
 ⏳ *개발 예정 기능*
 
@@ -42,20 +42,20 @@
 <img src="https://img.shields.io/badge/AJAX-0054A6?style=flat&logo=code&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/Fetch-00A9E0?style=flat&logo=javascript&logoColor=white" height="25" />
 
 - 🔍 수집 및 처리 <br>
-   <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/OKT-형태소분석기-FECA57?style=flat" height="25" /> <img src="https://img.shields.io/badge/Web%20Robot-00B8D4?style=flat&logo=web&logoColor=white" height="25" />
+   <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/Komoran-형태소분석기-00B894?style=flat" height="25" /> <img src="https://img.shields.io/badge/TextRank-키워드추출-0984e3?style=flat" height="25" /> <img src="https://img.shields.io/badge/Web%20Robot-00B8D4?style=flat&logo=web&logoColor=white" height="25" />
 
 - 🧠 검색 및 분석 <br>
    <img src="https://img.shields.io/badge/Elasticsearch-005571?style=flat&logo=elasticsearch&logoColor=white" height="25" />
 
 - 💾 데이터 저장소 <br>
-   <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white" height="25" />
+   <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/MySQL-005C84?style=flat&logo=mysql&logoColor=white" height="25" /><br>
 
 - ☁️ 실행 환경 (Infra)<br>
-<img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white" height="25" /><br>
-`Elasticsearch / Redis 실행 환경 구성용`
+<img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" height="25" /><br>
+`Elasticsearch / MongoDB / MySQL 실행 환경 구성용`
 
 - 🛠 개발 도구 & 빌드<br>
-<img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=gradle&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/Visual%20C++-00599C?style=flat&logo=visualstudio&logoColor=white" height="25" />
+<img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=gradle&logoColor=white" height="25" />
 
 
 ---
