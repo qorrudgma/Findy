@@ -55,7 +55,7 @@
 `Elasticsearch / MongoDB / MySQL 실행 환경 구성용`
 
 - 🛠 개발 도구 & 빌드<br>
-<img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=gradle&logoColor=white" height="25" />
+   <img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=gradle&logoColor=white" height="25" />
 
 
 ---
