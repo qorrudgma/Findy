@@ -1,0 +1,49 @@
+package Elasticsearch;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.transport.Transport;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.net.ssl.SSLContext;
+import java.io.File;
+import java.security.KeyStore;
+
+@Configuration
+public class ElasticsearchConfig {
+
+    @Bean
+    public ElasticsearchClient elasticsearchClient() throws Exception {
+        // p12 키스토어 로드
+        char[] password = "1234".toCharArray(); // 비밀번호 없으면 빈 배열
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        keyStore.load(new File("src/main/resources/certs/certs.p12").toURI().toURL().openStream(), password);
+
+        SSLContext sslContext = SSLContexts.custom()
+                .loadKeyMaterial(keyStore, password)
+                .loadTrustMaterial(new File("src/main/resources/certs/certs.p12"), password, new TrustSelfSignedStrategy())
+                .build();
+
+        CloseableHttpAsyncClient httpClient = HttpAsyncClients.custom()
+                .setSSLContext(sslContext)
+                .build();
+
+        RestClientBuilder builder = RestClient.builder(
+                new org.apache.http.HttpHost("localhost", 9200, "https"))
+                .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setHttpAsyncClient(httpClient));
+
+        RestClient restClient = builder.build();
+
+        Transport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+
+        return new ElasticsearchClient(transport);
+    }
+}

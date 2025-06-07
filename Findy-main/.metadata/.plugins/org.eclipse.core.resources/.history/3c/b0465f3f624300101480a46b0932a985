@@ -1,0 +1,33 @@
+package Elasticsearch;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.transport.endpoints.BooleanResponse;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
+public class ElasticTestService {
+
+    @Autowired
+    private ElasticsearchClient elasticsearchClient;
+
+    public void testConnection() {
+        try {
+        	BooleanResponse response = elasticsearchClient.ping();
+            if (response.value()) {
+//                System.out.println("Elasticsearch 연결 성공!");
+                log.info("Elasticsearch 연결 성공!");
+            } else {
+//                System.out.println("연결은 되지만 ping 실패");
+                log.info("연결은 되지만 ping 실패");
+            }
+        } catch (Exception e) {
+//            System.out.println("연결 실패!");
+            log.info("연결 실패!");
+            e.printStackTrace();
+        }
+    }
+}

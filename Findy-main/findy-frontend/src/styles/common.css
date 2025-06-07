@@ -1,0 +1,101 @@
+/* ==============================================
+   공통 기본 설정 및 유틸리티 스타일
+   ============================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 50%, #E9ECEF 100%);
+    min-height: 100vh;
+    color: #2D3748;
+    padding-top: 180px; /* 120px로 큰 로고에 맞게 조정 */
+}
+
+/* 공통 색상 변수 (CSS Custom Properties) */
+:root {
+    --primary-blue: #6B73FF;
+    --light-blue: #87CEEB;
+    --text-primary: #2D3748;
+    --text-secondary: rgba(74, 85, 104, 0.7);
+    --border-light: rgba(135, 206, 235, 0.3);
+    --background-white: #FFFFFF;
+    --background-light: #F7FAFC;
+    --shadow-light: rgba(107, 115, 255, 0.1);
+    --shadow-medium: rgba(107, 115, 255, 0.2);
+    --shadow-heavy: rgba(107, 115, 255, 0.3);
+}
+
+/* 공통 유틸리티 클래스 */
+.text-center {
+    text-align: center;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gradient-bg {
+    background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
+}
+
+.card-shadow {
+    box-shadow: 0 8px 25px var(--shadow-light);
+}
+
+.hover-lift {
+    transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+}
+
+/* 공통 애니메이션 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #5A63E8, #76C7EA);
+}
+
+/* 반응형 기본 설정 */
+@media (max-width: 1024px) {
+    body {
+        padding-top: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-top: 260px;
+    }
+} 

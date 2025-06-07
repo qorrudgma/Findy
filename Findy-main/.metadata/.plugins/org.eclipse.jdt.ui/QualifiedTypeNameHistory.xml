@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="co.elastic.clients.transport.endpoints.BooleanResponse"/>
+    <fullyQualifiedTypeName name="lombok.extern.slf4j.Slf4j"/>
+    <fullyQualifiedTypeName name="com.mongodb.client.MongoDatabase"/>
+    <fullyQualifiedTypeName name="com.mongodb.client.MongoClient"/>
+    <fullyQualifiedTypeName name="co.elastic.clients.elasticsearch.ingest.simulate.Document"/>
+    <fullyQualifiedTypeName name="org.springframework.beans.factory.annotation.Autowired"/>
+</qualifiedTypeNameHistroy>

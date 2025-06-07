@@ -1,0 +1,19 @@
+package com.boot.elasticsearch;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ElasticTestRunner implements CommandLineRunner {
+
+	private final ElasticTestService testService;
+
+	public ElasticTestRunner(ElasticTestService testService) {
+		this.testService = testService;
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		testService.testConnection();
+	}
+}

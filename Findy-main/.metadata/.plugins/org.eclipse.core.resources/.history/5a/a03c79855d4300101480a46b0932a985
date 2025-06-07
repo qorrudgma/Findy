@@ -1,0 +1,5 @@
+package Elasticsearch;
+
+public class ElasticTestRunner {
+
+}

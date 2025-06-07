@@ -1,0 +1,26 @@
+package Elasticsearch;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ElasticTestService {
+
+    @Autowired
+    private ElasticsearchClient elasticsearchClient;
+
+    public void testConnection() {
+        try {
+            boolean pingResult = elasticsearchClient.ping();
+            if (pingResult) {
+                System.out.println("✅ Elasticsearch 연결 성공!");
+            } else {
+                System.out.println("❌ 연결은 되지만 ping 실패");
+            }
+        } catch (Exception e) {
+            System.out.println("🚫 연결 실패!");
+            e.printStackTrace();
+        }
+    }
+}

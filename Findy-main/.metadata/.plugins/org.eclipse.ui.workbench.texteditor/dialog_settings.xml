@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="hasShownOverlayPopupBefore" value="true"/>
+	<section name="java.lang.Class">
+		<list key="findhistory">
+			<item value="import org.apache.hc.core5.http.Header;"/>
+		</list>
+	</section>
+</section>
