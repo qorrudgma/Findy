@@ -128,13 +128,29 @@ const Header: React.FC = () => {
     };
   }, [searchQuery]);
 
+  // 검색 버튼 클릭
   const handleSearch = (query: string) => {
+    // console.log("검색 버튼을 눌렀어요");
     // if (query.trim()) {
     //   const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';
     //   navigate(`/search?q=${encodeURIComponent(query.trim())}${categoryParam}`);
     //   setShowSuggestions(false);
     //   setSearchQuery('');
     // }
+    // controller
+    (async () => {
+        try {
+          const response = await fetch(`/api/search?keyword=${encodeURIComponent(query)}`);
+          if (response.ok) {
+            const data = await response.json();
+            console.log("받아온 데이터 =>", data);
+            // 필요하면 여기서 상태 저장도 가능: setResults(data) 등
+          }
+        } catch (error) {
+          console.error('검색 API 호출 오류:', error);
+        }
+    })();
+    // 화면 바뀌는 곳
     navigate(`/search?keyword=${query}`);
   };
 

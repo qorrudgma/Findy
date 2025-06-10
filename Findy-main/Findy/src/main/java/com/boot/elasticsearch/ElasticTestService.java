@@ -12,33 +12,49 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class ElasticTestService {
 
-   private final ElasticsearchClient client;
+	private final ElasticsearchClient client;
 
-   public ElasticTestService(ElasticsearchClient client) {
-      this.client = client;
-   }
+	public ElasticTestService(ElasticsearchClient client) {
+		this.client = client;
+	}
 
-   public List<Map<String, Object>> searchNews() throws IOException {
-      SearchRequest request = new SearchRequest.Builder()
-            .index("newsdata.newsdata")
-            .query(q -> q.matchAll(m -> m))
-            .size(100)
-            .build();
+	public List<Map<String, Object>> searchNews() throws IOException {
+		SearchRequest request = new SearchRequest.Builder().index("newsdata.newsdata").query(q -> q.matchAll(m -> m))
+				.size(100).build();
 
-      SearchResponse<Map> response = client.search(request, Map.class);
-      List<Hit<Map>> hits = response.hits().hits();
+		SearchResponse<Map> response = client.search(request, Map.class);
+		List<Hit<Map>> hits = response.hits().hits();
 
-      List<Map<String, Object>> results = new ArrayList<>();
-      for (Hit<Map> hit : hits) {
-         results.add(hit.source());
-      }
+		List<Map<String, Object>> results = new ArrayList<>();
+		for (Hit<Map> hit : hits) {
+			results.add(hit.source());
+//			log.info("" + hit.source());
+		}
 
-      return results;
-   }
+		return results;
+	}
+
+	public List<Map<String, Object>> searchNews(String keyword) throws IOException {
+		SearchRequest request = new SearchRequest.Builder().index("newsdata.newsdata")
+				.query(q -> q.match(m -> m.field("headline").query(keyword))).build();
+
+		SearchResponse<Map> response = client.search(request, Map.class);
+		List<Hit<Map>> hits = response.hits().hits();
+
+		List<Map<String, Object>> results = new ArrayList<>();
+		for (Hit<Map> hit : hits) {
+			results.add(hit.source());
+//			log.info("" + hit.source());
+		}
+
+		return results;
+	}
 
 //   public void searchNews() throws IOException {
 //      System.out.println("뜨나1");

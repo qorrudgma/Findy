@@ -1,13 +1,15 @@
 package com.boot.controller;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boot.dto.AutocompleteDTO;
+import com.boot.elasticsearch.ElasticTestService;
 import com.boot.service.AutocompleteService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AutocompleteController {
 
 	private final AutocompleteService autocompleteService;
+
+	private final ElasticTestService elasticTestService;
 
 	/**
 	 * 자동완성 API 엔드포인트
@@ -32,10 +36,12 @@ public class AutocompleteController {
 		return autocompleteService.getSuggestions(query);
 	}
 
-	@RequestMapping("/search")
-	public String getKeword(@RequestParam("keyword") String keyword) {
+	@GetMapping("/search")
+	public List<Map<String, Object>> getKeword(@RequestParam("keyword") String keyword) throws IOException {
 		log.info("@# keyword => " + keyword);
+		List<Map<String, Object>> news_data = elasticTestService.searchNews(keyword);
+		log.info("!@# news_data => " + news_data);
 
-		return "SearchPage";
+		return news_data;
 	}
 }

@@ -186,7 +186,9 @@ const HomePage: React.FC = () => {
           {/* 왼쪽 여백 공간 */}
           <div className="side-space left-space">
           {/* <img src="/images/jjh1.jpg" alt="Findy Logo" className="side-space-image" /> */}
-            <p>광고 또는 추가 콘텐츠 영역</p>
+            <p>광고 또는 추가 콘텐츠 영역
+              {/* <img src ="https://flexible.img.hani.co.kr/flexible/normal/900/640/imgdb/original/2025/0609/20250609502994.jpg" alt="img_test"></img> */}
+            </p>
           </div>
           
           {/* 뉴스 그리드 */}
