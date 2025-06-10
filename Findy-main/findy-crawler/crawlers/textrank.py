@@ -10,7 +10,9 @@ def textrank_keywords(nouns, window_size=4, top_k=10):
                 graph.add_edge(nouns[i], nouns[j], weight=1.0)
     scores = nx.pagerank(graph)
     ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-    return ranked[:top_k]
+    # return ranked[:top_k]
+    # 키워드만 추출
+    return [keyword for keyword, _ in ranked[:top_k]]
 
 def textrank_summarize(sentences, top_k=3):
     vectorizer = TfidfVectorizer()
@@ -26,3 +28,5 @@ def textrank_summarize(sentences, top_k=3):
     scores = nx.pagerank(similarity_graph)
     ranked_sentences = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     return [sentences[idx] for idx, _ in ranked_sentences[:top_k]]
+
+

@@ -32,4 +32,6 @@ def tf_idf(headline, text, pos_result, nouns):
         tfidf_keywords.append((word, final_score))
     tfidf_keywords = sorted(tfidf_keywords, key=lambda x: x[1], reverse=True)
 
-    return tfidf_keywords[:10]
+    # return tfidf_keywords[:10]
+    # 키워드만 추출
+    return [word for word, _ in tfidf_keywords[:10]]

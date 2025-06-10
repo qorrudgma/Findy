@@ -3,6 +3,7 @@ package com.boot.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,17 +18,24 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AutocompleteController {
 
-    private final AutocompleteService autocompleteService;
-    
-    /**
-     * 자동완성 API 엔드포인트
-     * 
-     * @param q 검색 쿼리
-     * @return 자동완성 제안 목록
-     */
-    @GetMapping("/api/autocomplete")
-    public List<AutocompleteDTO> getAutocompleteSuggestions(@RequestParam("q") String query) {
-        log.info("자동완성 API 요청: {}", query);
-        return autocompleteService.getSuggestions(query);
-    }
-} 
+	private final AutocompleteService autocompleteService;
+
+	/**
+	 * 자동완성 API 엔드포인트
+	 * 
+	 * @param q 검색 쿼리
+	 * @return 자동완성 제안 목록
+	 */
+	@GetMapping("/api/autocomplete")
+	public List<AutocompleteDTO> getAutocompleteSuggestions(@RequestParam("q") String query) {
+//        log.info("자동완성 API 요청: {}", query);
+		return autocompleteService.getSuggestions(query);
+	}
+
+	@RequestMapping("/search")
+	public String getKeword(@RequestParam("keyword") String keyword) {
+		log.info("@# keyword => " + keyword);
+
+		return "SearchPage";
+	}
+}

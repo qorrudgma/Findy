@@ -2,7 +2,8 @@ from pymongo import MongoClient
 
 def save_to_mongodb(articles):
     try:
-        client = MongoClient("mongodb://localhost:27017/")  # MongoDB 연결
+        # client = MongoClient("mongodb://localhost:27017/")  # MongoDB 연결
+        client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000")  # MongoDB 연결
         db = client["newsdata"]  # DB 선택
         collection = db["newsdata"]  # 컬렉션 선택
 

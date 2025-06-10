@@ -97,3 +97,4 @@ tests/
 *.docx#
 *.xlsx#
 ~$*
+/.metadata/

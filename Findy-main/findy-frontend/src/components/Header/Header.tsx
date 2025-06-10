@@ -129,12 +129,13 @@ const Header: React.FC = () => {
   }, [searchQuery]);
 
   const handleSearch = (query: string) => {
-    if (query.trim()) {
-      const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';
-      navigate(`/search?q=${encodeURIComponent(query.trim())}${categoryParam}`);
-      setShowSuggestions(false);
-      setSearchQuery('');
-    }
+    // if (query.trim()) {
+    //   const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';
+    //   navigate(`/search?q=${encodeURIComponent(query.trim())}${categoryParam}`);
+    //   setShowSuggestions(false);
+    //   setSearchQuery('');
+    // }
+    navigate(`/search?keyword=${query}`);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

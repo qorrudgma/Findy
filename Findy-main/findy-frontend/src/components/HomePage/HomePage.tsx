@@ -106,6 +106,7 @@ const HomePage: React.FC = () => {
       
       // 실제 API 호출 시도
       const response = await fetch('/api/search?q=뉴스&page=0&size=10');
+      console.log("#####################api 호출을 시도했음.######################");
       
       if (response.ok) {
         const data = await response.json();
