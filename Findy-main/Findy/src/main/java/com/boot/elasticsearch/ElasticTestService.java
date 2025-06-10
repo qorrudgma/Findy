@@ -1,7 +1,9 @@
 package com.boot.elasticsearch;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -14,27 +16,51 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 @Service
 public class ElasticTestService {
 
-	private final ElasticsearchClient client;
+   private final ElasticsearchClient client;
 
-	public ElasticTestService(ElasticsearchClient client) {
-		this.client = client;
-	}
+   public ElasticTestService(ElasticsearchClient client) {
+      this.client = client;
+   }
 
-	public void searchNews() throws IOException {
-		System.out.println("뜨나1");
-		SearchRequest request = new SearchRequest.Builder().index("newsdata.newsdata") // 색인 이름
-//				.query(q -> q.match(m -> m.field("headline").query("경희대"))).build();
-//				.query(q -> q.matchPhrase(m -> m.field("headline").query("작년"))).build();
-				// 전체 조회
-				.size(1000).query(q -> q.matchAll(m -> m)).build();
+   public List<Map<String, Object>> searchNews() throws IOException {
+      SearchRequest request = new SearchRequest.Builder()
+            .index("newsdata.newsdata")
+            .query(q -> q.matchAll(m -> m))
+            .size(100)
+            .build();
 
-		SearchResponse<Object> response = client.search(request, Object.class);
-		List<Hit<Object>> hits = response.hits().hits();
+      SearchResponse<Map> response = client.search(request, Map.class);
+      List<Hit<Map>> hits = response.hits().hits();
 
-		for (Hit<Object> hit : hits) {
-//			System.out.println("!@#$" + hit.source());
-		}
-	}
+      List<Map<String, Object>> results = new ArrayList<>();
+      for (Hit<Map> hit : hits) {
+         results.add(hit.source());
+      }
+
+      return results;
+   }
+
+//   public void searchNews() throws IOException {
+//      System.out.println("뜨나1");
+////      SearchRequest request = new SearchRequest.Builder().index("newsdata.newsdata") // 색인 이름
+////            .query(q -> q.match(m -> m.field("headline").query("공정위"))).build();
+//
+//
+//      //모든 데이터 출력
+//      SearchRequest request = new SearchRequest.Builder()
+//            .index("newsdata.newsdata")
+//            .query(q -> q.matchAll(m -> m))  // 전체 문서 검색
+//            .size(100)  // 최대 100건까지 받도록 설정
+//            .build();
+//
+//
+//      SearchResponse<Object> response = client.search(request, Object.class);
+//      List<Hit<Object>> hits = response.hits().hits();
+//
+//      for (Hit<Object> hit : hits) {
+//         System.out.println("!@#$" + hit.source());
+//      }
+//   }
 }
 //인증서 있는 버전
 //import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -53,7 +79,7 @@ public class ElasticTestService {
 //
 //    public void testConnection() {
 //        try {
-//        	BooleanResponse response = elasticsearchClient.ping();
+//           BooleanResponse response = elasticsearchClient.ping();
 //            if (response.value()) {
 //                System.out.println("Elasticsearch 연결 성공!");
 ////                log.info("Elasticsearch 연결 성공!");

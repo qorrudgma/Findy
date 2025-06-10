@@ -103,20 +103,27 @@ const HomePage: React.FC = () => {
   const loadLatestNews = async () => {
     try {
       setIsLoading(true);
-      
-      // 실제 API 호출 시도
-      const response = await fetch('/api/search?q=뉴스&page=0&size=10');
-      console.log("#####################api 호출을 시도했음.######################");
-      
+
+      const response = await fetch("http://localhost:8485/api/search?q=뉴스&page=0&size=10");
       if (response.ok) {
-        const data = await response.json();
-        setNewsData(data.content || dummyNews);
+        const rawData = await response.json();
+
+        const mappedData: NewsArticle[] = rawData.map((item: any) => ({
+          id: item.id || item.url,  // 없으면 URL을 임시 ID로 사용
+          category: item.category,
+          title: item.headline,  // 🔁 매핑!
+          content: item.content,
+          publishedAt: item.time,  // 🔁 매핑!
+          tags: item.tags || [],  // 누락 시 빈 배열
+          url: item.url,
+        }));
+
+        setNewsData(mappedData);
       } else {
         throw new Error('API 호출 실패');
       }
     } catch (error) {
       console.error('뉴스 로드 오류:', error);
-      // API 실패 시 더미 데이터 사용
       setNewsData(dummyNews);
     } finally {
       setIsLoading(false);
