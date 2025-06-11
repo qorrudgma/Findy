@@ -1,9 +1,22 @@
 from pymongo import MongoClient
+from pymongo.errors import ServerSelectionTimeoutError
 
 def save_to_mongodb(articles):
+    print("----------------디비 연결 시작----------------")
+    try:
+        # client = MongoClient("mongodb://mongoadmin:1234@localhost:27017/?authSource=admin&replicaSet=rs0", serverSelectionTimeoutMS=5000)
+        client = MongoClient("mongodb://mongoadmin:1234@localhost:27017/?authSource=admin&replicaSet=rs0&directConnection=true", serverSelectionTimeoutMS=5000)
+        info = client.server_info()
+        print("MongoDB 연결 성공:", info["version"])
+    except ServerSelectionTimeoutError as e:
+        print("MongoDB 연결 실패:", e)
+    print("==================디비 저장 시작==================")
     try:
         # client = MongoClient("mongodb://localhost:27017/")  # MongoDB 연결
-        client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000")  # MongoDB 연결
+        # client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000")  # MongoDB 연결
+        # client = MongoClient("mongodb://mongoadmin:1234@localhost:27017/newsdata?authSource=admin&replicaSet=rs0")  # MongoDB 보안 테스트
+        client = MongoClient("mongodb://mongoadmin:1234@localhost:27017/?authSource=admin&replicaSet=rs0&directConnection=true", serverSelectionTimeoutMS=5000)  # MongoDB 보안 테스트
+
         db = client["newsdata"]  # DB 선택
         collection = db["newsdata"]  # 컬렉션 선택
 
@@ -37,3 +50,14 @@ def save_to_mongodb(articles):
 
     except Exception as e:
         print(f"[MongoDB 오류] {e}")
+
+# test
+# def test():
+#     try:
+#         # client = MongoClient("mongodb://mongoadmin:1234@localhost:27017/?authSource=admin&replicaSet=rs0", serverSelectionTimeoutMS=5000)
+#         client = MongoClient("mongodb://mongoadmin:1234@localhost:27017/?authSource=admin&replicaSet=rs0&directConnection=true", serverSelectionTimeoutMS=5000)
+#         info = client.server_info()
+#         print("MongoDB 연결 성공:", info["version"])
+#     except ServerSelectionTimeoutError as e:
+#         print("MongoDB 연결 실패:", e)
+# test()

@@ -113,6 +113,7 @@ categories = ["Economy", "Opinion", "Society", "Health", "Sports", "Culture", "E
 # categories = ["Economy"]
 data = []
 for category in categories:
+    print("donga - ", category)
     # 반복할 페이지 수
     for i in range(10):
         headlines = fetch_headlines(category, i)

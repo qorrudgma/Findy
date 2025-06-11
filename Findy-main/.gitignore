@@ -1,4 +1,5 @@
 # 🗑️ Findy 프로젝트 .gitignore
+.metadata/
 
 # ===== Java/Spring Boot =====
 *.class

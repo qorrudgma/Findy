@@ -10,3 +10,7 @@ networkx             파이썬의 그래프 이론 및 네트워크 분석 라�
 pymongo              MongoDB
 komoran              komoran
 selenium             웹 브라우저 자동 조작
+
+npm install @fortawesome/fontawesome-svg-core
+npm install @fortawesome/free-solid-svg-icons  
+npm install @fortawesome/react-fontawesome

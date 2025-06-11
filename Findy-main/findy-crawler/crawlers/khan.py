@@ -104,6 +104,7 @@ categories = ["economy", "opinion", "national", "life/health/articles", "culture
 # categories = ["economy"]
 data = []
 for category in categories:
+    print("khan - ", category)
     # 반복할 페이지 수
     for i in range(10):
         headlines = fetch_headlines(category, i+1)

@@ -90,6 +90,7 @@ data = []
 print("=== 연합뉴스 크롤링 시작 ===")
 
 for category in categories:
+    print("yna - ", category)
     print(f"\n[카테고리] {category} 수집 중...")
     headlines = fetch_headlines(category, 1)  # 첫 페이지만
 
