@@ -1,0 +1,121 @@
+
+[2025-06-11 12:16:11.616885] === 전체 크롤링 시작 ===
+[2025-06-11 12:16:11.616912] ▶ chosun.py 실행 시작
+[2025-06-11 12:16:11.645621]  chosun.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', 'chosun.py']' returned non-zero exit status 2.
+[2025-06-11 12:16:11.651870] ▶ donga.py 실행 시작
+[2025-06-11 12:16:11.683238]  donga.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', 'donga.py']' returned non-zero exit status 2.
+[2025-06-11 12:16:11.683869] ▶ edaily.py 실행 시작
+[2025-06-11 12:16:11.709598]  edaily.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', 'edaily.py']' returned non-zero exit status 2.
+[2025-06-11 12:16:11.710190] ▶ hani.py 실행 시작
+[2025-06-11 12:16:11.735441]  hani.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', 'hani.py']' returned non-zero exit status 2.
+[2025-06-11 12:16:11.736005] ▶ khan.py 실행 시작
+[2025-06-11 12:16:11.762864]  khan.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', 'khan.py']' returned non-zero exit status 2.
+[2025-06-11 12:16:11.763351] === 전체 크롤링 종료 ===
+
+[2025-06-11 12:17:44.946493] === 전체 크롤링 시작 ===
+[2025-06-11 12:17:44.946514] ▶ \findy-crawler\crawlers\chosun.py 실행 시작
+[2025-06-11 12:17:44.969172]  \findy-crawler\crawlers\chosun.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', '\\findy-crawler\\crawlers\\chosun.py']' returned non-zero exit status 2.
+[2025-06-11 12:17:44.974710] ▶ \findy-crawler\crawlers\donga.py 실행 시작
+[2025-06-11 12:17:44.998163]  \findy-crawler\crawlers\donga.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', '\\findy-crawler\\crawlers\\donga.py']' returned non-zero exit status 2.
+[2025-06-11 12:17:44.998711] ▶ \findy-crawler\crawlers\edaily.py 실행 시작
+[2025-06-11 12:17:45.020010]  \findy-crawler\crawlers\edaily.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', '\\findy-crawler\\crawlers\\edaily.py']' returned non-zero exit status 2.
+[2025-06-11 12:17:45.020610] ▶ \findy-crawler\crawlers\hani.py 실행 시작
+[2025-06-11 12:17:45.042064]  \findy-crawler\crawlers\hani.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', '\\findy-crawler\\crawlers\\hani.py']' returned non-zero exit status 2.
+[2025-06-11 12:17:45.042550] ▶ \findy-crawler\crawlers\khan.py 실행 시작
+[2025-06-11 12:17:45.064424]  \findy-crawler\crawlers\khan.py 실행 실패
+Traceback (most recent call last):
+  File "c:\project\Findy\Findy-main\findy-crawler\crawlers\launcher.py", line 29, in <module>
+    subprocess.run(["python", file], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\user\AppData\Local\Programs\Python\Python313\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python', '\\findy-crawler\\crawlers\\khan.py']' returned non-zero exit status 2.
+[2025-06-11 12:17:45.064885] === 전체 크롤링 종료 ===
+
+[2025-06-11 12:22:49.622180] === 전체 크롤링 시작 ===
+[2025-06-11 12:22:49.622201] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py 실행 시작
+[2025-06-11 12:54:33.031396]  C:/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py 실행 완료
+[2025-06-11 12:54:33.031446] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/donga.py 실행 시작
+[2025-06-11 13:09:39.507179]  C:/project/Findy/Findy-main/findy-crawler/crawlers/donga.py 실행 완료
+[2025-06-11 13:09:39.507207] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py 실행 시작
+[2025-06-11 13:16:11.102746]  C:/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py 실행 완료
+[2025-06-11 13:16:11.102763] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/hani.py 실행 시작
+[2025-06-11 13:32:23.530801]  C:/project/Findy/Findy-main/findy-crawler/crawlers/hani.py 실행 완료
+[2025-06-11 13:32:23.530822] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/khan.py 실행 시작
+[2025-06-11 13:46:41.264797]  C:/project/Findy/Findy-main/findy-crawler/crawlers/khan.py 실행 완료
+[2025-06-11 13:46:41.264828] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py 실행 시작
+[2025-06-11 15:53:22.342538]  C:/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py 실행 완료
+[2025-06-11 15:53:22.342658] === 전체 크롤링 종료 ===

@@ -30,6 +30,7 @@ public class AutocompleteController {
 	 * @param q 검색 쿼리
 	 * @return 자동완성 제안 목록
 	 */
+	// 자동완성
 	@GetMapping("/api/autocomplete")
 	public List<AutocompleteDTO> getAutocompleteSuggestions(@RequestParam("q") String query) {
 //        log.info("자동완성 API 요청: {}", query);
@@ -39,7 +40,7 @@ public class AutocompleteController {
 	@GetMapping("/search")
 	public List<Map<String, Object>> getKeword(@RequestParam("keyword") String keyword) throws IOException {
 		log.info("@# keyword => " + keyword);
-		List<Map<String, Object>> news_data = elasticTestService.searchNews(keyword);
+		List<Map<String, Object>> news_data = elasticTestService.searchNews("keyword");
 		log.info("!@# news_data => " + news_data);
 
 		return news_data;

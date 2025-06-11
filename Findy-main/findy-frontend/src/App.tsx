@@ -11,6 +11,8 @@ import AdPolicy from './components/AdPolicy/AdPolicy';
 import FAQ from './components/FAQ/FAQ';
 import FAQDetail from './components/FAQDetail/FAQDetail';
 import ContactForm from './components/ContactForm/ContactForm';
+import ScrollToTopButton from './components/ScrollToTopButton/ScrollToTopButton';
+import SettingsButton from './components/SettingsButton/SettingsButton';
 import './styles/common.css';
 import './styles/App.css';
 
@@ -33,6 +35,8 @@ function App() {
           </Routes>
         </main>
         <Footer />
+        <ScrollToTopButton />
+        <SettingsButton />
       </div>
     </Router>
   );

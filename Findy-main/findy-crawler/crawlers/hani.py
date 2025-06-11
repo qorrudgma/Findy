@@ -84,11 +84,11 @@ def fetch_article_content(article_url):
         return None
 
 # 실행
-# categories = ["economy", "opinion", "society", "health", "sports", "culture"]
-categories = ["economy"]
+categories = ["economy", "opinion", "society", "health", "sports", "culture"]
+# categories = ["economy"]
 data = []
 for category in categories:
-    for i in range(1):
+    for i in range(10):
         headlines = fetch_headlines(category, i + 1)
         if headlines:
             for idx, item in enumerate(headlines, start=1):

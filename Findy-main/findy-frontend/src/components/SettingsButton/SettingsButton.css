@@ -1,0 +1,78 @@
+.settings-button {
+  position: fixed;
+  right: 30px;
+  bottom: 95px; /* Top 버튼(50px + 30px 마진) 위에 배치 */
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 10%, #ffffff 90%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  opacity: 0.9;
+}
+
+.settings-button:hover {
+  background: linear-gradient(135deg, #ffffff 10%, #667eea 90%);
+  transform: translateY(-2px) rotate(90deg); /* 호버 시 회전 효과 */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+}
+
+.settings-button:active {
+  transform: translateY(0) rotate(90deg);
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); */
+}
+
+.settings-button:focus {
+  outline: none;
+  /* box-shadow: 0 0 0 3px rgba(252, 182, 159, 0.3); */
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .settings-button {
+    width: 45px;
+    height: 45px;
+    right: 20px;
+    bottom: 80px; /* 모바일에서 Top 버튼(45px + 20px 마진) 위에 배치 */
+    font-size: 16px;
+  }
+}
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+.settings-button {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 설정 아이콘 회전 애니메이션 */
+.settings-button:hover .fa-cog {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} 

@@ -129,36 +129,36 @@ category_mapping = {
 }
 
 # 건강은 없음
-# categories = [
-#     # 경제
-#     "economy/economic-policy",
-#     "economy/macro",
-#     "economy/forex",
-#     "economy/tax",
-#     "economy/job-welfare",
-#     # 오피니언
-#     "opinion",
-#     # 사회
-#     "society/incidents",
-#     "society/education",
-#     "society/administration",
-#     "society/local",
-#     "society/employment",
-#     # 스포츠
-#     "sports",
-#     # 문화/연예
-#     "culture",
-#     "entertainment/2001",
-#     "entertainment/2002-2003",
-#     "entertainment/2004",
-#     "entertainment/2005",
-#     "entertainment/2006"
-# ]
-categories = ["economy/economic-policy"]
+categories = [
+    # 경제
+    "economy/economic-policy",
+    "economy/macro",
+    "economy/forex",
+    "economy/tax",
+    "economy/job-welfare",
+    # 오피니언
+    "opinion",
+    # 사회
+    "society/incidents",
+    "society/education",
+    "society/administration",
+    "society/local",
+    "society/employment",
+    # 스포츠
+    "sports",
+    # 문화/연예
+    "culture",
+    "entertainment/2001",
+    "entertainment/2002-2003",
+    "entertainment/2004",
+    "entertainment/2005",
+    "entertainment/2006"
+]
+# categories = ["economy/economic-policy"]
 data = []
 for category in categories:
     # 반복할 페이지 수
-    for i in range(1):
+    for i in range(10):
         headlines = fetch_headlines(category, i)
 
         if headlines:

@@ -8,14 +8,8 @@
 }
 
 /* 메인 콘텐츠 */
-.main-container{
-    margin-top: 0 !important;
-}
-
 .main-content {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-    max-width: 65%;
+    max-width: 75%;
     margin: 0 auto;
     padding: 2rem;
     margin-top: 1rem;
@@ -210,8 +204,6 @@
 
 @media (max-width: 768px) {
     .main-content {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
         padding: 1rem;
         max-width: 95%;
     }

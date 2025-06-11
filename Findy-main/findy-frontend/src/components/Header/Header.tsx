@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass, faBell, faBookmark, faGear } from '@fortawesome/free-solid-svg-icons';
 import './Header.css';
 
 interface SearchSuggestion {
@@ -25,16 +27,16 @@ const Header: React.FC = () => {
   ];
 
   // 더미 자동완성 데이터 사전
-  const dummyAutocompleteDict: Record<string, string[]> = {
-    '강': ['강아지', '강남', '강물', '강원도', '강철', '강하다', '강남역', '강의', '강변', '강원대학교'],
-    '경': ['경제', '경기도', '경찰', '경복궁', '경영', '경기', '경쟁', '경력', '경상도', '경험'],
-    '서': ['서울', '서비스', '서양', '서점', '서쪽', '서버', '서류', '서명', '서초', '서민'],
-    '부': ['부산', '부동산', '부모', '부분', '부부', '부장', '부족', '부정', '부자', '부대'],
-    '정': ['정치', '정부', '정책', '정신', '정상', '정보', '정수', '정확', '정리', '정류장'],
-    '대': ['대학', '대한민국', '대통령', '대구', '대기업', '대전', '대형', '대화', '대상', '대회'],
-    '사': ['사람', '사회', '사건', '사진', '사업', '사랑', '사고', '사무실', '사용', '사이'],
-    '일': ['일본', '일자리', '일상', '일요일', '일정', '일기', '일반', '일식', '일년', '일부']
-  };
+  // const dummyAutocompleteDict: Record<string, string[]> = {
+  //   '강': ['강아지', '강남', '강물', '강원도', '강철', '강하다', '강남역', '강의', '강변', '강원대학교'],
+  //   '경': ['경제', '경기도', '경찰', '경복궁', '경영', '경기', '경쟁', '경력', '경상도', '경험'],
+  //   '서': ['서울', '서비스', '서양', '서점', '서쪽', '서버', '서류', '서명', '서초', '서민'],
+  //   '부': ['부산', '부동산', '부모', '부분', '부부', '부장', '부족', '부정', '부자', '부대'],
+  //   '정': ['정치', '정부', '정책', '정신', '정상', '정보', '정수', '정확', '정리', '정류장'],
+  //   '대': ['대학', '대한민국', '대통령', '대구', '대기업', '대전', '대형', '대화', '대상', '대회'],
+  //   '사': ['사람', '사회', '사건', '사진', '사업', '사랑', '사고', '사무실', '사용', '사이'],
+  //   '일': ['일본', '일자리', '일상', '일요일', '일정', '일기', '일반', '일식', '일년', '일부']
+  // };
 
   // 자동완성 데이터 로드
   const loadSuggestions = async (query: string) => {
@@ -56,27 +58,28 @@ const Header: React.FC = () => {
       console.error('자동완성 로드 오류:', error);
       
       // 더미 자동완성 데이터 생성
-      let dummySuggestions: SearchSuggestion[] = [];
+      // let dummySuggestions: SearchSuggestion[] = [];
       
       // 한글 첫 글자 기준으로 매칭되는 단어들 찾기
-      const firstChar = query.charAt(0);
-      if (dummyAutocompleteDict[firstChar]) {
-        // 입력된 검색어로 시작하는 단어들만 필터링
-        dummySuggestions = dummyAutocompleteDict[firstChar]
-          .filter(word => word.startsWith(query))
-          .map(word => ({ query: word }));
-      }
+      // const firstChar = query.charAt(0);
+      // if (dummyAutocompleteDict[firstChar]) {
+      //   // 입력된 검색어로 시작하는 단어들만 필터링
+      //   dummySuggestions = dummyAutocompleteDict[firstChar]
+      //     .filter(word => word.startsWith(query))
+      //     .map(word => ({ query: word }));
+      // }
       
       // 기본 더미 데이터 추가
-      if (dummySuggestions.length === 0) {
-        dummySuggestions = [
-          { query: `${query} 뉴스` },
-          { query: `${query} 정치` },
-          { query: `${query} 경제` },
-        ];
-      }
+      // if (dummySuggestions.length === 0) {
+      //   dummySuggestions = [
+      //     { query: `${query} 뉴스` },
+      //     { query: `${query} 정치` },
+      //     { query: `${query} 경제` },
+      //   ];
+      // }
       
-      setSuggestions(dummySuggestions);
+      // setSuggestions(dummySuggestions);
+      setSuggestions([]);
     }
   };
 
@@ -90,7 +93,8 @@ const Header: React.FC = () => {
       }
     } catch (error) {
       console.error('인기 검색어 로드 오류:', error);
-      setPopularSearches(['경제', '정치', '사회', 'AI', '스포츠']);
+      // setPopularSearches(['경제', '정치', '사회', 'AI', '스포츠']);
+      setPopularSearches([]);
     }
   };
 
@@ -128,30 +132,13 @@ const Header: React.FC = () => {
     };
   }, [searchQuery]);
 
-  // 검색 버튼 클릭
   const handleSearch = (query: string) => {
-    // console.log("검색 버튼을 눌렀어요");
-    // if (query.trim()) {
-    //   const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';
-    //   navigate(`/search?q=${encodeURIComponent(query.trim())}${categoryParam}`);
-    //   setShowSuggestions(false);
-    //   setSearchQuery('');
-    // }
-    // controller
-    (async () => {
-        try {
-          const response = await fetch(`/api/search?keyword=${encodeURIComponent(query)}`);
-          if (response.ok) {
-            const data = await response.json();
-            console.log("받아온 데이터 =>", data);
-            // 필요하면 여기서 상태 저장도 가능: setResults(data) 등
-          }
-        } catch (error) {
-          console.error('검색 API 호출 오류:', error);
-        }
-    })();
-    // 화면 바뀌는 곳
-    navigate(`/search?keyword=${query}`);
+    if (query.trim()) {
+      const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';
+      navigate(`/search?q=${encodeURIComponent(query.trim())}${categoryParam}`);
+      setShowSuggestions(false);
+      setSearchQuery('');
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -265,9 +252,9 @@ const Header: React.FC = () => {
                     onFocus={() => searchQuery.length >= 1 && setShowSuggestions(true)}
                     autoComplete="off"
                   />
-                  <button type="submit" className="search-btn">
-                    🔍
-                  </button>
+                <button type="submit" className="search-btn">
+                  <FontAwesomeIcon icon={faMagnifyingGlass} />
+                </button>
                 </div>
                 
                 {/* 자동완성 드롭다운 */}
@@ -296,15 +283,15 @@ const Header: React.FC = () => {
           {/* 오른쪽 영역 */}
           <div className="header-right">
             <div className="user-actions">
-              <button className="action-btn" title="알림">
-                🔔
+              {/* <button className="action-btn" title="알림">
+                <FontAwesomeIcon icon={faBell} />
               </button>
               <button className="action-btn" title="북마크">
-                📚
+                <FontAwesomeIcon icon={faBookmark} />
               </button>
               <button className="action-btn" title="설정">
-                ⚙️
-              </button>
+                <FontAwesomeIcon icon={faGear} />
+              </button> */}
             </div>
           </div>
         </div>

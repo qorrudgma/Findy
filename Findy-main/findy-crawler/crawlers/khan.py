@@ -100,12 +100,12 @@ def clean_datetime(text):
 category_mapping = {
     "life/health/articles": "health"
 }
-# categories = ["economy", "opinion", "national", "life/health/articles", "culture"]
-categories = ["economy"]
+categories = ["economy", "opinion", "national", "life/health/articles", "culture"]
+# categories = ["economy"]
 data = []
 for category in categories:
     # 반복할 페이지 수
-    for i in range(1):
+    for i in range(10):
         headlines = fetch_headlines(category, i+1)
 
         if headlines:

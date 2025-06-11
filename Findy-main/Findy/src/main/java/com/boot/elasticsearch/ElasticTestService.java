@@ -50,16 +50,53 @@ public class ElasticTestService {
 		List<Map<String, Object>> results = new ArrayList<>();
 		for (Hit<Map> hit : hits) {
 			results.add(hit.source());
-//			log.info("" + hit.source());
+//         log.info("" + hit.source());
 		}
 
 		return results;
 	}
 
+	// 메인페이지에서 카테고리 클릭시, 출력해주기 위한 메소드
+
+	private List<Map<String, Object>> extractHits(SearchResponse<Map> response) {
+		List<Map<String, Object>> results = new ArrayList<>();
+		for (Hit<Map> hit : response.hits().hits()) {
+			results.add(hit.source());
+		}
+		return results;
+	}
+
+	public List<Map<String, Object>> searchWithCategory(String keyword, String category, int page, int size) {
+		try {
+			SearchRequest.Builder requestBuilder = new SearchRequest.Builder().index("newsdata.newsdata")
+					.from(page * size).size(size);
+
+			if (keyword != null && !keyword.isEmpty() && category != null && !category.isEmpty()) {
+				requestBuilder.query(q -> q.bool(b -> b.must(m1 -> m1.match(m -> m.field("headline").query(keyword)))
+						.filter(f -> f.term(t -> t.field("category.keyword").value(category)))));
+			} else if (keyword != null && !keyword.isEmpty()) {
+				requestBuilder.query(q -> q.match(m -> m.field("headline").query(keyword)));
+			} else if (category != null && !category.isEmpty()) {
+				requestBuilder.query(q -> q.term(t -> t.field("category.keyword").value(category)));
+			} else {
+				requestBuilder.query(q -> q.matchAll(m -> m));
+			}
+
+			SearchResponse<Map> response = client.search(requestBuilder.build(), Map.class);
+			return extractHits(response);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
+
+}
+
 //   public void searchNews() throws IOException {
 //      System.out.println("뜨나1");
-////      SearchRequest request = new SearchRequest.Builder().index("newsdata.newsdata") // 색인 이름
-////            .query(q -> q.match(m -> m.field("headline").query("공정위"))).build();
+/// /      SearchRequest request = new SearchRequest.Builder().index("newsdata.newsdata") // 색인 이름
+/// /            .query(q -> q.match(m -> m.field("headline").query("공정위"))).build();
 //
 //
 //      //모든 데이터 출력
@@ -77,7 +114,7 @@ public class ElasticTestService {
 //         System.out.println("!@#$" + hit.source());
 //      }
 //   }
-}
+
 //인증서 있는 버전
 //import co.elastic.clients.elasticsearch.ElasticsearchClient;
 //import co.elastic.clients.transport.endpoints.BooleanResponse;
@@ -98,7 +135,7 @@ public class ElasticTestService {
 //           BooleanResponse response = elasticsearchClient.ping();
 //            if (response.value()) {
 //                System.out.println("Elasticsearch 연결 성공!");
-////                log.info("Elasticsearch 연결 성공!");
+/// /                log.info("Elasticsearch 연결 성공!");
 //            } else {
 //                System.out.println("연결은 되지만 ping 실패");
 ////                log.info("연결은 되지만 ping 실패");
