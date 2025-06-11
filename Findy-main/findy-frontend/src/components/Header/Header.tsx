@@ -132,6 +132,7 @@ const Header: React.FC = () => {
     };
   }, [searchQuery]);
 
+  // 여기서 검색이 뭐로 할지 넘겨줌
   const handleSearch = (query: string) => {
     if (query.trim()) {
       const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';

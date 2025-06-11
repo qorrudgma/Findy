@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.boot.elasticsearch.ElasticService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class NewsSearchController {
@@ -30,6 +33,8 @@ public class NewsSearchController {
 		// 간단한 형태로 리턴 구조 통일
 		Map<String, Object> result = Map.of("content", newsList, "totalElements", newsList.size(), "totalPages", 1,
 				"currentPage", page);
+		log.info("result => "+result);
+		
 		return ResponseEntity.ok(result);
 	}
 

@@ -119,3 +119,18 @@ subprocess.CalledProcessError: Command '['python', '\\findy-crawler\\crawlers\\k
 [2025-06-11 13:46:41.264828] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py 실행 시작
 [2025-06-11 15:53:22.342538]  C:/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py 실행 완료
 [2025-06-11 15:53:22.342658] === 전체 크롤링 종료 ===
+
+[2025-06-11 21:18:11.020204] === 전체 크롤링 시작 ===
+[2025-06-11 21:18:11.020204] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py 실행 시작
+[2025-06-11 22:08:47.327785]  C:/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py 실행 완료
+[2025-06-11 22:08:47.327785] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/donga.py 실행 시작
+[2025-06-11 22:24:47.537402]  C:/project/Findy/Findy-main/findy-crawler/crawlers/donga.py 실행 완료
+[2025-06-11 22:24:47.537402] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py 실행 시작
+[2025-06-11 22:31:25.099566]  C:/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py 실행 완료
+[2025-06-11 22:31:25.099566] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/hani.py 실행 시작
+[2025-06-11 22:49:11.296132]  C:/project/Findy/Findy-main/findy-crawler/crawlers/hani.py 실행 완료
+[2025-06-11 22:49:11.296132] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/khan.py 실행 시작
+[2025-06-11 23:05:17.857927]  C:/project/Findy/Findy-main/findy-crawler/crawlers/khan.py 실행 완료
+[2025-06-11 23:05:17.857927] ▶ C:/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py 실행 시작
+[2025-06-12 00:56:20.732828]  C:/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py 실행 완료
+[2025-06-12 00:56:20.733353] === 전체 크롤링 종료 ===

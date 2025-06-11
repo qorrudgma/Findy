@@ -38,7 +38,7 @@ public class AutocompleteController {
 	}
 
 	@GetMapping("/search")
-	public List<Map<String, Object>> getKeword(@RequestParam("keyword") String keyword) throws IOException {
+	public List<Map<String, Object>> getKeword(@RequestParam("q") String keyword) throws IOException {
 		log.info("@# keyword => " + keyword);
 		List<Map<String, Object>> news_data = elasticTestService.searchNews("keyword");
 		log.info("!@# news_data => " + news_data);

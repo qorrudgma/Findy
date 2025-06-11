@@ -35,19 +35,21 @@ const SearchPage: React.FC = () => {
     }
   }, [query, category, currentPage]);
 
+  // 여기서 검색어 받아서 뭐로 할지 적음음
   const performSearch = async () => {
     try {
       setIsLoading(true);
       
       const params = new URLSearchParams();
       if (query) params.append('q', query);
-      if (category) params.append('category', category);
-      params.append('page', currentPage.toString());
-      params.append('size', '10');
+      // if (category) params.append('category', category);
+      // params.append('page', currentPage.toString());
+      // params.append('size', '10');
 
       // 백엔드 서버 주소로 직접 호출
-      console.log('API 호출 시작:', `http://localhost:8485/api/search?${params.toString()}`);
-      const response = await fetch(`http://localhost:8485/api/search?${params.toString()}`);
+      // console.log('API 호출 시작:', `http://localhost:8485/api/search?${params.toString()}`);
+      // const response = await fetch(`http://localhost:8485/api/search?${params.toString()}`);
+      const response = await fetch(`http://localhost:8485/search?${params.toString()}`);
       
       if (response.ok) {
         const data: any = await response.json();
