@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.boot.elasticsearch.ElasticService;
+import com.boot.service.ElasticService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +33,7 @@ public class NewsSearchController {
 		// 간단한 형태로 리턴 구조 통일
 		Map<String, Object> result = Map.of("content", newsList, "totalElements", newsList.size(), "totalPages", 1,
 				"currentPage", page);
-		log.info("result => "+result);
+		// log.info("result => "+result);
 		
 		return ResponseEntity.ok(result);
 	}

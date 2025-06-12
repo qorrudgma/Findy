@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boot.dto.AutocompleteDTO;
-import com.boot.elasticsearch.ElasticTestService;
 import com.boot.service.AutocompleteService;
+import com.boot.service.ElasticService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class AutocompleteController {
 
 	private final AutocompleteService autocompleteService;
 
-	private final ElasticTestService elasticTestService;
+	private final ElasticService elasticService;
 
 	/**
 	 * 자동완성 API 엔드포인트
@@ -40,7 +40,7 @@ public class AutocompleteController {
 	@GetMapping("/search")
 	public List<Map<String, Object>> getKeword(@RequestParam("q") String keyword) throws IOException {
 		log.info("@# keyword => " + keyword);
-		List<Map<String, Object>> news_data = elasticTestService.searchNews("keyword");
+		List<Map<String, Object>> news_data = elasticService.newsSearch(keyword);
 		log.info("!@# news_data => " + news_data);
 
 		return news_data;
