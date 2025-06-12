@@ -54,6 +54,11 @@ def fetch_article_content(article_url):
         headline = headline_tags.get_text(separator=' ', strip=True)
         print(headline)
 
+        # 이미지 추출
+        div = soup.select_one("div.article-body-wrap")
+        img_tag = div.select_one("img")
+        img = img_tag.get("src")
+
         # 텍스트 내용이 태그들과 있어서 내용만 뽑아내기
         content_tag = soup.select_one("div.article-body")
         if content_tag:
@@ -85,6 +90,7 @@ def fetch_article_content(article_url):
 
         return {
             "headline": headline,
+            "img": img,
             "content": clean_text,
             "tfidf_keywords": tfidf_keywords,
             "textrank_keywords": textrank_kw,
@@ -130,34 +136,34 @@ category_mapping = {
 }
 
 # 건강은 없음
-# categories = [
-#     # 경제
-#     "economy/economic-policy",
-#     "economy/macro",
-#     "economy/forex",
-#     "economy/tax",
-#     "economy/job-welfare",
-#     # 오피니언
-#     "opinion/0001",
-#     "opinion/0002",
-#     "opinion/0003",
-#     # 사회
-#     "society/incidents",
-#     "society/education",
-#     "society/administration",
-#     "society/local",
-#     "society/employment",
-#     # 스포츠
-#     "sports",
-#     # 문화/연예
-#     "culture",
-#     "entertainment/2001",
-#     "entertainment/2002-2003",
-#     "entertainment/2004",
-#     "entertainment/2005",
-#     "entertainment/2006"
-# ]
-categories = ["opinion/0003"]
+categories = [
+    # 경제
+    "economy/economic-policy",
+    "economy/macro",
+    "economy/forex",
+    "economy/tax",
+    "economy/job-welfare",
+    # 오피니언
+    "opinion/0001",
+    "opinion/0002",
+    "opinion/0003",
+    # 사회
+    "society/incidents",
+    "society/education",
+    "society/administration",
+    "society/local",
+    "society/employment",
+    # 스포츠
+    "sports",
+    # 문화/연예
+    "culture",
+    "entertainment/2001",
+    "entertainment/2002-2003",
+    "entertainment/2004",
+    "entertainment/2005",
+    "entertainment/2006"
+]
+# categories = ["opinion/0003"]
 data = []
 for category in categories:
     print("hankyung - ", category)

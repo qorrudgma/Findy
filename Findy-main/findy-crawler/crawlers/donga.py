@@ -60,8 +60,14 @@ def fetch_article_content(article_url):
         else:
             headline = "제목 없음"
 
-        # 텍스트 내용이 태그들과 있어서 내용만 뽑아내기
+        # 크롤링할 section
         content_tag = soup.select_one("section.news_view")
+
+        # 이미지 추출
+        img_tag = content_tag.select_one("img")
+        img = img_tag.get("src")
+
+        # 텍스트 내용이 태그들과 있어서 내용만 뽑아내기
         if content_tag:
             clean_text = content_tag.get_text(separator=' ', strip=True)
 
@@ -86,6 +92,7 @@ def fetch_article_content(article_url):
 
         return {
             "headline": headline,
+            "img":img,
             "content": clean_text,
             "tfidf_keywords": tfidf_keywords,
             "textrank_keywords": textrank_kw,

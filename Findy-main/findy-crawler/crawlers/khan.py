@@ -54,6 +54,11 @@ def fetch_article_content(article_url):
         else:
             headline = "제목 없음"
 
+        # 이미지 추출
+        div = soup.select_one("div.art_body")
+        img_tag = div.select_one("img")
+        img = img_tag.get("src")
+
         # 내용
         content_tag = soup.select_one("div.art_body")
         content = content_tag.get_text(strip=True) if content_tag else "내용 없음"
@@ -76,6 +81,7 @@ def fetch_article_content(article_url):
 
         return {
             "headline": headline,
+            "img": img,
             "content": content,
             "tfidf_keywords": tfidf_keywords,
             "textrank_keywords": textrank_kw,

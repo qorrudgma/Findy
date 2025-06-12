@@ -47,6 +47,11 @@ def fetch_article_content(article_url):
         headline_tag = soup.select_one("h3.ArticleDetailView_title__9kRU_")
         headline = headline_tag.text.strip() if headline_tag else "제목 없음"
 
+        # 이미지 추출
+        div = soup.select_one("div.ArticleDetailContent_imageContainer___o_gm")
+        img_tag = div.select_one("img")
+        img = img_tag.get("src")
+
         # 내용
         content_tag = soup.select("p.text")
         paragraphs = [tag.get_text(strip=True) for tag in content_tag[:-1]]
@@ -74,6 +79,7 @@ def fetch_article_content(article_url):
 
         return {
             "headline": headline,
+            "img": img,
             "content": full_text,
             "tfidf_keywords": tfidf_keywords,
             "textrank_keywords": textrank_kw,
@@ -98,8 +104,8 @@ category_mapping = {
     "culture": "연예/문화"
 }
 # 실행
-# categories = ["economy", "opinion", "society", "health", "sports", "culture"]
-categories = ["culture"]
+categories = ["economy", "opinion", "society", "health", "sports", "culture"]
+# categories = ["culture"]
 data = []
 for category in categories:
     print("hani - ", category)
