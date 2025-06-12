@@ -27,7 +27,7 @@ import scala.collection.Seq;
 @Slf4j
 @Service
 public class ElasticService {
-	private final ElasticsearchClient client; // 그대로 보관
+	private final ElasticsearchClient client;
 	private final ElasticsearchOperations operations;
 	private final KeyboardMapper keyboardMapper;
 	private final HangulComposer hangulComposer;
@@ -136,8 +136,19 @@ public class ElasticService {
 
 		// 한글 포함 여부 체크
 		boolean containsHangul = keyword.matches(".*[가-힣]+.*");
-		if (!containsHangul) {
-			// 한글이 전혀 없을 때만 한영키 변환
+		// 2) 오직 영어 알파벳만으로 이뤄졌는지
+		boolean isEnglishOnly = keyword.matches("^[A-Za-z]+$");
+
+		if (containsHangul) {
+			// 이미 한글이 포함된 경우
+			log.info("한글 포함 변환 생략 => " + keyword);
+
+		} else if (isEnglishOnly && keyword.length() < 4) {
+			// 영어만인데, 4글자 미만인 경우
+			log.info("영어 키워드(길이 < 4) 변환 생략 => " + keyword);
+
+		} else {
+			// 그 외(혼합어 혹은 영어 4글자 이상)는 한영키 변환 + 합치기
 			String converted = keyboardMapper.convertEngToKor(keyword);
 			log.info("한영키 변환 => " + converted);
 
@@ -145,8 +156,6 @@ public class ElasticService {
 			log.info("한글 패치 => " + patched);
 
 			keyword = patched;
-		} else {
-			log.info("한글 포함 감지, 변환 생략 => " + keyword);
 		}
 
 		// 분석할수있게 변환
@@ -187,27 +196,66 @@ public class ElasticService {
 				}
 			}
 		}
-		combined = combined.stream().distinct().collect(Collectors.toList());
-		log.info("combined => " + combined);
 
-		// Elasticsearch
+		// 첫 테스트 시작
+//		combined = combined.stream().distinct().collect(Collectors.toList());
+//		log.info("combined => " + combined);
+//		// Elasticsearch
+//		BoolQuery.Builder boolB = new BoolQuery.Builder();
+//		for (String term : combined) {
+//			boolB.should(s -> s.match(m -> m.field("headline").query(term).fuzziness("AUTO")));
+//		}
+//
+//		/*
+//		 * 검색시 가중치 제목: 가장 높음 내용: 가장 낮은 가중치 요약: 여기는 내용과 제목사이 가중치 키워드: 요약과 제목 사이 가중치
+//		 * 
+//		 * 제목 > 키워드 > 요약 > 내용
+//		 */
+//		SearchRequest req = SearchRequest
+//				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(10));
+//
+//		SearchResponse<Map> resp = client.search(req, Map.class);
+//		List<Map<String, Object>> list = resp.hits().hits().stream().map(h -> h.source()).collect(Collectors.toList());
+//		log.info("list => " + list);
+		// 첫 테스트 끝
+
+		// …
+
+		// 1) BoolQuery에 term×field 마다 should(match…boost) 추가
 		BoolQuery.Builder boolB = new BoolQuery.Builder();
 		for (String term : combined) {
-			boolB.should(s -> s.match(m -> m.field("headline").query(term).fuzziness("AUTO")));
+			boolB.should(s -> s.match(m -> m.field("headline") // 제목에 있을 때
+					.query(term).fuzziness("AUTO").boost(5.0f) // +5.0 점
+			));
+			boolB.should(s -> s.match(m -> m.field("textrank_keywords")// 키워드 필드에 있을 때
+					.query(term).fuzziness("AUTO").boost(3.0f) // +3.0 점
+			));
+			boolB.should(s -> s.match(m -> m.field("summary") // 요약에 있을 때
+					.query(term).fuzziness("AUTO").boost(2.0f) // +2.0 점
+			));
+			boolB.should(s -> s.match(m -> m.field("content") // 본문에 있을 때
+					.query(term).fuzziness("AUTO").boost(1.0f) // +1.0 점
+			));
 		}
 
-		/*
-		 * 검색시 가중치 제목: 가장 높음 내용: 가장 낮은 가중치 요약: 여기는 내용과 제목사이 가중치 키워드: 요약과 제목 사이 가중치
-		 * 
-		 * 제목 > 키워드 > 요약 > 내용
-		 */
+		// 2) SearchRequest 빌드 (score 내림차순 정렬은 기본)
 		SearchRequest req = SearchRequest
-				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(10));
+				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(20) // 원하는 개수
+				);
 
+		// 3) 검색 실행
 		SearchResponse<Map> resp = client.search(req, Map.class);
-		List<Map<String, Object>> list = resp.hits().hits().stream().map(h -> h.source()).collect(Collectors.toList());
-		log.info("list => " + list);
 
-		return new ArrayList<>();
+		// 4) 결과와 점수 읽기
+		List<Map<String, Object>> results = resp.hits().hits().stream()
+				// 중간에 각 hit의 source를 로그로 출력
+				.peek(hit -> log.info("결과 => " + hit.source()))
+				// SearchHit<Map>에서 Map<String,Object>만 꺼내기
+				.map(hit -> hit.source())
+				// List<Map<String,Object>>로 수집
+				.collect(Collectors.toList());
+		log.info("results =>" + results);
+
+		return results;
 	}
 }

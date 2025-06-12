@@ -27,9 +27,9 @@ public class ElasticsearchConfig {
 
 		// [2] 사용자 인증 설정
 		BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-		credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "qwer1234"));
+//		credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "qwer1234"));
 		// 보안 테스트
-//		credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "1234"));
+		credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "1234"));
 
 		// [3] RestClient 생성
 		RestClient restClient = RestClient.builder(new HttpHost("localhost", 9200, "https"))
