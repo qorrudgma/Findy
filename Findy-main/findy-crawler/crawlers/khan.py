@@ -105,12 +105,12 @@ category_mapping = {
     "culture": "연예/문화"
 }
 categories = ["economy", "opinion", "national", "life/health/articles", "culture"]
-# categories = ["economy"]
+# categories = ["culture"]
 data = []
 for category in categories:
     print("khan - ", category)
     # 반복할 페이지 수
-    for i in range(10):
+    for i in range(50):
         headlines = fetch_headlines(category, i+1)
 
         if headlines:
@@ -121,6 +121,10 @@ for category in categories:
                 if article:
                     # 출력전에 교체
                     converted_category = category_mapping.get(category, category)
+
+                    print("결과 => ")
+                    for key, value in article.items():
+                        print(f"{key}:\n{value}\n")
 
                     data.append(article)
                 else:

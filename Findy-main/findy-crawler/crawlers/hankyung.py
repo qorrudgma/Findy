@@ -109,7 +109,9 @@ category_mapping = {
     "economy/tax": "경제",
     "economy/job-welfare": "경제",
     # 오피니언
-    "opinion": "오피니언",
+    "opinion/0001": "오피니언",
+    "opinion/0002": "오피니언",
+    "opinion/0003": "오피니언",
     # 사회
     "society/incidents": "사회",
     "society/education": "사회",
@@ -136,7 +138,9 @@ category_mapping = {
 #     "economy/tax",
 #     "economy/job-welfare",
 #     # 오피니언
-#     "opinion",
+#     "opinion/0001",
+#     "opinion/0002",
+#     "opinion/0003",
 #     # 사회
 #     "society/incidents",
 #     "society/education",
@@ -153,12 +157,12 @@ category_mapping = {
 #     "entertainment/2005",
 #     "entertainment/2006"
 # ]
-categories = ["entertainment/2001"]
+categories = ["opinion/0003"]
 data = []
 for category in categories:
     print("hankyung - ", category)
     # 반복할 페이지 수
-    for i in range(1):
+    for i in range(50):
         headlines = fetch_headlines(category, i)
 
         if headlines:
