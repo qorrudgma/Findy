@@ -32,7 +32,7 @@ def fetch_headlines(category,page):
                     url = "https://www.hankyung.com" + url
                 news_headlines.append({"url": url})
                 # print("--------",news_headlines)
-        print("!@#$",news_headlines)
+        # print("!@#$",news_headlines)
         return news_headlines
     except Exception as e:
         print(f"오류 발생: {e}")
@@ -58,12 +58,11 @@ def fetch_article_content(article_url):
         content_tag = soup.select_one("div.article-body")
         if content_tag:
             clean_text = content_tag.get_text(separator=' ', strip=True)
-        print(clean_text)
+        # print(clean_text)
 
         # 보도시간 추출
         date_items = soup.select_one("span.txt-date")
         last_time = date_items.get_text(separator=' ', strip=True)
-        print()
 
         if clean_text:
             # print(f"내용: {clean_text}\n")
@@ -71,10 +70,10 @@ def fetch_article_content(article_url):
             nouns, pos_result = komoran(clean_text)
             # TF-IDF
             tfidf_keywords = tf_idf(headline, clean_text, pos_result, nouns)
-            print(tfidf_keywords)
+            # print(tfidf_keywords)
             # TextRank
             textrank_kw = textrank_keywords(nouns)
-            print(textrank_kw)
+            # print(textrank_kw)
         else:
             print(f"내용 없음{clean_text}")
         print()
@@ -82,7 +81,7 @@ def fetch_article_content(article_url):
         # 중요 내용
         sentences = [s.strip() for s in clean_text.split('.') if len(s.strip()) > 10]
         summary_sentences = textrank_summarize(sentences, top_k=3)
-        print("!@#$!@#$!@#$",summary_sentences)
+        # print("!@#$!@#$!@#$",summary_sentences)
 
         return {
             "headline": headline,
@@ -91,7 +90,7 @@ def fetch_article_content(article_url):
             "textrank_keywords": textrank_kw,
             "url": article_url,
             "category": category,
-            "source": "donga",
+            "source": "hankyung",
             "summary": summary_sentences,
             "time": last_time
         }
@@ -129,37 +128,37 @@ category_mapping = {
 }
 
 # 건강은 없음
-categories = [
-    # 경제
-    "economy/economic-policy",
-    "economy/macro",
-    "economy/forex",
-    "economy/tax",
-    "economy/job-welfare",
-    # 오피니언
-    "opinion",
-    # 사회
-    "society/incidents",
-    "society/education",
-    "society/administration",
-    "society/local",
-    "society/employment",
-    # 스포츠
-    "sports",
-    # 문화/연예
-    "culture",
-    "entertainment/2001",
-    "entertainment/2002-2003",
-    "entertainment/2004",
-    "entertainment/2005",
-    "entertainment/2006"
-]
-# categories = ["economy/economic-policy"]
+# categories = [
+#     # 경제
+#     "economy/economic-policy",
+#     "economy/macro",
+#     "economy/forex",
+#     "economy/tax",
+#     "economy/job-welfare",
+#     # 오피니언
+#     "opinion",
+#     # 사회
+#     "society/incidents",
+#     "society/education",
+#     "society/administration",
+#     "society/local",
+#     "society/employment",
+#     # 스포츠
+#     "sports",
+#     # 문화/연예
+#     "culture",
+#     "entertainment/2001",
+#     "entertainment/2002-2003",
+#     "entertainment/2004",
+#     "entertainment/2005",
+#     "entertainment/2006"
+# ]
+categories = ["entertainment/2001"]
 data = []
 for category in categories:
     print("hankyung - ", category)
     # 반복할 페이지 수
-    for i in range(10):
+    for i in range(1):
         headlines = fetch_headlines(category, i)
 
         if headlines:
@@ -169,6 +168,10 @@ for category in categories:
                 if article:
                     # 출력전에 교체
                     converted_category = category_mapping.get(category, category)
+
+                    print("결과 => ")
+                    for key, value in article.items():
+                        print(f"{key}:\n{value}\n")
 
                     data.append(article)
                 else:
