@@ -9,6 +9,7 @@ from mongo_save import save_to_mongodb # MongoDB
 
 def fetch_headlines(category, page):
     f_url = f"https://www.hani.co.kr/arti/{category}?page={page}"
+    print(f_url)
     headers = {"User-Agent": "Mozilla/5.0"}
     try:
         response = requests.get(f_url, headers=headers)
@@ -17,8 +18,12 @@ def fetch_headlines(category, page):
         news_headlines = []
 
         articles = soup.select("li.ArticleList_item___OGQO")
+        if not(articles):
+            articles = soup.select("li.ArticleGalleryList_item__f39zX")
         for article in articles:
             link_tag = article.select_one("a.BaseArticleCard_link__Q3YFK")
+            if not(link_tag):
+                link_tag = article.select_one("a.BaseArticleCardVertical_link__3rmjA")
             if link_tag:
                 url = link_tag.get("href")
                 if url and not url.startswith("http"):
@@ -93,12 +98,12 @@ category_mapping = {
     "culture": "연예/문화"
 }
 # 실행
-categories = ["economy", "opinion", "society", "health", "sports", "culture"]
-# categories = ["economy"]
+# categories = ["economy", "opinion", "society", "health", "sports", "culture"]
+categories = ["culture"]
 data = []
 for category in categories:
     print("hani - ", category)
-    for i in range(10):
+    for i in range(1):
         headlines = fetch_headlines(category, i + 1)
         if headlines:
             for idx, item in enumerate(headlines, start=1):
@@ -107,6 +112,10 @@ for category in categories:
                 if article:
                     # 출력전에 교체
                     converted_category = category_mapping.get(category, category)
+
+                    print("결과 => ")
+                    for key, value in article.items():
+                        print(f"{key}:\n{value}\n")
                     
                     data.append(article)
                 else:
