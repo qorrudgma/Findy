@@ -50,6 +50,41 @@ public class ElasticService {
 		return results;
 	}
 
+	// 페이징처리를 위한 메소드
+	public Map<String, Object> searchWithPagination(String keyword, String category, int page, int size) {
+		try {
+			SearchRequest.Builder requestBuilder = new SearchRequest.Builder().index("newsdata.newsdata")
+					.from(page * size).size(size);
+
+			// 검색 조건 구성
+			if (keyword != null && !keyword.isEmpty() && category != null && !category.isEmpty()) {
+				requestBuilder.query(q -> q.bool(b -> b.must(m1 -> m1.match(m -> m.field("headline").query(keyword)))
+						.filter(f -> f.term(t -> t.field("category.keyword").value(category)))));
+			} else if (keyword != null && !keyword.isEmpty()) {
+				requestBuilder.query(q -> q.match(m -> m.field("headline").query(keyword)));
+			} else if (category != null && !category.isEmpty()) {
+				requestBuilder.query(q -> q.term(t -> t.field("category.keyword").value(category)));
+			} else {
+				requestBuilder.query(q -> q.matchAll(m -> m));
+			}
+
+			// 실제 검색
+			SearchResponse<Map> response = client.search(requestBuilder.build(), Map.class);
+
+			// 전체 개수와 데이터 추출
+			long totalHits = response.hits().total() != null ? response.hits().total().value() : 0;
+			int totalPages = (int) Math.ceil((double) totalHits / size);
+			List<Map<String, Object>> results = extractHits(response);
+
+			// 반환할 Map 구성
+			return Map.of("content", results, "totalElements", totalHits, "totalPages", totalPages, "currentPage",
+					page);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Map.of("content", List.of(), "totalElements", 0, "totalPages", 0, "currentPage", page);
+		}
+	}
+
 	public List<Map<String, Object>> searchWithCategory(String keyword, String category, int page, int size) {
 		try {
 			SearchRequest.Builder requestBuilder = new SearchRequest.Builder().index("newsdata.newsdata")
@@ -161,6 +196,11 @@ public class ElasticService {
 			boolB.should(s -> s.match(m -> m.field("headline").query(term).fuzziness("AUTO")));
 		}
 
+		/*
+		 * 검색시 가중치 제목: 가장 높음 내용: 가장 낮은 가중치 요약: 여기는 내용과 제목사이 가중치 키워드: 요약과 제목 사이 가중치
+		 * 
+		 * 제목 > 키워드 > 요약 > 내용
+		 */
 		SearchRequest req = SearchRequest
 				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(10));
 
@@ -170,4 +210,5 @@ public class ElasticService {
 
 		return new ArrayList<>();
 	}
+
 }

@@ -1,6 +1,5 @@
 package com.boot.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -28,14 +27,7 @@ public class NewsSearchController {
 			@RequestParam(value = "category", required = false) String category,
 			@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "size", defaultValue = "10") int size) {
-		List<Map<String, Object>> newsList = elasticService.searchWithCategory(keyword, category, page, size);
-
-		// 간단한 형태로 리턴 구조 통일
-		Map<String, Object> result = Map.of("content", newsList, "totalElements", newsList.size(), "totalPages", 1,
-				"currentPage", page);
-		// log.info("result => "+result);
-		
+		Map<String, Object> result = elasticService.searchWithPagination(keyword, category, page, size);
 		return ResponseEntity.ok(result);
 	}
-
 }

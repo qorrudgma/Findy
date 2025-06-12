@@ -61,10 +61,23 @@ const SearchPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (query || category || source) {
+    if (query || category) {
       performSearch();
     }
-  }, [query, category, source, currentPage]);
+  }, [query, category, currentPage]);
+
+//   //페이징처리 초기화용
+//   // 👉 1. currentPage 초기화용 useEffect 추가
+//   useEffect(() => {
+//     setCurrentPage(0);  // 카테고리나 검색어가 바뀌면 항상 페이지 0부터 시작
+//   }, [query, category]);
+//
+// // 👉 2. 기존 검색 실행용 useEffect는 currentPage만 감지
+//   useEffect(() => {
+//     if (query || category) {
+//       performSearch();
+//     }
+//   }, [currentPage]);
 
   // 여기서 검색어 받아서 뭐로 할지 적음
   const performSearch = async () => {

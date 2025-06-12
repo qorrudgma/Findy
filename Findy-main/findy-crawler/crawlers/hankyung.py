@@ -104,28 +104,28 @@ def fetch_article_content(article_url):
 # hankyung 전용 매핑
 category_mapping = {
     # 경제
-    "economy/economic-policy": "economy",
-    "economy/macro": "economy",
-    "economy/forex": "economy",
-    "economy/tax": "economy",
-    "economy/job-welfare": "economy",
+    "economy/economic-policy": "경제",
+    "economy/macro": "경제",
+    "economy/forex": "경제",
+    "economy/tax": "경제",
+    "economy/job-welfare": "경제",
     # 오피니언
-    "opinion": "opinion",
+    "opinion": "오피니언",
     # 사회
-    "society/incidents": "national",
-    "society/education": "national",
-    "society/administration": "national",
-    "society/local": "national",
-    "society/employment": "national",
+    "society/incidents": "사회",
+    "society/education": "사회",
+    "society/administration": "사회",
+    "society/local": "사회",
+    "society/employment": "사회",
     # 스포츠
-    "sports": "sports",
-    # 문화/연예
-    "culture": "culture",
-    "entertainment/2001": "culture",
-    "entertainment/2002-2003": "culture",
-    "entertainment/2004": "culture",
-    "entertainment/2005": "culture",
-    "entertainment/2006": "culture"
+    "sports": "스포츠",
+    # 연예/문화
+    "culture": "연예/문화",
+    "entertainment/2001": "연예/문화",
+    "entertainment/2002-2003": "연예/문화",
+    "entertainment/2004": "연예/문화",
+    "entertainment/2005": "연예/문화",
+    "entertainment/2006": "연예/문화"
 }
 
 # 건강은 없음

@@ -82,7 +82,16 @@ def fetch_article_content(article_url):
     except Exception as e:
         print(f"본문 크롤링 오류: {e}")
         return None
-
+    
+# hani 전용 매핑
+category_mapping = {
+    "economy": "경제",
+    "opinion": "오피니언",
+    "society": "사회",
+    "health": "건강",
+    "sports": "스포츠",
+    "culture": "연예/문화"
+}
 # 실행
 categories = ["economy", "opinion", "society", "health", "sports", "culture"]
 # categories = ["economy"]
@@ -96,6 +105,9 @@ for category in categories:
                 # print(f"기사 {idx}번 URL: {item['url']}")
                 article = fetch_article_content(item['url'])
                 if article:
+                    # 출력전에 교체
+                    converted_category = category_mapping.get(category, category)
+                    
                     data.append(article)
                 else:
                     print("기사 본문 크롤링 실패")

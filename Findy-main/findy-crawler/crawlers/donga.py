@@ -101,13 +101,13 @@ def fetch_article_content(article_url):
 # 실행 흐름
 # donga 전용 매핑
 category_mapping = {
-    "Economy": "economy",
-    "Opinion": "opinion",
-    "Society": "society",
-    "Health": "health",
-    "Sports": "sports",
-    "Culture": "culture",
-    "Entertainment": "culture"
+    "Economy": "경제",
+    "Opinion": "오피니언",
+    "Society": "사회",
+    "Health": "건강",
+    "Sports": "스포츠",
+    "Culture": "연예/문화",
+    "Entertainment": "연예/문화"
 }
 categories = ["Economy", "Opinion", "Society", "Health", "Sports", "Culture", "Entertainment"]
 # categories = ["Economy"]
