@@ -96,7 +96,7 @@ def extract_article_data(driver, article_url, category_name):
         published_at = pub_time["content"] if pub_time else None
 
         # post_id = urlparse(article_url).path.rstrip("/").split("/")[-1]  # URL에서 post_id 추출
-        post_id = article_url  # 걍 URL을 post_id 느낌으로 사용 
+        post_id = article_url  # 걍 URL을 post_id 느낌으로 사용
 
         return {
       "headline": title,
@@ -161,7 +161,7 @@ def collect_articles_from_category(category_url, max_pages=3):
 # ======================
 def save_to_mongodb(articles):
     try:
-        client = MongoClient("mongodb://localhost:27017/")
+        client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000")
         db = client["newsdata"]
         collection = db["newsdata"]
 

@@ -42,14 +42,21 @@ const SearchPage: React.FC = () => {
       
       const params = new URLSearchParams();
       if (query) params.append('q', query);
-      // if (category) params.append('category', category);
-      // params.append('page', currentPage.toString());
-      // params.append('size', '10');
+      if (category) params.append('category', category);
+      params.append('page', currentPage.toString());
+      params.append('size', '10');
 
-      // 백엔드 서버 주소로 직접 호출
-      // console.log('API 호출 시작:', `http://localhost:8485/api/search?${params.toString()}`);
-      // const response = await fetch(`http://localhost:8485/api/search?${params.toString()}`);
-      const response = await fetch(`http://localhost:8485/search?${params.toString()}`);
+      let url;
+        if (query) {
+          // 키워드 검색용 엔드포인트
+          url = `http://localhost:8485/search?${params.toString()}`;
+        } else {
+          // 카테고리 조회용 엔드포인트
+          url = `http://localhost:8485/api/search?${params.toString()}`;
+        }
+      
+      
+      const response = await fetch(url);
       
       if (response.ok) {
         const data: any = await response.json();

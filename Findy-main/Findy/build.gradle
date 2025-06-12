@@ -33,10 +33,16 @@ dependencies {
 	// Elasticsearch start
 //    implementation 'co.elastic.clients:elasticsearch-java:8.12.2'
     implementation 'co.elastic.clients:elasticsearch-java:9.0.2'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:9.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 //    implementation platform('co.elastic.clients:elasticsearch-bom:9.0.2')
 //    implementation 'co.elastic.clients:elasticsearch-java'
 	// Elasticsearch end
+	// jHunspell start
+//	implementation 'com.github.dzo:jhunspell:1.0.0'
+	implementation files('libs/jhunspell-1.0.5.jar')
+    implementation 'net.java.dev.jna:jna:5.13.0'
+	// jHunspell end
 	// Okt start
 	implementation 'org.openkoreantext:open-korean-text:2.1.0'
 	implementation 'org.apache.commons:commons-text:1.10.0'

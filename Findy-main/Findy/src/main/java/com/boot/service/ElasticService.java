@@ -4,17 +4,20 @@ import java.io.IOException; // 입출력 예외 처리를 위한 클래스
 import java.util.ArrayList; // 리스트 객체 생성을 위한 클래스
 import java.util.List; // 리스트 타입 사용을 위한 인터페이스
 import java.util.Map; // 결과 데이터를 키-값 형태로 다루기 위한 Map 인터페이스
+import java.util.stream.Collectors;
 
 import org.openkoreantext.processor.OpenKoreanTextProcessorJava;
 import org.openkoreantext.processor.tokenizer.KoreanTokenizer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
+import com.boot.elasticsearch.EnglishDictionary;
 import com.boot.elasticsearch.HangulComposer;
 import com.boot.elasticsearch.KeyboardMapper;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient; // Elasticsearch 클라이언트 클래스
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest; // 검색 요청 객체
 import co.elastic.clients.elasticsearch.core.SearchResponse; // 검색 응답 객체
 import co.elastic.clients.elasticsearch.core.search.Hit; // 검색 결과의 단일 항목 표현
@@ -24,17 +27,19 @@ import scala.collection.Seq;
 @Slf4j
 @Service
 public class ElasticService {
-	@Autowired
-	private ElasticsearchOperations elasticsearchOperations;
-	@Autowired
-	private KeyboardMapper keyboardMapper;
-	@Autowired
-	private HangulComposer hangulComposer;
-	private final ElasticsearchClient client;
+	private final ElasticsearchClient client; // 그대로 보관
+	private final ElasticsearchOperations operations;
+	private final KeyboardMapper keyboardMapper;
+	private final HangulComposer hangulComposer;
+	private final EnglishDictionary englishDictionary;
 
-	// 생성자를 통해 의존성 주입 (Spring이 클라이언트 객체를 주입)
-	public ElasticService(ElasticsearchClient client) {
+	public ElasticService(ElasticsearchClient client, ElasticsearchOperations operations, KeyboardMapper keyboardMapper,
+			HangulComposer hangulComposer, EnglishDictionary englishDictionary) {
 		this.client = client;
+		this.operations = operations;
+		this.keyboardMapper = keyboardMapper;
+		this.hangulComposer = hangulComposer;
+		this.englishDictionary = englishDictionary;
 	}
 
 	private List<Map<String, Object>> extractHits(SearchResponse<Map> response) {
@@ -70,15 +75,45 @@ public class ElasticService {
 		}
 	}
 
-	public List<Map<String, Object>> newsSearch(String keyword) {
+	public List<Map<String, Object>> newsSearch(String keyword) throws ElasticsearchException, IOException {
 		log.info("keyword => " + keyword);
 
-		// 한영키
-		keyword = keyboardMapper.convertEngToKor(keyword);
-		log.info("한영키 변환 keyword => " + keyword);
-		// 위에서 변환한거 합치기
-		keyword = hangulComposer.combine(keyword);
-		log.info("한글 패치 keyword => " + keyword);
+		// 영 -> 한 변환 시도
+//		String converted = keyboardMapper.convertEngToKor(keyword);
+//		log.info("convertEngToKor => " + converted);
+//		converted = hangulComposer.combine(converted);
+
+		// 변환 결과에 한글 글자가 하나라도 있으면, 진짜 한영키 미전환으로 간주
+//		boolean hasHangul = converted.codePoints().anyMatch(cp -> (cp >= 0xAC00 && cp <= 0xD7A3));
+//		if (hasHangul) {
+//			// 한영키 미전환 -> 합치기
+//			keyword = hangulComposer.combine(converted);
+//			log.info("한글 패치 keyword => " + keyword);
+//
+//		} else if (englishDictionary.exists(keyword)) {
+//			// 변환 결과에 한글 없고, 사전에 있는 영단어면 변환 생략
+//			log.info("영어 사전 단어 감지, 변환 생략 => " + keyword);
+//
+//		} else {
+//			// 사전에 없고 변환 결과도 한글 아님 -> 일단 변환 생략
+//			log.info("변환 대상 아님, 그대로 사용 => " + keyword);
+//		}
+
+		// 한글 포함 여부 체크
+		boolean containsHangul = keyword.matches(".*[가-힣]+.*");
+		if (!containsHangul) {
+			// 한글이 전혀 없을 때만 한영키 변환
+			String converted = keyboardMapper.convertEngToKor(keyword);
+			log.info("한영키 변환 => " + converted);
+
+			String patched = hangulComposer.combine(converted);
+			log.info("한글 패치 => " + patched);
+
+			keyword = patched;
+		} else {
+			log.info("한글 포함 감지, 변환 생략 => " + keyword);
+		}
+
 		// 분석할수있게 변환
 		CharSequence normalized = OpenKoreanTextProcessorJava.normalize(keyword);
 		log.info("형태소 분석한 keyword(normalized) => " + normalized);
@@ -88,6 +123,50 @@ public class ElasticService {
 		// 토큰으로 나눈 값 리스트로
 		List<String> tokenList = OpenKoreanTextProcessorJava.tokensToJavaStringList(tokens);
 		log.info("tokenList(분리된 입력값) => " + tokenList);
+
+		// 단어 만들기
+		List<String> combined = new ArrayList<>(tokenList);
+
+		int n = tokenList.size();
+		for (int i = 0; i < n; i++) {
+			StringBuilder sb = new StringBuilder();
+			int currentLength = 0; // sb 문자열의 길이(글자 수)
+
+			// j – i 범위 제한 없이, sb.length() 가 3 초과하면 break
+			for (int j = i; j < n; j++) {
+				String tok = tokenList.get(j);
+				int tokLen = tok.length();
+
+				// 새로 붙였을 때 3글자 초과하면 중단
+				if (currentLength + tokLen > 3) {
+					break;
+				}
+
+				// sb에 토큰 추가
+				sb.append(tok);
+				currentLength += tokLen;
+
+				// 합친 문자열이 2글자 이상이면 결과에 추가
+				if (currentLength >= 2) {
+					combined.add(sb.toString());
+				}
+			}
+		}
+		combined = combined.stream().distinct().collect(Collectors.toList());
+		log.info("combined => " + combined);
+
+		// Elasticsearch
+		BoolQuery.Builder boolB = new BoolQuery.Builder();
+		for (String term : combined) {
+			boolB.should(s -> s.match(m -> m.field("headline").query(term).fuzziness("AUTO")));
+		}
+
+		SearchRequest req = SearchRequest
+				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(10));
+
+		SearchResponse<Map> resp = client.search(req, Map.class);
+		List<Map<String, Object>> list = resp.hits().hits().stream().map(h -> h.source()).collect(Collectors.toList());
+		log.info("list => " + list);
 
 		return new ArrayList<>();
 	}
