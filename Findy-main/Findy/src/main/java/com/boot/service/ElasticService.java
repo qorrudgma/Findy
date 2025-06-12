@@ -210,5 +210,4 @@ public class ElasticService {
 
 		return new ArrayList<>();
 	}
-
 }
