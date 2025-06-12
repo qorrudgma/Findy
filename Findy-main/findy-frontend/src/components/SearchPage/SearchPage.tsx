@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import NewsCard from '../NewsCard/NewsCard';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import './SearchPage.css';
@@ -16,8 +16,6 @@ interface NewsArticle {
   url: string;
 }
 
-
-
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [searchResults, setSearchResults] = useState<NewsArticle[]>([]);
@@ -25,17 +23,50 @@ const SearchPage: React.FC = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const navigate = useNavigate();
 
   const query = searchParams.get('q') || '';
   const category = searchParams.get('category') || '';
+  const source = searchParams.get('source') || '';
+
+  // 주요 언론사 목록 (표시용 한글명)
+  const newsSources = [
+    '조선일보', '중앙일보', '동아일보',
+    '경향신문', '한겨레', '이데일리',
+    '연합뉴스'
+  ];
+
+  // 한글 언론사명을 영어 코드로 변환하는 매핑
+  const sourceCodeMap: { [key: string]: string } = {
+    '조선일보': 'chosun',
+    '중앙일보': 'joongang', 
+    '동아일보': 'donga',
+    '한국일보': 'hankook',
+    '경향신문': 'khan',
+    '한겨레': 'hani',
+    '이데일리': 'edaily',
+    '연합뉴스': 'yna'
+  };
+
+  // 영어 코드를 한글명으로 변환하는 역매핑
+  const reverseSourceCodeMap: { [key: string]: string } = {
+    'chosun': '조선일보',
+    'joongang': '중앙일보',
+    'donga': '동아일보', 
+    'hankook': '한국일보',
+    'khan': '경향신문',
+    'hani': '한겨레',
+    'edaily': '이데일리',
+    'yna': '연합뉴스'
+  };
 
   useEffect(() => {
-    if (query || category) {
+    if (query || category || source) {
       performSearch();
     }
-  }, [query, category, currentPage]);
+  }, [query, category, source, currentPage]);
 
-  // 여기서 검색어 받아서 뭐로 할지 적음음
+  // 여기서 검색어 받아서 뭐로 할지 적음
   const performSearch = async () => {
     try {
       setIsLoading(true);
@@ -118,8 +149,34 @@ const SearchPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleSourceClick = (selectedSource: string) => {
+    // 한글 언론사명을 영어 코드로 변환
+    const sourceCode = sourceCodeMap[selectedSource] || selectedSource;
+    let searchUrl = `/search?source=${encodeURIComponent(sourceCode)}`;
+    if (query) {
+      searchUrl += `&q=${encodeURIComponent(query)}`;
+    }
+    if (category) {
+      searchUrl += `&category=${encodeURIComponent(category)}`;
+    }
+    navigate(searchUrl);
+    // 페이지 상단으로 부드럽게 스크롤
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   const getSearchTitle = () => {
-    if (query && category) {
+    if (source && query) {
+      // 영어 코드를 한글명으로 변환하여 표시
+      const sourceName = reverseSourceCodeMap[source] || source;
+      return `"${query}" (${sourceName})`;
+    } else if (source) {
+      // 영어 코드를 한글명으로 변환하여 표시
+      const sourceName = reverseSourceCodeMap[source] || source;
+      return `${sourceName}`;
+    } else if (query && category) {
       return `"${query}" (${category})`;
     } else if (query) {
       return `"${query}"`;
@@ -142,6 +199,22 @@ const SearchPage: React.FC = () => {
               {/* {totalPages > 0 && ` (페이지 ${currentPage + 1}/${totalPages})`} */}
             </p>
           )}
+          
+          {/* 언론사별 카테고리 버튼 */}
+          <div className="news-sources-section">
+            <h3 className="sources-title">📰 언론사별 뉴스</h3>
+            <div className="news-sources-grid">
+              {newsSources.map((newsSource, index) => (
+                <button
+                  key={index}
+                  className={`source-btn ${source === sourceCodeMap[newsSource] ? 'active' : ''}`}
+                  onClick={() => handleSourceClick(newsSource)}
+                >
+                  {newsSource}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {isLoading ? (

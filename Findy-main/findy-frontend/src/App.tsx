@@ -13,14 +13,30 @@ import FAQDetail from './components/FAQDetail/FAQDetail';
 import ContactForm from './components/ContactForm/ContactForm';
 import ScrollToTopButton from './components/ScrollToTopButton/ScrollToTopButton';
 import SettingsButton from './components/SettingsButton/SettingsButton';
+import LeftSidebar from './components/LeftSidebar/LeftSidebar';
+import RightSidebar from './components/RightSidebar/RightSidebar';
 import './styles/common.css';
 import './styles/App.css';
 
+/**
+ * 메인 App 컴포넌트
+ * 수정사항:
+ * - 왼쪽 사이드바 컴포넌트 추가 (실시간 인기기사)
+ * - 오른쪽 사이드바 컴포넌트 추가 (언론사 목록)
+ * - 양쪽 사이드바가 모든 페이지에서 표시되도록 구성
+ */
 function App() {
   return (
     <Router>
       <div className="App">
         <Header />
+        
+        {/* 왼쪽 사이드바 - 실시간 인기기사 */}
+        <LeftSidebar />
+        
+        {/* 오른쪽 사이드바 - 언론사 목록 */}
+        <RightSidebar />
+        
         <main className="main-container">
           <Routes>
             <Route path="/" element={<HomePage />} />

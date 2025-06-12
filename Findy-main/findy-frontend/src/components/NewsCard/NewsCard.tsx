@@ -11,11 +11,12 @@ interface NewsArticle {
   time: string;
   source: string;
   url: string;
+  imageUrl?: string;
 }
 
 interface NewsCardProps {
   article: NewsArticle;
-  cardType: 'main-primary' | 'main-secondary' | 'side' | 'normal' | 'list';
+  cardType: 'main-primary' | 'main-secondary' | 'side' | 'normal' | 'list' | 'main-large' | 'side-small';
   onClick: (article: NewsArticle) => void;
 }
 
@@ -91,10 +92,11 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
   const getCardClassName = () => {
     switch (cardType) {
       case 'main-primary':
-        return 'main-news-card primary';
       case 'main-secondary':
-        return 'main-news-card secondary';
+      case 'main-large':
+        return 'main-news-card';
       case 'side':
+      case 'side-small':
         return 'side-news-card';
       case 'normal':
         return 'news-card';
@@ -104,7 +106,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
         return 'news-card';
     }
   };
-
+// 메인뉴스 카드
   const renderMainCard = (isPrimary: boolean) => (
     <div className={getCardClassName()} onClick={handleClick}>
       <div className="news-card-header">
@@ -121,6 +123,21 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
         </div>
         <span className="news-category-badge">{article.category}</span>
       </div>
+      
+      {/* 메인 뉴스 이미지 */}
+      {article.imageUrl && (
+        <div className="main-news-image-container">
+          <img 
+            src={article.imageUrl} 
+            alt={article.headline}
+            className="main-news-image"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        </div>
+      )}
+      
       <h3 className="main-news-title">{article.headline}</h3>
       <p className="main-news-preview">{article.preview}</p>
       <div className="news-card-footer">
@@ -128,7 +145,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
       </div>
     </div>
   );
-
+// 사이드 뉴스카드
   const renderSideCard = () => (
     <div className={getCardClassName()} onClick={handleClick}>
       <div className="news-card-header">
@@ -152,7 +169,27 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
       </div>
     </div>
   );
-
+// 사이드 작은 뉴스카드 
+  const renderSideSmallCard = () => (
+    <div className={getCardClassName()} onClick={handleClick}>
+      <div className="news-card-header">
+        <div className="news-source">
+          <img 
+            src={getSourceIcon(article.source || 'default')} 
+            alt={getSourceName(article.source || 'default')} 
+            className="source-icon"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/sources/default-news.svg';
+            }}
+          />
+          <span className="source-name">{getSourceName(article.source || 'default')}</span>
+        </div>
+        <span className="news-category-badge">{article.category}</span>
+      </div>
+      <h4 className="side-news-title">{article.headline}</h4>
+    </div>
+  );
+// 일반 뉴스카드        
   const renderNormalCard = () => (
     <div className={getCardClassName()} onClick={handleClick}>
       <div className="news-card-header">
@@ -176,7 +213,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
       </div>
     </div>
   );
-
+// 검색창 뉴스카드
   const renderListCard = () => (
     <div className={getCardClassName()} onClick={handleClick}>
       <div className="list-news-content">
@@ -211,8 +248,12 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
       return renderMainCard(true);
     case 'main-secondary':
       return renderMainCard(false);
+    case 'main-large':
+      return renderMainCard(true);
     case 'side':
       return renderSideCard();
+    case 'side-small':
+      return renderSideSmallCard();
     case 'normal':
       return renderNormalCard();
     case 'list':

@@ -139,6 +139,9 @@ const Header: React.FC = () => {
       navigate(`/search?q=${encodeURIComponent(query.trim())}${categoryParam}`);
       setShowSuggestions(false);
       setSearchQuery('');
+      
+      // 검색 후 상단으로 부드럽게 스크롤
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -178,12 +181,15 @@ const Header: React.FC = () => {
     }
   };
 
+  // 카테고리 클릭 처리 및 상단 스크롤
   const handleCategoryClick = (category: string) => {
     if (category === '전체') {
       navigate('/');
     } else {
       navigate(`/search?category=${encodeURIComponent(category)}`);
     }
+    // 카테고리 클릭 후 상단으로 부드럽게 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -196,6 +202,8 @@ const Header: React.FC = () => {
 
   const handleLogoClick = () => {
     navigate('/');
+    // 홈으로 이동 후 상단으로 부드럽게 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSuggestionClick = (suggestion: string) => {

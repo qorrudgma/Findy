@@ -1,0 +1,210 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './LeftSidebar.css';
+
+interface NewsArticle {
+  id?: string;
+  headline: string;
+  content: string;
+  preview: string;
+  keywords: string[];
+  category: string;
+  time: string;
+  source: string;
+  url: string;
+}
+
+/**
+ * 왼쪽 사이드바 컴포넌트
+ * - 실시간 인기기사 표시
+ * - 스크롤에 따른 위치 조정 (90% 스크롤 시 고정)
+ * - 언론사명 한글 매핑 기능
+ */
+const LeftSidebar: React.FC = () => {
+  const [popularArticles, setPopularArticles] = useState<NewsArticle[]>([]);
+  const [popularSearches, setPopularSearches] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [shouldStopAtFooter, setShouldStopAtFooter] = useState(false); // 스크롤 위치에 따른 사이드바 고정 상태
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    loadPopularContent();
+
+    // 스크롤에 따른 사이드바 위치 조정 로직 (90% 스크롤 시 고정)
+    const handleScroll = () => {
+      const sidebar = document.querySelector('.left-sidebar-container') as HTMLElement;
+      
+      if (sidebar) {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        const scrollTop = window.scrollY;
+        const sidebarHeight = sidebar.offsetHeight;
+        
+        // 스크롤 진행률 계산 (0~1 사이 값)
+        const scrollProgress = (scrollTop + windowHeight) / documentHeight;
+        const shouldStop = scrollProgress >= 0.9; // 90% 스크롤 시 멈춤 (아래쪽 10% 남음)
+        
+        if (shouldStop) {
+          // 스크롤 90% 지점에서 사이드바를 절대 위치로 고정
+          const stopPosition = documentHeight * 0.9 - windowHeight / 2 - sidebarHeight / 2;
+          setShouldStopAtFooter(true);
+          sidebar.style.position = 'absolute';
+          sidebar.style.top = `${Math.max(100, stopPosition)}px`;
+          sidebar.style.transform = 'none';
+        } else {
+          // 일반 상태: 화면 중앙에 고정 (fixed positioning)
+          setShouldStopAtFooter(false);
+          sidebar.style.position = 'fixed';
+          sidebar.style.top = '50%';
+          sidebar.style.transform = 'translateY(-50%)';
+        }
+      }
+    };
+
+    // 초기 실행 및 이벤트 리스너 등록
+    handleScroll();
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  // 실시간 인기기사 로드 (언론사명 한글 매핑 포함)
+  const loadPopularArticles = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://localhost:8485/api/search?page=0&size=5");
+      
+      if (response.ok) {
+        const rawData = await response.json();
+        const rawContent = Array.isArray(rawData.content) ? rawData.content : [];
+        
+        // 영어 언론사명을 한글로 매핑하는 객체
+        const sourceNameMap: { [key: string]: string } = {
+          'chosun': '조선일보',
+          'joongang': '중앙일보',
+          'donga': '동아일보',
+          'khan': '경향신문',
+          'hani': '한겨레',
+          'edaily': '이데일리',
+          'yonhap': '연합뉴스',
+          'yna': '연합뉴스',
+          'sbs': 'SBS',
+          'kbs': 'KBS',
+          'mbc': 'MBC',
+          'ytn': 'YTN',
+          'seoul': '서울신문'
+        };
+        
+        const mappedData: NewsArticle[] = rawContent.map((item: any) => ({
+          id: item.id || item.url || Math.random().toString(),
+          category: item.category || "기타",
+          headline: item.headline || "제목 없음",
+          content: item.content || "내용 없음",
+          preview: item.content?.substring(0, 50) + '...',
+          time: item.time || "날짜 없음",
+          source: sourceNameMap[item.source] || item.source || '기타', // 영어 → 한글 매핑 적용
+          tags: item.tags || [],
+          url: item.url || "#"
+        }));
+
+        setPopularArticles(mappedData.slice(0, 5)); // 상위 5개 기사만 표시
+      }
+    } catch (error) {
+      console.error('인기기사 로드 오류:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 인기 검색어 로드 (현재 사용하지 않음)
+  const loadPopularSearches = async () => {
+    try {
+      const response = await fetch('/api/search/popular');
+      if (response.ok) {
+        const data = await response.json();
+        setPopularSearches(data.slice(0, 10));
+      } else {
+        throw new Error('API 호출 실패');
+      }
+    } catch (error) {
+      console.error('인기 검색어 로드 오류:', error);
+    }
+  };
+
+  const loadPopularContent = () => {
+    loadPopularArticles();
+    loadPopularSearches();
+  };
+
+  // 기사 클릭 시 새 탭에서 열기
+  const handleArticleClick = (article: NewsArticle) => {
+    if (article.url && article.url !== '#') {
+      window.open(article.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  // 검색어 클릭 시 검색 페이지로 이동
+  const handleSearchClick = (searchTerm: string) => {
+    navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+  };
+
+  return (
+    <div className={`left-sidebar-container ${shouldStopAtFooter ? 'stop-at-footer' : ''}`}>
+      <div className="left-sidebar">
+        {/* 실시간 인기기사 섹션 */}
+        <div className="sidebar-section">
+          <h3 className="sidebar-title">실시간 인기기사</h3>
+          
+          {isLoading ? (
+            <div className="sidebar-loading">로딩 중...</div>
+          ) : (
+            <div className="popular-articles">
+              {popularArticles.map((article, index) => (
+                <div 
+                  key={article.id || index}
+                  className="popular-article-item"
+                  onClick={() => handleArticleClick(article)}
+                >
+                  <div className="article-rank">{index + 1}</div>
+                  <div className="article-content">
+                    <div className="article-headline">{article.headline}</div>
+                    <div className="article-meta">
+                      <span className="article-source">{article.source}</span> {/* 한글 언론사명 표시 */}
+                      <span className="article-time">{article.time}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 인기검색어 섹션 (현재 주석처리) */}
+        {/*
+        <div className="sidebar-section">
+          <h3 className="sidebar-title">실시간 인기검색어</h3>
+          <div className="popular-searches">
+            {popularSearches.slice(0, 5).map((searchTerm, index) => (
+              <div 
+                key={index}
+                className="popular-search-item"
+                onClick={() => handleSearchClick(searchTerm)}
+              >
+                <div className="search-rank">{index + 1}</div>
+                <div className="search-term">{searchTerm}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        */}
+      </div>
+    </div>
+  );
+};
+
+export default LeftSidebar; 

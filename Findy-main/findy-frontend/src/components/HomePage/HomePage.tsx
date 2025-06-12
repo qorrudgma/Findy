@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NewsCard from '../NewsCard/NewsCard';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import './HomePage.css';
@@ -19,8 +20,26 @@ const HomePage: React.FC = () => {
   const [newsData, setNewsData] = useState<NewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [popularSearches, setPopularSearches] = useState<string[]>([]);
+  const navigate = useNavigate();
 
+  // 주요 언론사 목록 (표시용 한글명)
+  const newsSources = [
+    '조선일보', '중앙일보', '동아일보', 
+    '경향신문', '한겨레', '이데일리',
+    '연합뉴스'
+  ];
 
+  // 한글 언론사명을 영어 코드로 변환하는 매핑
+  const sourceCodeMap: { [key: string]: string } = {
+    '조선일보': 'chosun',
+    '중앙일보': 'joongang', 
+    '동아일보': 'donga',
+    '한국일보': 'hankook',
+    '경향신문': 'khan',
+    '한겨레': 'hani',
+    '이데일리': 'edaily',
+    '연합뉴스': 'yna'
+  };
 
   useEffect(() => {
     loadLatestNews();
@@ -33,7 +52,7 @@ const HomePage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch("http://localhost:8485/api/search?page=0&size=100");
+      const response = await fetch("http://localhost:8485/api/search?page=0&size=10000");
 
       if (response.ok) {
         const rawData = await response.json();
@@ -70,7 +89,6 @@ const HomePage: React.FC = () => {
     }
   };
 
-
   // 인기 검색어 로드
   const loadPopularSearches = async () => {
     try {
@@ -91,6 +109,17 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const handleSourceClick = (source: string) => {
+    // 한글 언론사명을 영어 코드로 변환
+    const sourceCode = sourceCodeMap[source] || source;
+    navigate(`/search?source=${encodeURIComponent(sourceCode)}`);
+    // 페이지 상단으로 부드럽게 스크롤
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -104,113 +133,73 @@ const HomePage: React.FC = () => {
             AI 기반 검색으로 정확하고 빠른 뉴스를 만나보세요
           </p>
           
-          {/* 인기 검색어 표시 */}
-          {/* {popularSearches.length > 0 && (
-            <div className="popular-searches-home">
-              <span className="popular-label">🔥 인기 검색어:</span>
-              {popularSearches.map((search, index) => (
+          {/* 언론사별 카테고리 버튼 */}
+          {/* <div className="news-sources-section">
+            <h2 className="sources-title">📰 언론사별 뉴스</h2>
+            <div className="news-sources-grid">
+              {newsSources.map((source, index) => (
                 <button
                   key={index}
-                  className="popular-tag-home"
-                  onClick={() => {
-                    window.location.href = `/search?q=${encodeURIComponent(search)}`;
-                  }}
+                  className="source-btn"
+                  onClick={() => handleSourceClick(source)}
                 >
-                  {search}
+                  {source}
                 </button>
               ))}
             </div>
-          )} */}
+          </div> */}
         </div>
 
         <div className="news-wrapper">
-          {/* 왼쪽 여백 공간 */}
-          <div className="side-space left-space">
-          {/* <img src="/images/jjh1.jpg" alt="Findy Logo" className="side-space-image" /> */}
-            <p>광고 또는 추가 콘텐츠 영역</p>
-          </div>
-          
-          {/* 뉴스 그리드 */}
-          <div className="news-grid">
-            {/* 뉴스 그리드 */}
-            {newsData.length === 0 ? (
-              <div className="no-results">
-                <h3>뉴스가 없습니다</h3>
-                <p>잠시 후 다시 시도해주세요.</p>
-              </div>
-            ) : (
-              <>
-                {/* 메인 뉴스 섹션 */}
-                <div className="main-news-section">
-                  {/* 중앙 메인 뉴스 */}
-                  <div className="center-news-container">
-                    {newsData[0] && (
-                      <NewsCard 
-                        article={newsData[0]} 
-                        cardType="main-primary" 
-                        onClick={handleNewsClick}
-                      />
-                    )}
-                    {newsData[1] && (
-                      <NewsCard 
-                        article={newsData[1]} 
-                        cardType="main-secondary" 
-                        onClick={handleNewsClick}
-                      />
-                    )}
-                  </div>
+          {newsData.length === 0 ? (
+            <div className="no-results">
+              <h3>뉴스가 없습니다</h3>
+              <p>잠시 후 다시 시도해주세요.</p>
+            </div>
+          ) : (
+            <>
+              {/* 상단 뉴스 레이아웃: 왼쪽 메인 + 오른쪽 사이드 */}
+              <div className="top-news-layout">
+                {/* 왼쪽 메인 뉴스카드 */}
+                {newsData[0] && (
+                  <NewsCard 
+                    article={newsData[0]} 
+                    cardType="main-large" 
+                    onClick={handleNewsClick}
+                  />
+                )}
 
-                  {/* 왼쪽 사이드 뉴스 */}
-                  {newsData.length > 2 && (
-                    <div className="side-news-container left">
-                      {newsData.slice(2, 5).map((article) => (
-                        <NewsCard 
-                          key={article.id || article.headline} 
-                          article={article} 
-                          cardType="side" 
-                          onClick={handleNewsClick}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 오른쪽 사이드 뉴스 */}
-                  {newsData.length > 5 && (
-                    <div className="side-news-container right">
-                      {newsData.slice(5, 8).map((article) => (
-                        <NewsCard 
-                          key={article.id || article.headline} 
-                          article={article} 
-                          cardType="side" 
-                          onClick={handleNewsClick}
-                        />
-                      ))}
-                    </div>
-                  )}
+                {/* 오른쪽 작은 뉴스카드들 */}
+                <div className="side-news-container">
+                  {newsData.slice(1, 7).map((article) => (
+                    <NewsCard 
+                      key={article.id || article.headline}
+                      article={article} 
+                      cardType="side-small" 
+                      onClick={handleNewsClick}
+                    />
+                  ))}
                 </div>
+              </div>
 
-                {/* 추가 뉴스 그리드 */}
-                {newsData.length > 8 && (
-                  <div className="additional-news-grid">
-                    {newsData.slice(8).map((article) => (
+              {/* 하단 뉴스 그리드 (4개) */}
+              {newsData.length > 7 && (
+                <div className="bottom-news-section">
+                  <h3 className="bottom-news-title">더 많은 뉴스</h3>
+                  <div className="bottom-news-grid">
+                    {newsData.slice(7, 11).map((article) => (
                       <NewsCard 
-                        key={article.id || article.headline} 
+                        key={article.id || article.headline}
                         article={article} 
                         cardType="normal" 
                         onClick={handleNewsClick}
                       />
                     ))}
                   </div>
-                )}
-              </>
-            )}
-          </div>
-          
-          {/* 오른쪽 여백 공간 */}
-          <div className="side-space right-space">
-          {/* <img src="/images/jjh2.jpg" alt="Findy Logo" className="side-space-image" /> */}
-            <p>광고 또는 추가 콘텐츠 영역</p>
-          </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </main>

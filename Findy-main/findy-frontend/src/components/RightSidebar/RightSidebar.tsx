@@ -1,0 +1,133 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './RightSidebar.css';
+
+interface NewsSource {
+  name: string;
+  code: string;
+  category: string;
+  description: string;
+}
+/**
+ * 오른쪽 사이드바 컴포넌트
+ * - 언론사 목록 표시 (로고 + 이름)
+ * - 스크롤에 따른 위치 조정 (90% 스크롤 시 고정)
+ * - 실제 이미지 파일 사용 및 에러 처리
+ */
+const RightSidebar: React.FC = () => {
+  const [newsSources] = useState<NewsSource[]>([
+    { name: '조선일보', code: 'chosun', category: '종합', description: '대한민국 대표 종합일간지' },
+    { name: '중앙일보', code: 'joongang', category: '종합', description: '신뢰할 수 있는 뉴스와 정보' },
+    { name: '동아일보', code: 'donga', category: '종합', description: '정론직필의 언론정신' },
+    { name: '경향신문', code: 'khan', category: '종합', description: '진보적 시각의 종합일간지' },
+    { name: '한겨레', code: 'hani', category: '종합', description: '민주언론의 새로운 지평' },
+    { name: '이데일리', code: 'edaily', category: '경제', description: '경제전문 인터넷신문' },
+    { name: '연합뉴스', code: 'yna', category: '통신', description: '대한민국 대표 뉴스통신사' },
+    { name: '더미', code: '#', category: '#', description: '#' },
+    { name: '더미', code: '#', category: '#', description: '#' },
+    { name: '더미', code: '#', category: '#', description: '#' },
+    { name: '더미', code: '#', category: '#', description: '#' },
+  ]);
+  
+  const [shouldStopAtFooter, setShouldStopAtFooter] = useState(false);// 스크롤 위치에 따른 사이드바 고정 상태
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // 스크롤에 따른 사이드바 위치 조정 로직 (90% 스크롤 시 고정)
+    const handleScroll = () => {
+      const sidebar = document.querySelector('.right-sidebar-container') as HTMLElement;
+      
+      if (sidebar) {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        const scrollTop = window.scrollY;
+        const sidebarHeight = sidebar.offsetHeight;
+        
+        // 스크롤 진행률 계산 (0~1 사이 값)
+        const scrollProgress = (scrollTop + windowHeight) / documentHeight;
+        const shouldStop = scrollProgress >= 0.9; // 90% 스크롤 시 멈춤 (아래쪽 10% 남음)
+        
+        if (shouldStop) {
+          // 스크롤 90% 지점에서 사이드바를 절대 위치로 고정
+          const stopPosition = documentHeight * 0.9 - windowHeight / 2 - sidebarHeight / 2;
+          setShouldStopAtFooter(true);
+          sidebar.style.position = 'absolute';
+          sidebar.style.top = `${Math.max(100, stopPosition)}px`;
+          sidebar.style.transform = 'none';
+        } else {
+          // 일반 상태: 화면 중앙에 고정 (fixed positioning)
+          setShouldStopAtFooter(false);
+          sidebar.style.position = 'fixed';
+          sidebar.style.top = '50%';
+          sidebar.style.transform = 'translateY(-50%)';
+        }
+      }
+    };
+
+    // 초기 실행 및 이벤트 리스너 등록
+    handleScroll();
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  const handleSourceClick = (source: NewsSource) => {
+    navigate(`/search?source=${source.code}`);
+  };
+
+  const getSourceLogo = (sourceCode: string) => {
+    // 언론사별 로고 이미지 경로
+    const logoMap: { [key: string]: string } = {
+      'chosun': '/images/sources/chosun.jpg',
+      'joongang': '/images/sources/joongang.svg',
+      'donga': '/images/sources/donga.jpg',
+      'khan': '/images/sources/khan.jpg',
+      'hani': '/images/sources/hani.svg',
+      'edaily': '/images/sources/edaily.png',
+      'yna': '/images/sources/yonhap.png',
+    };
+    
+    return logoMap[sourceCode] || '/images/sources/default-news.svg';
+  };
+
+  return (
+    <div className={`right-sidebar-container ${shouldStopAtFooter ? 'stop-at-footer' : ''}`}>
+      <div className="right-sidebar">
+        {/* 언론사 목록 섹션 */}
+        <div className="sidebar-section">
+          <h3 className="sidebar-title">언론사</h3>
+          
+          <div className="news-sources">
+            <div className="news-sources-content">
+              {newsSources.map((source) => (
+                <button 
+                  key={source.code}
+                  className="source-btn-header"
+                  onClick={() => handleSourceClick(source)}
+                  title={source.description}
+                >
+                  <img 
+                    src={getSourceLogo(source.code)} 
+                    alt={source.name}
+                    className="source-logo-img"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/sources/default-news.svg';
+                    }}
+                  />
+                  <span className="source-name-header">{source.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RightSidebar; 

@@ -2,12 +2,28 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Footer.css';
 
+/**
+ * 푸터 컴포넌트
+ * 수정사항:
+ * - 모든 링크 클릭 시 상단 스크롤 기능 추가
+ * - handleNavigation 함수로 통합 처리
+ * - handleLinkClick 함수로 외부 링크 처리
+ */
 const Footer: React.FC = () => {
   const navigate = useNavigate();
 
+  // 내부 네비게이션 처리 및 상단 스크롤
   const handleNavigation = (path: string) => {
     navigate(path);
-    window.scrollTo(0, 0);
+    // 페이지 이동 후 상단으로 부드럽게 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 외부 링크 클릭 처리 및 상단 스크롤
+  const handleLinkClick = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    // 외부 링크 클릭 후 상단으로 부드럽게 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -24,21 +40,21 @@ const Footer: React.FC = () => {
             </p>
             {/*  소셜 미디어 링크  */}
             <div className="footer-social">
-                <a href="#" className="social-btn" title="페이스북">📘</a>
-                <a href="#" className="social-btn" title="트위터">🐦</a>
-                <a href="#" className="social-btn" title="인스타그램">📷</a>
-                <a href="#" className="social-btn" title="유튜브">📺</a>
+                <a href="#" className="social-btn" title="페이스북" onClick={() => handleLinkClick('#')} target="_blank">📘</a>
+                <a href="#" className="social-btn" title="트위터" onClick={() => handleLinkClick('#')} target="_blank">🐦</a>
+                <a href="#" className="social-btn" title="인스타그램" onClick={() => handleLinkClick('#')} target="_blank">📷</a>
+                <a href="#" className="social-btn" title="유튜브" onClick={() => handleLinkClick('#')} target="_blank">📺</a>
             </div>
           </div>
           
           <div className="footer-section">
             <h3 className="footer-subtitle">서비스</h3>
             <ul className="footer-links">
-              <li><Link to="/" className="footer-link">뉴스 검색</Link></li>
-              <li><Link to="/search" className="footer-link">카테고리별 뉴스</Link></li>
-              <li><a href="#" className="footer-link">인기 검색어</a></li>
-              <li><a href="#" className="footer-link">실시간 뉴스</a></li>
-              <li><a href="#" className="footer-link">북마크</a></li>
+              <li><Link to="/" className="footer-link" onClick={() => handleNavigation('/')}>뉴스 검색</Link></li>
+              <li><Link to="/search" className="footer-link" onClick={() => handleNavigation('/search')}>카테고리별 뉴스</Link></li>
+              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>인기 검색어</a></li>
+              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>실시간 뉴스</a></li>
+              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>북마크</a></li>
             </ul>
           </div>
           
@@ -46,7 +62,7 @@ const Footer: React.FC = () => {
             <h3 className="footer-subtitle">고객지원</h3>
             <ul className="footer-links">
               <li><Link to="/faq" className="footer-link" onClick={() => handleNavigation('/faq')}>자주 묻는 질문</Link></li>
-              <li><a href="#" className="footer-link">고객센터</a></li>
+              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>고객센터</a></li>
               <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>개선 제안</Link></li>
               <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>버그 신고</Link></li>
               <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>문의하기</Link></li>
