@@ -7,7 +7,10 @@ from selenium import webdriver  # 웹 페이지 조작을 위한 Selenium
 from selenium.webdriver.chrome.options import Options  # Chrome 옵션 설정
 from bs4 import BeautifulSoup  # HTML 파싱 라이브러리
 from urllib.parse import urljoin, urlparse  # URL 병합 및 파싱용
-from pymongo import MongoClient  # MongoDB와 연동
+from komoran import komoran # 형태소
+from tfidf import tf_idf # TF-IDF
+from textrank import textrank_keywords, textrank_summarize # TextRank
+from mongo_save import save_to_mongodb # MongoDB
 
 # ======================
 # 카테고리 미리 선언해주자 
@@ -92,20 +95,38 @@ def extract_article_data(driver, article_url, category_name):
                 paragraphs = fallback.find_all("p")
                 content = "\n".join(p.get_text(strip=True) for p in paragraphs)
 
+        if content:
+            # print(f"내용: {clean_text}\n")
+            # 형태소
+            nouns, pos_result = komoran(content)
+            # TF-IDF
+            tfidf_keywords = tf_idf(title, content, pos_result, nouns)
+            # TextRank
+            textrank_kw = textrank_keywords(nouns)
+        else:
+            print(f"내용 없음{content}")
+
         pub_time = soup.select_one("meta[property='article:published_time']")  # 발행일 추출
         published_at = pub_time["content"] if pub_time else None
+
+        # 중요 내용
+        sentences = [s.strip() for s in content.split('.') if len(s.strip()) > 10]
+        summary_sentences = textrank_summarize(sentences, top_k=3)
 
         # post_id = urlparse(article_url).path.rstrip("/").split("/")[-1]  # URL에서 post_id 추출
         post_id = article_url  # 걍 URL을 post_id 느낌으로 사용
 
         return {
-      "headline": title,
-    "url": article_url,  # ← 이걸 중복 체크 기준으로도 사용
-    "content": content,
-    "time": published_at,
-    "category": category_name,
-    "source": "chosun"
-}
+            "headline": title,
+            "url": article_url,  # ← 이걸 중복 체크 기준으로도 사용
+            "content": content,
+            "time": published_at,
+            "tfidf_keywords": tfidf_keywords,
+            "textrank_keywords": textrank_kw,
+            "summary": summary_sentences,
+            "category": category_name,
+            "source": "chosun"
+        }
 
     except Exception as e:
         print(f"[본문 추출 실패] {article_url} → {e}")
@@ -157,47 +178,7 @@ def collect_articles_from_category(category_url, max_pages=3):
     return collected
 
 # ======================
-# [5] MongoDB에 저장
-# ======================
-def save_to_mongodb(articles):
-    try:
-        client = MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000")
-        db = client["newsdata"]
-        collection = db["newsdata"]
-
-        total = len(articles)
-        unique_urls = set()
-        inserted = 0
-        skipped = 0
-
-        for article in articles:
-            url = article.get("url")
-            if not url:
-                skipped += 1
-                continue
-
-            if url in unique_urls:
-                continue
-            unique_urls.add(url)
-
-            result = collection.update_one(
-                {"url": url},
-                {"$setOnInsert": article},
-                upsert=True
-            )
-            if result.upserted_id or result.modified_count:
-                inserted += 1
-
-        print(f"\n 전체 수집 기사 수: {total}건")
-        print(f" 고유 URL 수: {len(unique_urls)}건")
-        print(f" 저장 또는 갱신: {inserted}건")
-        print(f" URL 누락으로 스킵된 건수: {skipped}건")
-
-    except Exception as e:
-        print(f"[MongoDB 오류] {e}")
-
-# ======================
-# [6] 메인 함수: 병렬 수집 및 저장 실행
+# [5] 메인 함수: 병렬 수집 및 저장 실행
 # ======================
 if __name__ == "__main__":
     categories = get_category_links()  # 카테고리 링크 수집

@@ -73,16 +73,15 @@ def clean_datetime(text):
 
 # 실행 흐름
 # 카테고리 종류
-# categories = ["economy", "opinion", "society", "hanihealth", "sports", "culture"]
 # donga 전용 매핑
 category_mapping = {
-    "Economy": "economy",
-    "Opinion": "opinion",
-    "Society": "society",
-    "Health": "hanihealth",
-    "Sports": "sports",
-    "Culture": "culture",
-    "Entertainment": "culture"
+    "Economy": "경제",
+    "Opinion": "오피니언",
+    "Society": "사회",
+    "Health": "건강",
+    "Sports": "스포츠",
+    "Culture": "연예/문화",
+    "Entertainment": "연예/문화"
 }
 categories = ["economy", "politics", "society", "sports", "culture"]  # 연합뉴스 카테고리
 data = []
@@ -104,7 +103,8 @@ for category in categories:
                 # headline이 리스트인 경우 첫 번째 요소 사용
                 if isinstance(article['headline'], list):
                     article['headline'] = article['headline'][0].text.strip() if article['headline'] else "제목 없음"
-                
+                # 카테고리 매핑
+                converted_category = category_mapping.get(category, category)
                 article['category'] = category
                 data.append(article)
                 print(f"    ✓ 제목: {article['headline'][:50]}...")

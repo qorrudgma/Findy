@@ -96,17 +96,13 @@ def clean_datetime(text):
     return time
 
 # 실행 흐름
-# khan 전용 매핑
+# khan 전용 매핑(스포츠 없음)
 category_mapping = {
     "economy": "경제",
     "opinion": "오피니언",
-    "society": "사회",
+    "national": "사회",
     "life/health/articles": "건강",
-    "sports": "스포츠",
     "culture": "연예/문화"
-}
-category_mapping = {
-    "life/health/articles": "health"
 }
 categories = ["economy", "opinion", "national", "life/health/articles", "culture"]
 # categories = ["economy"]
