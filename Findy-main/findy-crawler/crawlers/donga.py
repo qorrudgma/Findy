@@ -11,6 +11,7 @@ from mongo_save import save_to_mongodb # MongoDB
 def fetch_headlines(category,page):
     page = (page*10)+1
     f_url = f"https://www.donga.com/news/{category}?p={page}&prod=news&ymd=&m="
+    # print(f_url)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
@@ -22,6 +23,7 @@ def fetch_headlines(category,page):
         news_headlines = []
 
         articles_div = soup.select_one("div.divide_area > section.sub_news_sec")
+        # print(articles_div)
         articles = articles_div.select("div.news_body > h4.tit > a")
         
         for article in articles:
@@ -102,20 +104,29 @@ def fetch_article_content(article_url):
 # donga 전용 매핑
 category_mapping = {
     "Economy": "경제",
-    "Opinion": "오피니언",
-    "Society": "사회",
+    "Series": "오피니언",
+    "Society/70040100000001": "사회",
+    "Society/70040100000009": "사회",
+    "Society/70040100000002": "사회",
+    "Society/70040100000019": "사회",
+    "Society/70040100000278": "사회",
+    "Society/70040100000034": "사회",
+    "Society/70010000000260": "사회",
     "Health": "건강",
     "Sports": "스포츠",
     "Culture": "연예/문화",
     "Entertainment": "연예/문화"
 }
-categories = ["Economy", "Opinion", "Society", "Health", "Sports", "Culture", "Entertainment"]
-# categories = ["Economy"]
+# category_list = ["70040100000001","70040100000009","70040100000002","70040100000019","70040100000278","70040100000034","70010000000260"]
+# categories = ["Economy", "Series", "Society", "Health", "Sports", "Culture", "Entertainment"]
+
+categories = ["Economy", "Series/70040100000001", "Series/70040100000009", "Series/70040100000002", "Series/70040100000019", "Series/70040100000278", "Series/70040100000034", "Series/70010000000260", "Society", "Health", "Sports", "Culture", "Entertainment"]
+# categories = ["Series/70040100000019"]
 data = []
 for category in categories:
     print("donga - ", category)
     # 반복할 페이지 수
-    for i in range(10):
+    for i in range(1):
         headlines = fetch_headlines(category, i)
 
         if headlines:
@@ -125,6 +136,10 @@ for category in categories:
                 if article:
                     # 출력전에 교체
                     converted_category = category_mapping.get(category, category)
+
+                    print("결과 => ")
+                    for key, value in article.items():
+                        print(f"{key}:\n{value}\n")
 
                     data.append(article)
                 else:
