@@ -171,6 +171,12 @@
     box-shadow: none;
 }
 
+.first-last-btn {
+    font-size: 1.2rem;
+    font-weight: bold;
+    min-width: 3rem;
+}
+
 .pagination-numbers {
     display: flex;
     gap: 0.3rem;

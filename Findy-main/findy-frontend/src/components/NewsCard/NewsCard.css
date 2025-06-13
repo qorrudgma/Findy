@@ -324,8 +324,9 @@
     border: 1px solid #e0e0e0;
     transition: all 0.3s ease;
     cursor: pointer;
-    width: 100%;
-    margin-bottom: 1rem;
+    width: 90%;
+    margin: 0 auto 1rem auto; /* 카드 자체를 중앙 정렬 */
+    display: block; /* grid에서 block으로 변경 */
 }
 
 .list-news-card:hover {

@@ -60,24 +60,17 @@ const SearchPage: React.FC = () => {
     'yna': '연합뉴스'
   };
 
+  // 검색어나 카테고리가 변경되면 페이지를 0으로 초기화
   useEffect(() => {
-    if (query || category) {
+    setCurrentPage(0);
+  }, [query, category, source]);
+
+  // 검색 실행 (페이지 변경 포함)
+  useEffect(() => {
+    if (query || category || source) {
       performSearch();
     }
-  }, [query, category, currentPage]);
-
-//   //페이징처리 초기화용
-//   // 👉 1. currentPage 초기화용 useEffect 추가
-//   useEffect(() => {
-//     setCurrentPage(0);  // 카테고리나 검색어가 바뀌면 항상 페이지 0부터 시작
-//   }, [query, category]);
-//
-// // 👉 2. 기존 검색 실행용 useEffect는 currentPage만 감지
-//   useEffect(() => {
-//     if (query || category) {
-//       performSearch();
-//     }
-//   }, [currentPage]);
+  }, [query, category, source, currentPage]);
 
   // 여기서 검색어 받아서 뭐로 할지 적음
   const performSearch = async () => {
@@ -214,7 +207,7 @@ const SearchPage: React.FC = () => {
           )}
           
           {/* 언론사별 카테고리 버튼 */}
-          <div className="news-sources-section">
+          {/* <div className="news-sources-section">
             <h3 className="sources-title">📰 언론사별 뉴스</h3>
             <div className="news-sources-grid">
               {newsSources.map((newsSource, index) => (
@@ -227,7 +220,7 @@ const SearchPage: React.FC = () => {
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {isLoading ? (
@@ -256,6 +249,16 @@ const SearchPage: React.FC = () => {
                 {/* 페이지네이션 */}
                 {totalPages > 1 && (
                   <div className="pagination">
+                    {/* 맨 첫 페이지 버튼 */}
+                    <button
+                      className="pagination-btn first-last-btn"
+                      disabled={currentPage === 0}
+                      onClick={() => handlePageChange(0)}
+                      title="첫 페이지"
+                    >
+                      ≪
+                    </button>
+                    
                     <button
                       className="pagination-btn"
                       disabled={currentPage === 0}
@@ -293,6 +296,16 @@ const SearchPage: React.FC = () => {
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
                       다음
+                    </button>
+                    
+                    {/* 맨 마지막 페이지 버튼 */}
+                    <button
+                      className="pagination-btn first-last-btn"
+                      disabled={currentPage === totalPages - 1}
+                      onClick={() => handlePageChange(totalPages - 1)}
+                      title="마지막 페이지"
+                    >
+                      ≫
                     </button>
                   </div>
                 )}

@@ -308,21 +308,24 @@ const Header: React.FC = () => {
         {/* 하단 영역: 카테고리 네비게이션 */}
         <nav className="header-nav">
           <div className="category-list">
-            {categories.map((category) => (
-              <a 
-                href="#" 
-                key={category} 
-                className={`category-item ${
-                  (location.pathname === '/' && category === '전체') ||
-                  location.search.includes(`category=${encodeURIComponent(category)}`)
-                    ? 'active' : ''
-                }`}
-                data-category={category}
-                onClick={(e) => { e.preventDefault(); handleCategoryClick(category); }}
-              >
-                {category}
-              </a>
-            ))}
+            {categories.map((category) => {
+              const isActive = 
+                (location.pathname === '/' && category === '전체') ||
+                location.search.includes(`category=${encodeURIComponent(category)}`) ||
+                (location.pathname === '/search' && category === '전체' && !location.search.includes('category='));
+              
+              return (
+                <a 
+                  href="#" 
+                  key={category} 
+                  className={`category-item ${ isActive ? 'active' : '' }`}
+                  data-category={category}
+                  onClick={(e) => { e.preventDefault(); handleCategoryClick(category); }}
+                >
+                  {category}
+                </a>
+              );
+            })}
           </div>
         </nav>
       </div>
