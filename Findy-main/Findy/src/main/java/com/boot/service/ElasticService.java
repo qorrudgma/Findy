@@ -240,7 +240,8 @@ public class ElasticService {
 
 		// 2) SearchRequest 빌드 (score 내림차순 정렬은 기본)
 		SearchRequest req = SearchRequest
-				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(20) // 원하는 개수
+				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(10) // 원하는
+																									// 개수
 				);
 
 		// 3) 검색 실행
@@ -248,13 +249,13 @@ public class ElasticService {
 
 		// 4) 결과와 점수 읽기
 		List<Map<String, Object>> results = resp.hits().hits().stream()
-				// 중간에 각 hit의 source를 로그로 출력
-				.peek(hit -> log.info("결과 => " + hit.source()))
+		// 중간에 각 hit의 source를 로그로 출력
+//				.peek(hit -> log.info("결과 => " + hit.source()))
 				// SearchHit<Map>에서 Map<String,Object>만 꺼내기
 				.map(hit -> hit.source())
 				// List<Map<String,Object>>로 수집
 				.collect(Collectors.toList());
-		log.info("results =>" + results);
+//		log.info("results =>" + results);
 
 		return results;
 	}
