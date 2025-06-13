@@ -11,7 +11,6 @@ import org.openkoreantext.processor.tokenizer.KoreanTokenizer;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
-import com.boot.elasticsearch.EnglishDictionary;
 import com.boot.elasticsearch.HangulComposer;
 import com.boot.elasticsearch.KeyboardMapper;
 
@@ -31,15 +30,13 @@ public class ElasticService {
 	private final ElasticsearchOperations operations;
 	private final KeyboardMapper keyboardMapper;
 	private final HangulComposer hangulComposer;
-	private final EnglishDictionary englishDictionary;
 
 	public ElasticService(ElasticsearchClient client, ElasticsearchOperations operations, KeyboardMapper keyboardMapper,
-			HangulComposer hangulComposer, EnglishDictionary englishDictionary) {
+			HangulComposer hangulComposer) {
 		this.client = client;
 		this.operations = operations;
 		this.keyboardMapper = keyboardMapper;
 		this.hangulComposer = hangulComposer;
-		this.englishDictionary = englishDictionary;
 	}
 
 	private List<Map<String, Object>> extractHits(SearchResponse<Map> response) {
