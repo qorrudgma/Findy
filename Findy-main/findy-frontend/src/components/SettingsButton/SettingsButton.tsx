@@ -1,25 +1,70 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { useTheme } from '../../contexts/ThemeContext';
 import './SettingsButton.css';
 
 const SettingsButton: React.FC = () => {
-  // 나중에 실제 설정 기능으로 대체할 더미 함수
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isDarkMode, toggleDarkMode } = useTheme();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // 메뉴 외부 클릭 시 메뉴 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current && 
+        buttonRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleSettingsClick = () => {
-    console.log('설정 버튼 클릭됨 - 여기에 설정 기능 추가 예정');
-    // 임시로 알림 표시
-    alert('설정 기능은 곧 추가될 예정입니다!');
+    setIsMenuOpen(prev => !prev);
+  };
+
+  const handleDarkModeToggle = () => {
+    toggleDarkMode();
+    setIsMenuOpen(false); // 다크모드 변경 후 메뉴 닫기
   };
 
   return (
-    <button 
-      className="settings-button"
-      onClick={handleSettingsClick}
-      aria-label="설정"
-      title="설정"
-    >
-      <FontAwesomeIcon icon={faCog} />
-    </button>
+    <div className="settings-container">
+      <button 
+        ref={buttonRef}
+        className="settings-button"
+        onClick={handleSettingsClick}
+        aria-label="설정"
+        title="설정"
+      >
+        <FontAwesomeIcon icon={faCog} />
+      </button>
+      
+      {isMenuOpen && (
+        <div ref={menuRef} className="settings-menu">
+          <button 
+            className="settings-menu-item"
+            onClick={handleDarkModeToggle}
+          >
+            <FontAwesomeIcon 
+              icon={isDarkMode ? faSun : faMoon} 
+              className="menu-icon"
+            />
+            <span>{isDarkMode ? '라이트 모드' : '다크 모드'}</span>
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 

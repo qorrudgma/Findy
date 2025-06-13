@@ -14,6 +14,8 @@ interface NewsArticle {
   time: string;
   source: string;
   url: string;
+  img?: string; // MongoDB의 이미지 필드
+  imageUrl?: string; // 기존 호환성을 위한 필드
 }
 
 const HomePage: React.FC = () => {
@@ -69,7 +71,9 @@ const HomePage: React.FC = () => {
           time: item.time || "날짜 없음",
           source: item.source || '기타',
           tags: item.tags || [],
-          url: item.url || "#"
+          url: item.url || "#",
+          img: item.img || null, // MongoDB의 img 필드 추가
+          keywords: item.keywords || [] // keywords 필드도 추가
         }));
 
         const randomizedTop10 = [...mappedData]
@@ -130,7 +134,7 @@ const HomePage: React.FC = () => {
         <div className="content-header">
           <h2 className="content-title">최신 뉴스</h2>
           <p className="content-subtitle">
-            AI 기반 검색으로 정확하고 빠른 뉴스를 만나보세요
+            실시간 검색으로 정확하고 빠른 뉴스를 만나보세요
           </p>
           
           {/* 언론사별 카테고리 버튼 */}

@@ -21,6 +21,15 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // URL에서 검색어를 읽어와서 검색창에 표시
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const urlQuery = searchParams.get('q');
+    if (urlQuery && urlQuery !== searchQuery) {
+      setSearchQuery(urlQuery);
+    }
+  }, [location.search]);
+
   const categories = [
     '전체', '경제', '오피니언', '사회', '건강', 
     '연예/문화', '스포츠'
@@ -138,7 +147,7 @@ const Header: React.FC = () => {
       const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';
       navigate(`/search?q=${encodeURIComponent(query.trim())}${categoryParam}`);
       setShowSuggestions(false);
-      setSearchQuery('');
+      // setSearchQuery(''); // 검색어를 지우지 않음
       
       // 검색 후 상단으로 부드럽게 스크롤
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -197,6 +206,7 @@ const Header: React.FC = () => {
   };
 
   const handlePopularSearchClick = (query: string) => {
+    setSearchQuery(query);
     handleSearch(query);
   };
 

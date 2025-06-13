@@ -14,6 +14,13 @@ body {
     min-height: 100vh;
     color: #2D3748;
     padding-top: 80px; /* 120px로 큰 로고에 맞게 조정 */
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* 다크모드 스타일 */
+body.dark-mode {
+    background: linear-gradient(135deg, #1A202C 0%, #2D3748 50%, #4A5568 100%);
+    color: #acc8ee;
 }
 
 /* 공통 색상 변수 (CSS Custom Properties) */
@@ -28,6 +35,18 @@ body {
     --shadow-light: rgba(107, 115, 255, 0.1);
     --shadow-medium: rgba(107, 115, 255, 0.2);
     --shadow-heavy: rgba(107, 115, 255, 0.3);
+}
+
+/* 다크모드 색상 변수 */
+body.dark-mode {
+    --text-primary: #E2E8F0;
+    --text-secondary: rgba(226, 232, 240, 0.7);
+    --border-light: rgba(74, 85, 104, 0.3);
+    --background-white: #2D3748;
+    --background-light: #1A202C;
+    --shadow-light: rgba(0, 0, 0, 0.3);
+    --shadow-medium: rgba(0, 0, 0, 0.4);
+    --shadow-heavy: rgba(0, 0, 0, 0.5);
 }
 
 /* 공통 유틸리티 클래스 */
@@ -76,6 +95,10 @@ body {
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #4A5568;
 }
 
 ::-webkit-scrollbar-thumb {

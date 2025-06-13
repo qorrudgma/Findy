@@ -12,6 +12,7 @@ interface NewsArticle {
   source: string;
   url: string;
   imageUrl?: string;
+  img?: string; // MongoDB에서 사용하는 이미지 필드 추가
 }
 
 interface NewsCardProps {
@@ -50,6 +51,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
       'hani': '/images/sources/hani.svg',
       'khan': '/images/sources/khan.jpg',
       'edaily': '/images/sources/edaily.png',
+      'hankyung': '/images/sources/hankyung.png',
       
       // 한글명으로도 매핑 (호환성)
       '연합뉴스': '/images/sources/yonhap.png',
@@ -63,6 +65,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
       '한겨레': '/images/sources/hani.svg',
       '경향신문': '/images/sources/khan.jpg',
       '이데일리': '/images/sources/edaily.png',
+      '한국경제': '/images/sources/hankyung.png',
       
       // 기본 아이콘
       'default': '/images/sources/default-news.svg'
@@ -83,7 +86,9 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
       'joongang': '중앙일보',
       'donga': '동아일보',
       'hani': '한겨레',
-      'khan': '경향신문'
+      'khan': '경향신문',
+      'edaily': '이데일리',
+      'hankyung': '한국경제'
     };
     
     return sourceNames[source] || source;
@@ -125,10 +130,10 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, cardType, onClick }) => {
       </div>
       
       {/* 메인 뉴스 이미지 */}
-      {article.imageUrl && (
+      {(article.img || article.imageUrl) && (
         <div className="main-news-image-container">
           <img 
-            src={article.imageUrl} 
+            src={article.img || article.imageUrl} 
             alt={article.headline}
             className="main-news-image"
             onError={(e) => {

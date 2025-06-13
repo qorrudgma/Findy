@@ -12,6 +12,8 @@ interface NewsArticle {
   time: string;
   source: string;
   url: string;
+  img?: string; // MongoDB의 이미지 필드
+  imageUrl?: string; // 기존 호환성을 위한 필드
 }
 
 /**
@@ -109,7 +111,9 @@ const LeftSidebar: React.FC = () => {
           time: item.time || "날짜 없음",
           source: sourceNameMap[item.source] || item.source || '기타', // 영어 → 한글 매핑 적용
           tags: item.tags || [],
-          url: item.url || "#"
+          url: item.url || "#",
+          img: item.img || null, // MongoDB의 img 필드 추가
+          keywords: item.keywords || [] // keywords 필드도 추가
         }));
 
         setPopularArticles(mappedData.slice(0, 5)); // 상위 5개 기사만 표시

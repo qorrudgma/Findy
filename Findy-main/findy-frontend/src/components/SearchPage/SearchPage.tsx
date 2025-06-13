@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import NewsCard from '../NewsCard/NewsCard';
+import NewsListContainer from '../NewsCard/NewsListContainer';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import './SearchPage.css';
 
@@ -14,6 +14,8 @@ interface NewsArticle {
   time: string;
   source: string;
   url: string;
+  img?: string; // MongoDB의 이미지 필드
+  imageUrl?: string; // 기존 호환성을 위한 필드
 }
 
 const SearchPage: React.FC = () => {
@@ -23,6 +25,7 @@ const SearchPage: React.FC = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [isNewsExpanded, setIsNewsExpanded] = useState(false); // 뉴스 확장 상태 추가
   const navigate = useNavigate();
 
   const query = searchParams.get('q') || '';
@@ -33,7 +36,7 @@ const SearchPage: React.FC = () => {
   const newsSources = [
     '조선일보', '중앙일보', '동아일보',
     '경향신문', '한겨레', '이데일리',
-    '연합뉴스'
+    '연합뉴스', '한국경제'
   ];
 
   // 한글 언론사명을 영어 코드로 변환하는 매핑
@@ -45,7 +48,8 @@ const SearchPage: React.FC = () => {
     '경향신문': 'khan',
     '한겨레': 'hani',
     '이데일리': 'edaily',
-    '연합뉴스': 'yna'
+    '연합뉴스': 'yna',
+    '한국경제': 'hankyung'
   };
 
   // 영어 코드를 한글명으로 변환하는 역매핑
@@ -57,8 +61,31 @@ const SearchPage: React.FC = () => {
     'khan': '경향신문',
     'hani': '한겨레',
     'edaily': '이데일리',
-    'yna': '연합뉴스'
+    'yna': '연합뉴스',
+    'hankyung': '한국경제'
   };
+
+  // 뉴스 확장 상태가 변경될 때 사이드바 숨김/표시 처리
+  useEffect(() => {
+    const leftSidebarContainer = document.querySelector('.left-sidebar-container') as HTMLElement;
+    const rightSidebarContainer = document.querySelector('.right-sidebar-container') as HTMLElement;
+    
+    if (isNewsExpanded) {
+      // 확장 시 사이드바 숨김
+      if (leftSidebarContainer) leftSidebarContainer.style.display = 'none';
+      if (rightSidebarContainer) rightSidebarContainer.style.display = 'none';
+    } else {
+      // 축소 시 사이드바 표시
+      if (leftSidebarContainer) leftSidebarContainer.style.display = 'block';
+      if (rightSidebarContainer) rightSidebarContainer.style.display = 'block';
+    }
+    
+    // 컴포넌트 언마운트 시 정리
+    return () => {
+      if (leftSidebarContainer) leftSidebarContainer.style.display = '';
+      if (rightSidebarContainer) rightSidebarContainer.style.display = '';
+    };
+  }, [isNewsExpanded]);
 
   // 검색어나 카테고리가 변경되면 페이지를 0으로 초기화
   useEffect(() => {
@@ -84,13 +111,13 @@ const SearchPage: React.FC = () => {
       params.append('size', '10');
 
       let url;
-        // if (query) {
-        //   // 키워드 검색용 엔드포인트
-        //   url = `http://localhost:8485/search?${params.toString()}`;
-        // } else {
+        if (query) {
+          // 키워드 검색용 엔드포인트
+          url = `http://localhost:8485/search?${params.toString()}`;
+        } else {
           // 카테고리 조회용 엔드포인트
           url = `http://localhost:8485/api/search?${params.toString()}`;
-        // }
+        }
       
       
       const response = await fetch(url);
@@ -112,7 +139,9 @@ const SearchPage: React.FC = () => {
             time: item.time || "날짜 없음",
             source: item.source || '기타',
             tags: item.tags || [],
-            url: item.url || "#"
+            url: item.url || "#",
+            img: item.img || null, // MongoDB의 img 필드 추가
+            keywords: item.keywords || [] // keywords 필드도 추가
           }));
           
           setSearchResults(transformedNews);
@@ -192,18 +221,38 @@ const SearchPage: React.FC = () => {
     return '검색 결과';
   };
 
+  // 뉴스 확장 상태 변경 핸들러
+  const handleNewsExpandedChange = (isExpanded: boolean) => {
+    setIsNewsExpanded(isExpanded);
+  };
+
   return (
-    <div className="search-page">
+    <div className={`search-page ${isNewsExpanded ? 'news-expanded' : ''}`}>
       <div className="search-content">
         <div className="search-header">
-          <h2 className="search-title">
-            {getSearchTitle()} 검색 결과
-          </h2>
-          {!isLoading && (
-            <p className="search-subtitle">
-              총 {totalResults.toLocaleString()}개의 뉴스를 찾았습니다.
-              {/* {totalPages > 0 && ` (페이지 ${currentPage + 1}/${totalPages})`} */}
-            </p>
+          {/* 언론사별 검색 시에만 제목 표시 */}
+          {source && (
+            <h1 className="search-title">
+              {getSearchTitle()} 기사
+            </h1>
+          )}
+          
+          {/* AI 답변 섹션 */}
+          {query && !isLoading && (
+            <div className="ai-answer-section">
+              <div className="ai-answer-header">
+                <h3 className="ai-answer-title">🤖 AI 요약</h3>
+              </div>
+              <div className="ai-answer-content">
+                <div className="ai-answer-placeholder">
+                  {/* 여기에 ai 응답기능 넣으면 됨 */}
+                  <p>"{query}"에 대한 AI 분석 결과가 여기에 표시됩니다.</p>
+                  <div className="ai-loading">
+                    <span>AI가 뉴스를 분석하고 있습니다...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
           
           {/* 언론사별 카테고리 버튼 */}
@@ -235,15 +284,11 @@ const SearchPage: React.FC = () => {
             ) : (
               <div className="search-results">
                 <div className="results-list">
-                  {searchResults.map((article, index) => (
-                    <div className="news-list-item" key={article.id || `${index}-${article.headline}`}>
-                      <NewsCard
-                        article={article}
-                        cardType="list"
-                        onClick={handleNewsClick}
-                      />
-                    </div>
-                  ))}
+                  <NewsListContainer
+                    articles={searchResults}
+                    onArticleClick={handleNewsClick}
+                    onExpandedChange={handleNewsExpandedChange}
+                  />
                 </div>
 
                 {/* 페이지네이션 */}

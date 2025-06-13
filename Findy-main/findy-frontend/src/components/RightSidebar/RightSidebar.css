@@ -5,6 +5,7 @@
    - 헤더 카테고리 스타일 적용 (투명 배경, 얇은 테두리)
    - 하단 테두리만 유지 (border-bottom)
    - 실제 이미지 로고 사용
+   - 다크모드 지원 추가
    ============================================== */
 
 .right-sidebar-container {
@@ -27,6 +28,13 @@
   overflow: hidden;
   display: flex; /* Flexbox 레이아웃 적용 */
   flex-direction: column;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 다크모드 사이드바 스타일 */
+body.dark-mode .right-sidebar {
+  background: #2D3748;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-section {
@@ -46,6 +54,12 @@
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #1a73e8;
   flex-shrink: 0; /* 크기 고정 */
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode .sidebar-title {
+  color: #E2E8F0;
+  border-bottom-color: #90CDF4;
 }
 
 /* 언론사 목록 스타일 - 스크롤 기능 추가 */
@@ -88,6 +102,17 @@
   transform: translateY(-1px);
 }
 
+body.dark-mode .source-btn-header {
+  color: #A0AEC0;
+  border-bottom-color: #4A5568;
+}
+
+body.dark-mode .source-btn-header:hover {
+  color: #90CDF4;
+  border-bottom-color: #90CDF4;
+  background: #4A5568;
+}
+
 .source-btn-header:active {
   transform: translateY(0);
 }
@@ -116,6 +141,10 @@
   border-radius: 2px;
 }
 
+body.dark-mode .news-sources::-webkit-scrollbar-track {
+  background: #4A5568;
+}
+
 .news-sources::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 2px;
@@ -123,6 +152,14 @@
 
 .news-sources::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+body.dark-mode .news-sources::-webkit-scrollbar-thumb {
+  background: #718096;
+}
+
+body.dark-mode .news-sources::-webkit-scrollbar-thumb:hover {
+  background: #A0AEC0;
 }
 
 /* 반응형 디자인 */

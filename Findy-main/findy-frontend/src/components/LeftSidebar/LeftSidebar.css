@@ -5,6 +5,7 @@
    - Flexbox 레이아웃으로 변경
    - 스크롤 기능 추가
    - 반응형 높이 조정
+   - 다크모드 지원 추가
    ============================================== */
 
 .left-sidebar-container {
@@ -27,6 +28,13 @@
   overflow: hidden;
   display: flex; /* Flexbox 레이아웃 적용 */
   flex-direction: column;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 다크모드 사이드바 스타일 */
+body.dark-mode .left-sidebar {
+  background: #2D3748;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-section {
@@ -39,6 +47,11 @@
 
 .sidebar-section:not(:last-child) {
   border-bottom: 1px solid #f0f0f0;
+  transition: border-color 0.3s ease;
+}
+
+body.dark-mode .sidebar-section:not(:last-child) {
+  border-bottom-color: #4A5568;
 }
 
 .sidebar-title {
@@ -50,6 +63,12 @@
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #1a73e8;
   flex-shrink: 0; /* 크기 고정 */
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode .sidebar-title {
+  color: #E2E8F0;
+  border-bottom-color: #90CDF4;
 }
 
 /* 인기기사 스타일 - 스크롤 기능 추가 */
@@ -79,6 +98,11 @@
   border-color: #e8e8e8;
 }
 
+body.dark-mode .popular-article-item:hover {
+  background: #4A5568;
+  border-color: #718096;
+}
+
 .article-rank {
   background: #1a73e8;
   color: white;
@@ -91,6 +115,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+body.dark-mode .article-rank {
+  background: #90CDF4;
+  color: #1A202C;
 }
 
 .article-content {
@@ -109,6 +139,11 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode .article-headline {
+  color: #E2E8F0;
 }
 
 .article-meta {
@@ -122,10 +157,20 @@
 .article-source {
   font-weight: 500;
   color: #1a73e8;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode .article-source {
+  color: #90CDF4;
 }
 
 .article-time {
   color: #999;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode .article-time {
+  color: #A0AEC0;
 }
 
 /* 인기검색어 스타일 (현재 사용하지 않음) */
@@ -149,6 +194,10 @@
   background: #f8f9ff;
 }
 
+body.dark-mode .popular-search-item:hover {
+  background: #4A5568;
+}
+
 .search-rank {
   background: #ff6b6b;
   color: white;
@@ -167,6 +216,11 @@
   font-size: 0.85rem;
   color: #333;
   font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode .search-term {
+  color: #E2E8F0;
 }
 
 /* 로딩 상태 */
@@ -175,6 +229,11 @@
   padding: 2rem;
   color: #666;
   font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode .sidebar-loading {
+  color: #A0AEC0;
 }
 
 /* 스크롤바 스타일 - 인기기사 영역에만 적용 */
@@ -187,6 +246,10 @@
   border-radius: 2px;
 }
 
+body.dark-mode .popular-articles::-webkit-scrollbar-track {
+  background: #4A5568;
+}
+
 .popular-articles::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 2px;
@@ -194,6 +257,14 @@
 
 .popular-articles::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+body.dark-mode .popular-articles::-webkit-scrollbar-thumb {
+  background: #718096;
+}
+
+body.dark-mode .popular-articles::-webkit-scrollbar-thumb:hover {
+  background: #A0AEC0;
 }
 
 /* 반응형 디자인 */

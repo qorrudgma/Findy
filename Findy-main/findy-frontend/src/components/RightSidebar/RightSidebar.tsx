@@ -23,6 +23,7 @@ const RightSidebar: React.FC = () => {
     { name: '한겨레', code: 'hani', category: '종합', description: '민주언론의 새로운 지평' },
     { name: '이데일리', code: 'edaily', category: '경제', description: '경제전문 인터넷신문' },
     { name: '연합뉴스', code: 'yna', category: '통신', description: '대한민국 대표 뉴스통신사' },
+    { name: '한국경제', code: 'hankyung', category: '통신', description: '대한민국 대표 뉴스통신사' },
     { name: '더미', code: '#', category: '#', description: '#' },
     { name: '더미', code: '#', category: '#', description: '#' },
     { name: '더미', code: '#', category: '#', description: '#' },
@@ -90,6 +91,7 @@ const RightSidebar: React.FC = () => {
       'hani': '/images/sources/hani.svg',
       'edaily': '/images/sources/edaily.png',
       'yna': '/images/sources/yonhap.png',
+      'hankyung': '/images/sources/hankyung.png',
     };
     
     return logoMap[sourceCode] || '/images/sources/default-news.svg';
