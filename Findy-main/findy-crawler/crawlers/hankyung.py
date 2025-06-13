@@ -178,6 +178,7 @@ for category in categories:
                 if article:
                     # 출력전에 교체
                     converted_category = category_mapping.get(category, category)
+                    article["category"] = converted_category
 
                     print("결과 => ")
                     for key, value in article.items():

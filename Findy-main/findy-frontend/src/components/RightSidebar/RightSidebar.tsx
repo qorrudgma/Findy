@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './RightSidebar.css';
 
 interface NewsSource {
@@ -32,6 +33,7 @@ const RightSidebar: React.FC = () => {
   
   const [shouldStopAtFooter, setShouldStopAtFooter] = useState(false);// 스크롤 위치에 따른 사이드바 고정 상태
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // 스크롤에 따른 사이드바 위치 조정 로직 (90% 스크롤 시 고정)
@@ -65,8 +67,8 @@ const RightSidebar: React.FC = () => {
       }
     };
 
-    // 초기 실행 및 이벤트 리스너 등록
-    handleScroll();
+    // ✅ DOM 렌더링이 끝난 다음에 강제로 실행
+    requestAnimationFrame(() => handleScroll());
     
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll, { passive: true });
@@ -102,7 +104,7 @@ const RightSidebar: React.FC = () => {
       <div className="right-sidebar">
         {/* 언론사 목록 섹션 */}
         <div className="sidebar-section">
-          <h3 className="sidebar-title">언론사</h3>
+          <h3 className="sidebar-title">{t('sidebar.newsSources')}</h3>
           
           <div className="news-sources">
             <div className="news-sources-content">

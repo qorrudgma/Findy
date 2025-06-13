@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NewsCard from '../NewsCard/NewsCard';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './HomePage.css';
 
 interface NewsArticle {
@@ -23,6 +24,7 @@ const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [popularSearches, setPopularSearches] = useState<string[]>([]);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // 주요 언론사 목록 (표시용 한글명)
   const newsSources = [
@@ -132,9 +134,9 @@ const HomePage: React.FC = () => {
     <main className="home-page">
       <div className="main-content">
         <div className="content-header">
-          <h2 className="content-title">최신 뉴스</h2>
+          <h2 className="content-title">{t('home.latestNews')}</h2>
           <p className="content-subtitle">
-            실시간 검색으로 정확하고 빠른 뉴스를 만나보세요
+            {t('home.subtitle')}
           </p>
           
           {/* 언론사별 카테고리 버튼 */}
@@ -157,8 +159,8 @@ const HomePage: React.FC = () => {
         <div className="news-wrapper">
           {newsData.length === 0 ? (
             <div className="no-results">
-              <h3>뉴스가 없습니다</h3>
-              <p>잠시 후 다시 시도해주세요.</p>
+              <h3>{t('home.noNews')}</h3>
+              <p>{t('home.tryLater')}</p>
             </div>
           ) : (
             <>
@@ -189,7 +191,7 @@ const HomePage: React.FC = () => {
               {/* 하단 뉴스 그리드 (4개) */}
               {newsData.length > 7 && (
                 <div className="bottom-news-section">
-                  <h3 className="bottom-news-title">더 많은 뉴스</h3>
+                  <h3 className="bottom-news-title">{t('home.moreNews')}</h3>
                   <div className="bottom-news-grid">
                     {newsData.slice(7, 11).map((article) => (
                       <NewsCard 

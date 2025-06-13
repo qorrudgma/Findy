@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faBell, faBookmark, faGear } from '@fortawesome/free-solid-svg-icons';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './Header.css';
 
 interface SearchSuggestion {
@@ -20,6 +21,7 @@ const Header: React.FC = () => {
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
 
   // URL에서 검색어를 읽어와서 검색창에 표시
   useEffect(() => {
@@ -31,8 +33,13 @@ const Header: React.FC = () => {
   }, [location.search]);
 
   const categories = [
-    '전체', '경제', '오피니언', '사회', '건강', 
-    '연예/문화', '스포츠'
+    { key: '전체', label: t('header.categories.all') },
+    { key: '경제', label: t('header.categories.economy') },
+    { key: '오피니언', label: t('header.categories.opinion') },
+    { key: '사회', label: t('header.categories.society') },
+    { key: '건강', label: t('header.categories.health') },
+    { key: '연예/문화', label: t('header.categories.entertainment') },
+    { key: '스포츠', label: t('header.categories.sports') }
   ];
 
   // 더미 자동완성 데이터 사전
@@ -143,9 +150,19 @@ const Header: React.FC = () => {
 
   // 여기서 검색이 뭐로 할지 넘겨줌
   const handleSearch = (query: string) => {
-    if (query.trim()) {
-      const categoryParam = selectedCategory ? `&category=${encodeURIComponent(selectedCategory)}` : '';
-      navigate(`/search?q=${encodeURIComponent(query.trim())}${categoryParam}`);
+    // 검색어가 있거나 카테고리가 선택된 경우 검색 실행
+    if (query.trim() || selectedCategory) {
+      let searchUrl = '/search?';
+      const params = new URLSearchParams();
+      
+      if (query.trim()) {
+        params.append('q', query.trim());
+      }
+      if (selectedCategory) {
+        params.append('category', selectedCategory);
+      }
+      
+      navigate(`/search?${params.toString()}`);
       setShowSuggestions(false);
       // setSearchQuery(''); // 검색어를 지우지 않음
       
@@ -191,18 +208,36 @@ const Header: React.FC = () => {
   };
 
   // 카테고리 클릭 처리 및 상단 스크롤
-  const handleCategoryClick = (category: string) => {
-    if (category === '전체') {
+  const handleCategoryClick = (categoryKey: string) => {
+    if (categoryKey === 'all') {
       navigate('/');
     } else {
-      navigate(`/search?category=${encodeURIComponent(category)}`);
+      navigate(`/search?category=${encodeURIComponent(categoryKey)}`);
     }
     // 카테고리 클릭 후 상단으로 부드럽게 스크롤
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(e.target.value);
+    const newCategory = e.target.value;
+    setSelectedCategory(newCategory);
+    
+    // 카테고리 변경 시 즉시 검색 실행
+    if (newCategory || searchQuery.trim()) {
+      const params = new URLSearchParams();
+      
+      if (searchQuery.trim()) {
+        params.append('q', searchQuery.trim());
+      }
+      if (newCategory) {
+        params.append('category', newCategory);
+      }
+      
+      navigate(`/search?${params.toString()}`);
+      
+      // 검색 후 상단으로 부드럽게 스크롤
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handlePopularSearchClick = (query: string) => {
@@ -250,13 +285,13 @@ const Header: React.FC = () => {
                     value={selectedCategory}
                     onChange={handleCategoryChange}
                   >
-                    <option value="">전체</option>
-                    <option value="경제">경제</option>
-                    <option value="오피니언">오피니언</option>
-                    <option value="사회">사회</option>
-                    <option value="건강">건강</option>
-                    <option value="연예/문화">연예/문화</option>
-                    <option value="스포츠">스포츠</option>
+                    <option value="">{t('header.categories.all')}</option>
+                    <option value="경제">{t('header.categories.economy')}</option>
+                    <option value="오피니언">{t('header.categories.opinion')}</option>
+                    <option value="사회">{t('header.categories.society')}</option>
+                    <option value="건강">{t('header.categories.health')}</option>
+                    <option value="연예/문화">{t('header.categories.entertainment')}</option>
+                    <option value="스포츠">{t('header.categories.sports')}</option>
                   </select>
                   <div className="search-divider"></div>
                   <input 
@@ -264,7 +299,7 @@ const Header: React.FC = () => {
                     type="text" 
                     id="searchInput" 
                     className="search-input-inner" 
-                    placeholder="뉴스, 키워드, 주제를 검색해보세요..." 
+                    placeholder={t('header.search.placeholder')} 
                     value={searchQuery}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
@@ -320,19 +355,19 @@ const Header: React.FC = () => {
           <div className="category-list">
             {categories.map((category) => {
               const isActive = 
-                (location.pathname === '/' && category === '전체') ||
-                location.search.includes(`category=${encodeURIComponent(category)}`) ||
-                (location.pathname === '/search' && category === '전체' && !location.search.includes('category='));
+                (location.pathname === '/' && category.key === 'all') ||
+                location.search.includes(`category=${encodeURIComponent(category.key)}`) ||
+                (location.pathname === '/search' && category.key === 'all' && !location.search.includes('category='));
               
               return (
                 <a 
                   href="#" 
-                  key={category} 
+                  key={category.key} 
                   className={`category-item ${ isActive ? 'active' : '' }`}
-                  data-category={category}
-                  onClick={(e) => { e.preventDefault(); handleCategoryClick(category); }}
+                  data-category={category.key}
+                  onClick={(e) => { e.preventDefault(); handleCategoryClick(category.key); }}
                 >
-                  {category}
+                  {category.label}
                 </a>
               );
             })}

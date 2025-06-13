@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './Footer.css';
 
 /**
@@ -11,6 +12,7 @@ import './Footer.css';
  */
 const Footer: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // 내부 네비게이션 처리 및 상단 스크롤
   const handleNavigation = (path: string) => {
@@ -31,12 +33,12 @@ const Footer: React.FC = () => {
       <div className="footer-container">
         <div className="footer-content">
           <div className="footer-section">
-            <h3 className="footer-title">Findy 뉴스</h3>
+            <h3 className="footer-title">{t('footer.findyNews')}</h3>
             <p className="footer-description">
-              AI 기반 뉴스 검색 엔진으로 정확하고 빠른 뉴스를 제공합니다.
+              {t('footer.description1')}
             </p>
             <p className="footer-description">
-              신뢰할 수 있는 정보, 스마트한 검색 경험을 만나보세요.
+              {t('footer.description2')}
             </p>
             {/*  소셜 미디어 링크  */}
             <div className="footer-social">
@@ -48,35 +50,35 @@ const Footer: React.FC = () => {
           </div>
           
           <div className="footer-section">
-            <h3 className="footer-subtitle">서비스</h3>
+            <h3 className="footer-subtitle">{t('footer.services')}</h3>
             <ul className="footer-links">
-              <li><Link to="/" className="footer-link" onClick={() => handleNavigation('/')}>뉴스 검색</Link></li>
-              <li><Link to="/search" className="footer-link" onClick={() => handleNavigation('/search')}>카테고리별 뉴스</Link></li>
-              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>인기 검색어</a></li>
-              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>실시간 뉴스</a></li>
-              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>북마크</a></li>
+              <li><Link to="/" className="footer-link" onClick={() => handleNavigation('/')}>{t('footer.newsSearch')}</Link></li>
+              <li><Link to="/search" className="footer-link" onClick={() => handleNavigation('/search')}>{t('footer.categoryNews')}</Link></li>
+              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>{t('footer.popularSearch')}</a></li>
+              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>{t('footer.realtimeNews')}</a></li>
+              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>{t('footer.bookmark')}</a></li>
             </ul>
           </div>
           
           <div className="footer-section">
-            <h3 className="footer-subtitle">고객지원</h3>
+            <h3 className="footer-subtitle">{t('footer.support')}</h3>
             <ul className="footer-links">
-              <li><Link to="/faq" className="footer-link" onClick={() => handleNavigation('/faq')}>자주 묻는 질문</Link></li>
-              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>고객센터</a></li>
-              <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>개선 제안</Link></li>
-              <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>버그 신고</Link></li>
-              <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>문의하기</Link></li>
+              <li><Link to="/faq" className="footer-link" onClick={() => handleNavigation('/faq')}>{t('footer.faq')}</Link></li>
+              <li><a href="#" className="footer-link" onClick={() => handleLinkClick('#')}>{t('footer.customerCenter')}</a></li>
+              <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>{t('footer.suggestion')}</Link></li>
+              <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>{t('footer.bugReport')}</Link></li>
+              <li><Link to="/contact" className="footer-link" onClick={() => handleNavigation('/contact')}>{t('footer.contact')}</Link></li>
             </ul>
           </div>
           
           <div className="footer-section">
-            <h3 className="footer-subtitle">정책 및 약관</h3>
+            <h3 className="footer-subtitle">{t('footer.policies')}</h3>
             <ul className="footer-links">
-              <li><Link to="/terms" className="footer-link" onClick={() => handleNavigation('/terms')}>이용약관</Link></li>
-              <li><Link to="/privacy" className="footer-link" onClick={() => handleNavigation('/privacy')}>개인정보처리방침</Link></li>
-              <li><Link to="/copyright" className="footer-link" onClick={() => handleNavigation('/copyright')}>저작권 정책</Link></li>
-              <li><Link to="/ad-policy" className="footer-link" onClick={() => handleNavigation('/ad-policy')}>뉴스 제공업체</Link></li>
-              <li><Link to="/ad-policy" className="footer-link" onClick={() => handleNavigation('/ad-policy')}>광고 정책</Link></li>
+              <li><Link to="/terms" className="footer-link" onClick={() => handleNavigation('/terms')}>{t('footer.terms')}</Link></li>
+              <li><Link to="/privacy" className="footer-link" onClick={() => handleNavigation('/privacy')}>{t('footer.privacy')}</Link></li>
+              <li><Link to="/copyright" className="footer-link" onClick={() => handleNavigation('/copyright')}>{t('footer.copyright')}</Link></li>
+              <li><Link to="/ad-policy" className="footer-link" onClick={() => handleNavigation('/ad-policy')}>{t('footer.newsProvider')}</Link></li>
+              <li><Link to="/ad-policy" className="footer-link" onClick={() => handleNavigation('/ad-policy')}>{t('footer.adPolicy')}</Link></li>
             </ul>
           </div>
         </div>

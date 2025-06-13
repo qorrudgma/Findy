@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
 import NewsListContainer from '../NewsCard/NewsListContainer';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './SearchPage.css';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface NewsArticle {
   id?: string;
@@ -26,7 +29,12 @@ const SearchPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isNewsExpanded, setIsNewsExpanded] = useState(false); // 뉴스 확장 상태 추가
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<'latest' | 'oldest' | 'title' | 'content' | null>(null);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const query = searchParams.get('q') || '';
   const category = searchParams.get('category') || '';
@@ -110,14 +118,8 @@ const SearchPage: React.FC = () => {
       params.append('page', currentPage.toString());
       params.append('size', '10');
 
-      let url;
-        if (query) {
-          // 키워드 검색용 엔드포인트
-          url = `http://localhost:8485/search?${params.toString()}`;
-        } else {
-          // 카테고리 조회용 엔드포인트
-          url = `http://localhost:8485/api/search?${params.toString()}`;
-        }
+      // 통합된 검색 엔드포인트 사용
+      const url = `http://localhost:8485/api/search?${params.toString()}`;
       
       
       const response = await fetch(url);
@@ -226,10 +228,39 @@ const SearchPage: React.FC = () => {
     setIsNewsExpanded(isExpanded);
   };
 
+  // 날짜 범위 변경 핸들러
+  const handleDateRangeChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end);
+    
+    // 종료 날짜가 선택되면 검색 실행
+    if (start && end) {
+      setShowDatePicker(false);
+      // 날짜 필터링과 함께 검색 재실행
+      setCurrentPage(0);
+    }
+  };
+
+  // 날짜 필터 초기화
+  const handleDateReset = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setCurrentPage(0);
+  };
+
+  // 필터 변경 핸들러 (하나만 선택 가능)
+  const handleFilterChange = (filter: 'latest' | 'oldest' | 'title' | 'content') => {
+    setSelectedFilter(prevFilter => prevFilter === filter ? null : filter);
+    setCurrentPage(0);
+  };
+
   return (
     <div className={`search-page ${isNewsExpanded ? 'news-expanded' : ''}`}>
       <div className="search-content">
         <div className="search-header">
+          {/* 오탈자 수정 (오타) */}
+          <h1 className="search-request-title">{t(getSearchTitle())}</h1>
           {/* 언론사별 검색 시에만 제목 표시 */}
           {source && (
             <h1 className="search-title">
@@ -241,14 +272,14 @@ const SearchPage: React.FC = () => {
           {query && !isLoading && (
             <div className="ai-answer-section">
               <div className="ai-answer-header">
-                <h3 className="ai-answer-title">🤖 AI 요약</h3>
+                <h3 className="ai-answer-title">🤖 {t('search.aiSummary')}</h3>
               </div>
               <div className="ai-answer-content">
                 <div className="ai-answer-placeholder">
                   {/* 여기에 ai 응답기능 넣으면 됨 */}
-                  <p>"{query}"에 대한 AI 분석 결과가 여기에 표시됩니다.</p>
+                  <p>"{query}"{t('search.aiResult')}</p>
                   <div className="ai-loading">
-                    <span>AI가 뉴스를 분석하고 있습니다...</span>
+                    <span>{t('search.aiAnalyzing')}</span>
                   </div>
                 </div>
               </div>
@@ -270,6 +301,73 @@ const SearchPage: React.FC = () => {
               ))}
             </div>
           </div> */}
+          <div className="news-sources-section">
+            <div className="news-sources-grid">
+                <button
+                 className={`source-btn ${selectedFilter === 'latest' ? 'active' : ''}`}
+                 onClick={() => handleFilterChange('latest')}
+                 >
+                  {t('search.filters.latest')}
+                </button>
+                <button
+                 className={`source-btn ${selectedFilter === 'oldest' ? 'active' : ''}`}
+                 onClick={() => handleFilterChange('oldest')}
+                 >
+                  {t('search.filters.oldest')}
+                </button>
+                <button
+                 className={`source-btn ${selectedFilter === 'title' ? 'active' : ''}`}
+                 onClick={() => handleFilterChange('title')}
+                  >
+                  {t('search.filters.title')}
+                </button>
+                <button
+                 className={`source-btn ${selectedFilter === 'content' ? 'active' : ''}`}
+                 onClick={() => handleFilterChange('content')}
+                 >
+                  {t('search.filters.content')}
+                </button>
+                <div className="date-picker-container">
+                  <button
+                    className={`source-btn ${startDate && endDate ? 'active' : ''}`}
+                    onClick={() => setShowDatePicker(!showDatePicker)}
+                  >
+                    {startDate && endDate 
+                      ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
+                      : t('search.filters.period')
+                    }
+                  </button>
+                  {showDatePicker && (
+                    <div className="date-picker-dropdown">
+                      <DatePicker
+                        selected={startDate}
+                        onChange={handleDateRangeChange}
+                        startDate={startDate}
+                        endDate={endDate}
+                        selectsRange
+                        inline
+                        dateFormat="yyyy/MM/dd"
+                        placeholderText="날짜 범위 선택"
+                      />
+                                             <div className="date-picker-actions">
+                         <button 
+                           className="date-reset-btn"
+                           onClick={handleDateReset}
+                         >
+                           {t('search.filters.reset')}
+                         </button>
+                         <button 
+                           className="date-close-btn"
+                           onClick={() => setShowDatePicker(false)}
+                         >
+                           {t('search.filters.close')}
+                         </button>
+                       </div>
+                    </div>
+                  )}
+                </div>
+            </div>
+          </div>
         </div>
 
         {isLoading ? (
@@ -278,8 +376,8 @@ const SearchPage: React.FC = () => {
           <>
             {searchResults.length === 0 ? (
               <div className="no-results">
-                <h3>검색 결과가 없습니다</h3>
-                <p>다른 검색어나 카테고리를 시도해보세요.</p>
+                <h3>{t('search.noResults')}</h3>
+                <p>{t('search.tryOther')}</p>
               </div>
             ) : (
               <div className="search-results">
@@ -299,7 +397,7 @@ const SearchPage: React.FC = () => {
                       className="pagination-btn first-last-btn"
                       disabled={currentPage === 0}
                       onClick={() => handlePageChange(0)}
-                      title="첫 페이지"
+                      title={t('search.firstPage')}
                     >
                       ≪
                     </button>
@@ -309,7 +407,7 @@ const SearchPage: React.FC = () => {
                       disabled={currentPage === 0}
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      이전
+                      {t('search.previous')}
                     </button>
                     
                     <div className="pagination-numbers">
@@ -340,7 +438,7 @@ const SearchPage: React.FC = () => {
                       disabled={currentPage === totalPages - 1}
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      다음
+                      {t('search.next')}
                     </button>
                     
                     {/* 맨 마지막 페이지 버튼 */}
@@ -348,7 +446,7 @@ const SearchPage: React.FC = () => {
                       className="pagination-btn first-last-btn"
                       disabled={currentPage === totalPages - 1}
                       onClick={() => handlePageChange(totalPages - 1)}
-                      title="마지막 페이지"
+                      title={t('search.lastPage')}
                     >
                       ≫
                     </button>

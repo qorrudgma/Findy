@@ -127,7 +127,7 @@ category_mapping = {
 # category_list = ["70040100000001","70040100000009","70040100000002","70040100000019","70040100000278","70040100000034","70010000000260"]
 # categories = ["Economy", "Series", "Society", "Health", "Sports", "Culture", "Entertainment"]
 
-categories = ["Economy", "Series/70040100000001", "Series/70040100000009", "Series/70040100000002", "Series/70040100000019", "Series/70040100000278", "Series/70040100000034", "Series/70010000000260", "Society", "Health", "Sports", "Culture", "Entertainment"]
+categories = ["Economy", "Series", "Society/70040100000001", "Society/70040100000009", "Society/70040100000002", "Society/70040100000019", "Society/70040100000278", "Society/70040100000034", "Society/70010000000260", "Health", "Sports", "Culture", "Entertainment"]
 # categories = ["Series/70040100000019"]
 data = []
 for category in categories:
@@ -143,6 +143,7 @@ for category in categories:
                 if article:
                     # 출력전에 교체
                     converted_category = category_mapping.get(category, category)
+                    article["category"] = converted_category
 
                     print("결과 => ")
                     for key, value in article.items():

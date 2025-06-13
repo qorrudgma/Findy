@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './LeftSidebar.css';
 
 interface NewsArticle {
@@ -28,6 +29,7 @@ const LeftSidebar: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [shouldStopAtFooter, setShouldStopAtFooter] = useState(false); // 스크롤 위치에 따른 사이드바 고정 상태
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadPopularContent();
@@ -162,10 +164,10 @@ const LeftSidebar: React.FC = () => {
       <div className="left-sidebar">
         {/* 실시간 인기기사 섹션 */}
         <div className="sidebar-section">
-          <h3 className="sidebar-title">실시간 인기기사</h3>
+          <h3 className="sidebar-title">{t('sidebar.popularArticles')}</h3>
           
           {isLoading ? (
-            <div className="sidebar-loading">로딩 중...</div>
+            <div className="sidebar-loading">{t('sidebar.loading')}</div>
           ) : (
             <div className="popular-articles">
               {popularArticles.map((article, index) => (

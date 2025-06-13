@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import HomePage from './components/HomePage/HomePage';
@@ -30,7 +31,8 @@ import './styles/App.css';
 function App() {
   return (
     <ThemeProvider>
-      <Router>
+      <LanguageProvider>
+        <Router>
         <div className="App">
           <Header />
           
@@ -58,6 +60,7 @@ function App() {
           <SettingsButton />
         </div>
       </Router>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
