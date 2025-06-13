@@ -2,6 +2,13 @@
 import time  # 대기 시간 제어용
 import threading  # 스레드 간 동기화에 사용
 
+#  리소스 정리 및 명시적 종료 처리 추가
+############# 종료 후 자원반납################
+import sys
+import threading
+from jpype import isJVMStarted, shutdownJVM
+#############################################
+
 from concurrent.futures import ThreadPoolExecutor  # 병렬처리를 위한 ThreadPool
 from selenium import webdriver  # 웹 페이지 조작을 위한 Selenium
 from selenium.webdriver.chrome.options import Options  # Chrome 옵션 설정
@@ -206,3 +213,19 @@ if __name__ == "__main__":
 
     print(f"\n📰 총 수집된 기사 수: {len(total_articles)}")
     save_to_mongodb(total_articles)  # MongoDB 저장
+
+############## 정상 종료 후 , 자원반납 ############
+    # ✅ 크롤링 완료 로그
+    print("[조선일보]  크롤링 및 저장 완료")
+    # komoran JVM 종료
+    if isJVMStarted():
+        shutdownJVM()
+        print("[chosun.py] 🔚 JVM 종료 완료")
+
+    # 살아있는 스레드 출력 (디버깅용)
+    for t in threading.enumerate():
+        if t is not threading.main_thread():
+            print(f"[chosun.py] 🧵 살아있는 스레드: {t.name}")
+
+    # 프로세스 명시적 종료
+    sys.exit(0)
