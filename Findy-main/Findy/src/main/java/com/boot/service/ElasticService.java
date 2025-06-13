@@ -48,63 +48,146 @@ public class ElasticService {
 	}
 
 	// 페이징처리를 위한 메소드
-	public Map<String, Object> searchWithPagination(String keyword, String category, int page, int size) {
-		try {
+//	public Map<String, Object> searchWithPagination(String keyword, String category, int page, int size) {
+//		try {
+//			SearchRequest.Builder requestBuilder = new SearchRequest.Builder().index("newsdata.newsdata")
+//					.from(page * size).size(size);
+//
+//			// 검색 조건 구성
+//			if (keyword != null && !keyword.isEmpty() && category != null && !category.isEmpty()) {
+//				requestBuilder.query(q -> q.bool(b -> b.must(m1 -> m1.match(m -> m.field("headline").query(keyword)))
+//						.filter(f -> f.term(t -> t.field("category.keyword").value(category)))));
+//			} else if (keyword != null && !keyword.isEmpty()) {
+//				requestBuilder.query(q -> q.match(m -> m.field("headline").query(keyword)));
+//			} else if (category != null && !category.isEmpty()) {
+//				requestBuilder.query(q -> q.term(t -> t.field("category.keyword").value(category)));
+//			} else {
+//				requestBuilder.query(q -> q.matchAll(m -> m));
+//			}
+//
+//			// 실제 검색
+//			SearchResponse<Map> response = client.search(requestBuilder.build(), Map.class);
+//
+//			// 전체 개수와 데이터 추출
+//			long totalHits = response.hits().total() != null ? response.hits().total().value() : 0;
+//			int totalPages = (int) Math.ceil((double) totalHits / size);
+//			List<Map<String, Object>> results = extractHits(response);
+//
+//			// 반환할 Map 구성
+//			return Map.of("content", results, "totalElements", totalHits, "totalPages", totalPages, "currentPage",
+//					page);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return Map.of("content", List.of(), "totalElements", 0, "totalPages", 0, "currentPage", page);
+//		}
+//	}
+
+	public Map<String, Object> searchWithPagination(String keyword, String category, int page, int size)
+			throws IOException {
+		log.info("입력받은 keyword => " + keyword);
+
+		// 1) keyword가 없을 때
+		if (keyword == null || keyword.isBlank()) {
 			SearchRequest.Builder requestBuilder = new SearchRequest.Builder().index("newsdata.newsdata")
 					.from(page * size).size(size);
 
-			// 검색 조건 구성
-			if (keyword != null && !keyword.isEmpty() && category != null && !category.isEmpty()) {
-				requestBuilder.query(q -> q.bool(b -> b.must(m1 -> m1.match(m -> m.field("headline").query(keyword)))
-						.filter(f -> f.term(t -> t.field("category.keyword").value(category)))));
-			} else if (keyword != null && !keyword.isEmpty()) {
-				requestBuilder.query(q -> q.match(m -> m.field("headline").query(keyword)));
-			} else if (category != null && !category.isEmpty()) {
+			if (category != null && !category.isBlank()) {
 				requestBuilder.query(q -> q.term(t -> t.field("category.keyword").value(category)));
 			} else {
 				requestBuilder.query(q -> q.matchAll(m -> m));
 			}
 
-			// 실제 검색
-			SearchResponse<Map> response = client.search(requestBuilder.build(), Map.class);
-
-			// 전체 개수와 데이터 추출
-			long totalHits = response.hits().total() != null ? response.hits().total().value() : 0;
+			// 검색 실행
+			SearchResponse<Map> resp = client.search(requestBuilder.build(), Map.class);
+			long totalHits = resp.hits().total() != null ? resp.hits().total().value() : 0;
 			int totalPages = (int) Math.ceil((double) totalHits / size);
-			List<Map<String, Object>> results = extractHits(response);
+			List<Map> content = resp.hits().hits().stream().map(Hit::source).toList();
 
-			// 반환할 Map 구성
-			return Map.of("content", results, "totalElements", totalHits, "totalPages", totalPages, "currentPage",
+			return Map.of("content", content, "totalElements", totalHits, "totalPages", totalPages, "currentPage",
 					page);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Map.of("content", List.of(), "totalElements", 0, "totalPages", 0, "currentPage", page);
 		}
-	}
 
-	public List<Map<String, Object>> searchWithCategory(String keyword, String category, int page, int size) {
-		try {
-			SearchRequest.Builder requestBuilder = new SearchRequest.Builder().index("newsdata.newsdata")
-					.from(page * size).size(size);
+		// 한글 포함 여부 체크
+		boolean containsHangul = keyword.matches(".*[가-힣]+.*");
+		// 2) 오직 영어 알파벳만으로 이뤄졌는지
+		boolean isEnglishOnly = keyword.matches("^[A-Za-z]+$");
 
-			if (keyword != null && !keyword.isEmpty() && category != null && !category.isEmpty()) {
-				requestBuilder.query(q -> q.bool(b -> b.must(m1 -> m1.match(m -> m.field("headline").query(keyword)))
-						.filter(f -> f.term(t -> t.field("category.keyword").value(category)))));
-			} else if (keyword != null && !keyword.isEmpty()) {
-				requestBuilder.query(q -> q.match(m -> m.field("headline").query(keyword)));
-			} else if (category != null && !category.isEmpty()) {
-				requestBuilder.query(q -> q.term(t -> t.field("category.keyword").value(category)));
-			} else {
-				requestBuilder.query(q -> q.matchAll(m -> m));
+		if (containsHangul) {
+			// 이미 한글이 포함된 경우
+			log.info("한글 포함 변환 생략 => " + keyword);
+
+		} else if (isEnglishOnly && keyword.length() < 4) {
+			// 영어만인데, 4글자 미만인 경우
+			log.info("영어 키워드(길이 < 4) 변환 생략 => " + keyword);
+
+		} else {
+			// 그 외(혼합어 혹은 영어 4글자 이상)는 한영키 변환 + 합치기
+			String converted = keyboardMapper.convertEngToKor(keyword);
+			log.info("한영키 변환 => " + converted);
+
+			String patched = hangulComposer.combine(converted);
+			log.info("한글 패치 => " + patched);
+
+			keyword = patched;
+		}
+		log.info("한영키 변환 거친 keyword => " + keyword);
+
+		// 2) keyword가 있을 때
+		BoolQuery.Builder boolB = new BoolQuery.Builder();
+
+		// combined 리스트 생성
+		CharSequence normalized = OpenKoreanTextProcessorJava.normalize(keyword);
+		var tokens = OpenKoreanTextProcessorJava.tokenize(normalized);
+		List<String> tokenList = OpenKoreanTextProcessorJava.tokensToJavaStringList(tokens);
+		log.info("tokenList => " + tokenList);
+		List<String> combined = new ArrayList<>(tokenList);
+		// 단어 리스트 출력
+		for (int i = 0, n = tokenList.size(); i < n; i++) {
+			int len = 0;
+			var sb = new StringBuilder();
+			for (int j = i; j < n; j++) {
+				String tok = tokenList.get(j);
+				if (len + tok.length() > 3) {
+					break;
+				}
+				sb.append(tok);
+				len += tok.length();
+				if (len >= 2) {
+					combined.add(sb.toString());
+				}
 			}
-
-			SearchResponse<Map> response = client.search(requestBuilder.build(), Map.class);
-			return extractHits(response);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new ArrayList<>();
 		}
+		combined = combined.stream().distinct().toList();
+		log.info("검색에 쓰일 단어 => " + combined);
+
+		for (String term : combined) {
+			// 제목 가중치
+//			Fuzziness.fromEdits(1)
+			boolB.should(s -> s.match(m -> m.field("headline").query(term).fuzziness("1").boost(5.0f)));
+			// 키워드 가중치
+			boolB.should(s -> s.match(m -> m.field("textrank_keywords").query(term).fuzziness("1").boost(3.0f)));
+			// 중요 문단 가중치
+			boolB.should(s -> s.match(m -> m.field("summary").query(term).fuzziness("1").boost(1.0f)));
+			// 내용 가중치
+			boolB.should(s -> s.match(m -> m.field("content").query(term).fuzziness("1").boost(0.5f)));
+		}
+
+		// 카테고리 필터
+		if (category != null && !category.isBlank()) {
+			boolB.filter(f -> f.term(t -> t.field("category.keyword").value(category)));
+		}
+
+		// 3) keyword 있을 때의 검색 요청
+		SearchRequest request = SearchRequest
+				.of(b -> b.index("newsdata.newsdata").from(page * size).size(size).query(q -> q.bool(boolB.build())));
+
+		// 4) 검색 실행 & 결과 포장
+		SearchResponse<Map> resp = client.search(request, Map.class);
+		long totalHits = resp.hits().total() != null ? resp.hits().total().value() : 0;
+		int totalPages = (int) Math.ceil((double) totalHits / size);
+		List<Map> content = resp.hits().hits().stream().map(Hit::source).toList();
+
+		return Map.of("content", content, "totalElements", totalHits, "totalPages", totalPages, "currentPage", page);
 	}
 
 	public List<Map<String, Object>> newsSearch(String keyword) throws ElasticsearchException, IOException {
@@ -215,8 +298,6 @@ public class ElasticService {
 //		List<Map<String, Object>> list = resp.hits().hits().stream().map(h -> h.source()).collect(Collectors.toList());
 //		log.info("list => " + list);
 		// 첫 테스트 끝
-
-		// …
 
 		// 1) BoolQuery에 term×field 마다 should(match…boost) 추가
 		BoolQuery.Builder boolB = new BoolQuery.Builder();

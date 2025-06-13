@@ -95,6 +95,14 @@ def extract_article_data(driver, article_url, category_name):
                 paragraphs = fallback.find_all("p")
                 content = "\n".join(p.get_text(strip=True) for p in paragraphs)
 
+
+        ## 이미지 URL 추출
+        img_url = ""
+        img_tag = soup.select_one("meta[property='og:image']")
+        if img_tag and img_tag.get("content"):
+            img_url = img_tag["content"]
+
+
         if content:
             # print(f"내용: {clean_text}\n")
             # 형태소
@@ -125,7 +133,8 @@ def extract_article_data(driver, article_url, category_name):
             "textrank_keywords": textrank_kw,
             "summary": summary_sentences,
             "category": category_name,
-            "source": "chosun"
+            "source": "chosun",
+            "img":img_url
         }
 
     except Exception as e:
@@ -183,7 +192,6 @@ def collect_articles_from_category(category_url, max_pages=3):
 if __name__ == "__main__":
     categories = get_category_links()  # 카테고리 링크 수집
     print(f"\n📚 카테고리 수집 완료: {len(categories)}개")
-
     total_articles = []  # 전체 기사 리스트
     lock = threading.Lock()  # 동기화용 락 객체
 

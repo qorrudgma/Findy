@@ -84,13 +84,13 @@ const SearchPage: React.FC = () => {
       params.append('size', '10');
 
       let url;
-        if (query) {
-          // 키워드 검색용 엔드포인트
-          url = `http://localhost:8485/search?${params.toString()}`;
-        } else {
+        // if (query) {
+        //   // 키워드 검색용 엔드포인트
+        //   url = `http://localhost:8485/search?${params.toString()}`;
+        // } else {
           // 카테고리 조회용 엔드포인트
           url = `http://localhost:8485/api/search?${params.toString()}`;
-        }
+        // }
       
       
       const response = await fetch(url);

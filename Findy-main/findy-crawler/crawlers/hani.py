@@ -109,7 +109,7 @@ categories = ["economy", "opinion", "society", "health", "sports", "culture"]
 data = []
 for category in categories:
     print("hani - ", category)
-    for i in range(50):
+    for i in range(10):
         headlines = fetch_headlines(category, i + 1)
         if headlines:
             for idx, item in enumerate(headlines, start=1):

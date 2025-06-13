@@ -1,5 +1,6 @@
 package com.boot.controller;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class NewsSearchController {
 	public ResponseEntity<?> searchNews(@RequestParam(value = "q", required = false) String keyword,
 			@RequestParam(value = "category", required = false) String category,
 			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size) {
+			@RequestParam(value = "size", defaultValue = "10") int size) throws IOException {
 		Map<String, Object> result = elasticService.searchWithPagination(keyword, category, page, size);
 		return ResponseEntity.ok(result);
 	}

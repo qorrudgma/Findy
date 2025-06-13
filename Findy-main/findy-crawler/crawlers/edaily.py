@@ -32,7 +32,19 @@ def extract_article_content(article_url):
         else:
             print("❗ 날짜 태그 없음")
 
-        return content, published_at
+
+        # 이미지 URL 추출 (og:image 메타 태그 또는 대표 이미지)
+        image_url = ""
+        og_img = soup.select_one("meta[property='og:image']")
+        if og_img and og_img.get("content"):
+            image_url = og_img["content"]
+        else:
+            # 백업 이미지 추출 (본문 내 첫 번째 img 태그)
+            img_tag = soup.select_one("div.news_body img")
+            if img_tag and img_tag.get("src"):
+                image_url = img_tag["src"]
+
+        return content, published_at, image_url
 
     except Exception as e:
         print(f"❌ 본문/날짜 추출 실패: {e}")
@@ -102,7 +114,7 @@ for category, url in category_urls.items():
                 title = title_tag.get_text(strip=True) if title_tag else "[제목 없음]"
                 summary = a_tag.get_text(strip=True)
 
-            content, published_at = extract_article_content(full_url)
+            content, published_at, image_url = extract_article_content(full_url)
             post_id = hashlib.sha1(full_url.encode("utf-8")).hexdigest()
 
             # 형태소
@@ -128,7 +140,8 @@ for category, url in category_urls.items():
                 "tfidf_keywords": tfidf_keywords,
                 "textrank_keywords": textrank_kw,
                 "summary": summary_sentences,
-                "source": "edaily"
+                "source": "edaily",
+                "img": image_url
             }
 
             all_articles.append(doc)
