@@ -237,9 +237,7 @@ public class ElasticService {
 
 		// 2) SearchRequest 빌드 (score 내림차순 정렬은 기본)
 		SearchRequest req = SearchRequest
-				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(10) // 원하는
-																									// 개수
-				);
+				.of(b -> b.index("newsdata.newsdata").query(q -> q.bool(boolB.build())).size(1));
 
 		// 3) 검색 실행
 		SearchResponse<Map> resp = client.search(req, Map.class);
