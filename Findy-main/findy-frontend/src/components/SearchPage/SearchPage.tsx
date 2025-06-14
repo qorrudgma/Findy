@@ -39,6 +39,7 @@ const SearchPage: React.FC = () => {
   const { t } = useLanguage();
   const [originalKeyword, setOriginalKeyword] = useState('');
   const [convertedKeyword, setConvertedKeyword] = useState('');
+  const [aiSummary, setAiSummary] = useState<string>(''); // ai 상태변수 추가
 
 
   const query = searchParams.get('q') || '';
@@ -140,6 +141,9 @@ const SearchPage: React.FC = () => {
         // 입력키워드와 실제 검색 키워드 가져옴
         setOriginalKeyword(data.originalKeyword || '');
         setConvertedKeyword(data.convertedKeyword || '');
+
+        //백엔드에서 가져온 응답을 여기에 때려넣음
+        setAiSummary(data.aiSummary || '');
         
         // API 응답 데이터를 NewsArticle 형태로 변환
         if (data.content && data.content.length > 0) {

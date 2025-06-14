@@ -17,6 +17,8 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient; // Elasticsearch �
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest; // 검색 요청 객체
 import co.elastic.clients.elasticsearch.core.SearchResponse; // 검색 응답 객체
+import co.elastic.clients.elasticsearch.core.explain.Explanation;
+import co.elastic.clients.elasticsearch.core.explain.ExplanationDetail;
 import co.elastic.clients.elasticsearch.core.search.Hit; // 검색 결과의 단일 항목 표현
 import lombok.extern.slf4j.Slf4j;
 
