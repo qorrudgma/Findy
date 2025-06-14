@@ -36,13 +36,4 @@ public class AutocompleteController {
 //        log.info("자동완성 API 요청: {}", query);
 		return autocompleteService.getSuggestions(query);
 	}
-
-	@GetMapping("/search")
-	public List<Map<String, Object>> getKeword(@RequestParam("q") String keyword) throws IOException {
-		log.info("@# keyword => " + keyword);
-		List<Map<String, Object>> news_data = elasticService.newsSearch(keyword);
-		log.info("!@# news_data => " + news_data);
-
-		return news_data;
-	}
 }
