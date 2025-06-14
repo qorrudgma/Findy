@@ -411,7 +411,17 @@ const SearchPage: React.FC = () => {
               <div className="search-results">
                 <div className="results-list">
                   <NewsListContainer
-                    articles={searchResults}
+                    articles={[...searchResults].sort((a, b) => {
+                      // 최신순 정렬
+                      if (selectedFilter === 'latest') {
+                        return new Date(b.time).getTime() - new Date(a.time).getTime();
+                      // 오래된순 정렬
+                      } else if (selectedFilter === 'oldest') {
+                        return new Date(a.time).getTime() - new Date(b.time).getTime();
+                      }
+                      // 정렬 없음
+                      return 0;
+                    })}
                     onArticleClick={handleNewsClick}
                     onExpandedChange={handleNewsExpandedChange}
                   />
