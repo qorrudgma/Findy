@@ -13,6 +13,8 @@ interface NewsArticle {
   url: string;
   imageUrl?: string;
   img?: string; // MongoDB에서 사용하는 이미지 필드 추가
+  headlineScore?: number; // 제목 점수
+  contentScore?: number;  // 내용 점수
 }
 
 interface NewsCardProps {

@@ -50,7 +50,7 @@ public class ElasticService {
 		log.info("입력받은 keyword => " + keyword);
 		String originalKeyword = keyword;
 
-		// 1) keyword가 없을 때
+		// 1. 키워드가 없을 경우 전체 검색
 		if (keyword == null || keyword.isBlank()) {
 			SearchRequest.Builder requestBuilder = new SearchRequest.Builder().index("newsdata.newsdata")
 					.from(page * size).size(size);
@@ -61,7 +61,6 @@ public class ElasticService {
 				requestBuilder.query(q -> q.matchAll(m -> m));
 			}
 
-			// 검색 실행
 			SearchResponse<Map> resp = client.search(requestBuilder.build(), Map.class);
 			long totalHits = resp.hits().total() != null ? resp.hits().total().value() : 0;
 			int totalPages = (int) Math.ceil((double) totalHits / size);
@@ -71,42 +70,26 @@ public class ElasticService {
 					page);
 		}
 
+		// 2. 키워드가 존재할 경우 처리
 		if (!skipProcessing) {
-			// 한글 포함 여부 체크
 			boolean containsHangul = keyword.matches(".*[가-힣]+.*");
-			// 오직 영어 알파벳만으로 이뤄졌는지
 			boolean isEnglishOnly = keyword.matches("^[A-Za-z]+$");
 
-			if (containsHangul) {
-				// 이미 한글이 포함된 경우
-				log.info("한글 포함 변환 생략 => " + keyword);
-
-			} else if (isEnglishOnly && keyword.length() < 4) {
-				// 영어만인데, 4글자 미만인 경우
-				log.info("영어 키워드(길이 < 4) 변환 생략 => " + keyword);
-
-			} else {
-				// 그 외(혼합어 혹은 영어 4글자 이상)는 한영키 변환 + 합치기
+			if (!containsHangul && (!isEnglishOnly || keyword.length() >= 4)) {
 				String converted = keyboardMapper.convertEngToKor(keyword);
-				log.info("한영키 변환 => " + converted);
-
 				String patched = hangulComposer.combine(converted);
-				log.info("한글 패치 => " + patched);
-
+				log.info("한영키 변환 => {}", converted);
+				log.info("한글 패치 => {}", patched);
 				keyword = patched;
 			}
-			log.info("한영키 변환 거친 keyword => " + keyword);
 		}
-		// 2) keyword가 있을 때
-		BoolQuery.Builder boolB = new BoolQuery.Builder();
 
-		// combined 리스트 생성
+		// 3. 형태소 분석 + 조합어 생성
 		CharSequence normalized = OpenKoreanTextProcessorJava.normalize(keyword);
 		var tokens = OpenKoreanTextProcessorJava.tokenize(normalized);
 		List<String> tokenList = OpenKoreanTextProcessorJava.tokensToJavaStringList(tokens);
-		log.info("tokenList => " + tokenList);
 		List<String> combined = new ArrayList<>(tokenList);
-		// 단어 리스트 출력
+
 		for (int i = 0, n = tokenList.size(); i < n; i++) {
 			int len = 0;
 			var sb = new StringBuilder();
@@ -122,47 +105,101 @@ public class ElasticService {
 				}
 			}
 		}
+
 		combined = combined.stream().distinct().toList();
-		log.info("검색에 쓰일 단어 => " + combined);
+		log.info("검색에 쓰일 단어 => {}", combined);
+
+		// 4. BoolQuery 구성
+		BoolQuery.Builder boolB = new BoolQuery.Builder();
 		for (String term : combined) {
-			// 제목 가중치
-//			Fuzziness.fromEdits(1)
-			boolB.should(s -> s.match(m -> m.field("headline").query(term).fuzziness("1").boost(5.0f)));
-			// 키워드 가중치
+			boolB.should(s -> s.match(m -> m.field("headline").query(term).fuzziness("0").boost(5.0f)));
 			boolB.should(s -> s.match(m -> m.field("textrank_keywords").query(term).fuzziness("1").boost(3.0f)));
-			// 중요 문단 가중치
 			boolB.should(s -> s.match(m -> m.field("summary").query(term).fuzziness("1").boost(1.0f)));
-			// 내용 가중치
 			boolB.should(s -> s.match(m -> m.field("content").query(term).fuzziness("1").boost(0.5f)));
 		}
 
-		// 카테고리 필터
 		if (category != null && !category.isBlank()) {
 			boolB.filter(f -> f.term(t -> t.field("category.keyword").value(category)));
 		}
 
-		// 3) keyword 있을 때의 검색 요청
-		SearchRequest request = SearchRequest
-				.of(b -> b.index("newsdata.newsdata").from(page * size).size(size).query(q -> q.bool(boolB.build())));
+		// 5. 검색 실행
+		SearchRequest request = SearchRequest.of(b -> b.index("newsdata.newsdata").from(page * size).size(size)
+				.query(q -> q.bool(boolB.build())).explain(true));
 
-		// 4) 검색 실행 & 결과 포장
 		SearchResponse<Map> resp = client.search(request, Map.class);
 		long totalHits = resp.hits().total() != null ? resp.hits().total().value() : 0;
 		int totalPages = (int) Math.ceil((double) totalHits / size);
-		List<Map> content = resp.hits().hits().stream().map(Hit::source).toList();
 
+		// 6. 점수 기반 추정값 포함해서 결과 생성
+		double headlineBoost = 5.0;
+		double textrankBoost = 3.0;
+		double summaryBoost = 1.0;
+		double contentBoost = 0.5;
+		double totalBoost = headlineBoost + textrankBoost + summaryBoost + contentBoost;
+
+		List<Map<String, Object>> content = resp.hits().hits().stream().map(hit -> {
+			Map<String, Object> doc = new HashMap<>(hit.source());
+			double score = hit.score() != null ? hit.score() : 0.0;
+
+			double headlineScore = extractScoreFromExplanation(hit.explanation(), "headline");
+			double contentScore = extractScoreFromExplanation(hit.explanation(), "content");
+
+//			double headlineScore = score * (headlineBoost / totalBoost);
+//			double contentScore = score * (contentBoost / totalBoost);
+
+			log.info("----------headlineScore => {}", headlineScore);
+			log.info("contentScore => {}", contentScore);
+
+			doc.put("score", score);
+			doc.put("headlineScore", headlineScore);
+			doc.put("contentScore", contentScore);
+			return doc;
+		}).toList();
+
+		// 7. 최종 응답 리턴
 		Map<String, Object> result = new HashMap<>();
-
-		result.put("content", content); // 내용
+		result.put("content", content);
 		result.put("totalElements", totalHits);
 		result.put("totalPages", totalPages);
 		result.put("currentPage", page);
-		result.put("originalKeyword", originalKeyword); // 입력한 원래 검색어
-		result.put("convertedKeyword", keyword); // 최종 변환된 검색어
-//		result.put("tokenList", tokenList); // 형태소 분석 결과
-//		result.put("combinedTerms", combined); // 조합된 검색어 리스트
-
-//		return Map.of("content", content, "totalElements", totalHits, "totalPages", totalPages, "currentPage", page);
+		result.put("originalKeyword", originalKeyword);
+		result.put("convertedKeyword", keyword);
 		return result;
 	}
+
+	private double extractScoreFromExplanation(Explanation explanation, String field) {
+		if (explanation == null) {
+			return 0.0;
+		}
+		double sum = 0.0;
+
+		if (explanation.description() != null && explanation.description().toLowerCase().contains(field)) {
+			sum += explanation.value();
+		}
+
+		if (explanation.details() != null) {
+			for (ExplanationDetail detail : explanation.details()) {
+				sum += extractScoreFromExplanationDetail(detail, field);
+			}
+		}
+
+		return sum;
+	}
+
+	private double extractScoreFromExplanationDetail(ExplanationDetail detail, String field) {
+		double sum = 0.0;
+
+		if (detail.description() != null && detail.description().toLowerCase().contains(field)) {
+			sum += detail.value();
+		}
+
+		if (detail.details() != null) {
+			for (ExplanationDetail sub : detail.details()) {
+				sum += extractScoreFromExplanationDetail(sub, field);
+			}
+		}
+
+		return sum;
+	}
+
 }

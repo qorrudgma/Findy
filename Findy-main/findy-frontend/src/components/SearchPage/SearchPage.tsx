@@ -19,6 +19,8 @@ interface NewsArticle {
   url: string;
   img?: string; // MongoDB의 이미지 필드
   imageUrl?: string; // 기존 호환성을 위한 필드
+  headlineScore?: number; // 제목 점수
+  contentScore?: number;  // 내용 점수
 }
 
 const SearchPage: React.FC = () => {
@@ -154,10 +156,17 @@ const SearchPage: React.FC = () => {
             tags: item.tags || [],
             url: item.url || "#",
             img: item.img || null, // MongoDB의 img 필드 추가
-            keywords: item.keywords || [] // keywords 필드도 추가
+            keywords: item.keywords || [], // keywords 필드도 추가
+            headlineScore: item.headlineScore || 0,  // 제목 점수
+            contentScore: item.contentScore || 0     // 내용 점수
           }));
           
           setSearchResults(transformedNews);
+          // 기사 점수 리스트 뽑아보기
+          // console.log('정렬 대상 기사 리스트:', searchResults);
+          searchResults.forEach(article => {
+            console.log(`기사 제목: ${article.headline}, \n제목 점수: ${article.headlineScore}, \n내용 점수: ${article.contentScore}`);
+          });
           setTotalResults(data.totalElements || 0);
           setTotalPages(data.totalPages || 0);
         } else {
@@ -187,7 +196,7 @@ const SearchPage: React.FC = () => {
   };
   
   const handleReSearch = () => {
-    performSearch(true); // 🔹 researchMode: true
+    performSearch(true); // researchMode: true
   };
 
   const handleNewsClick = (article: NewsArticle) => {
@@ -297,23 +306,29 @@ const SearchPage: React.FC = () => {
           )}
           
           {/* AI 답변 섹션 */}
-          {query && !isLoading && (
-            <div className="ai-answer-section">
-              <div className="ai-answer-header">
-                <h3 className="ai-answer-title">🤖 {t('search.aiSummary')}</h3>
-              </div>
-              <div className="ai-answer-content">
-                <div className="ai-answer-placeholder">
-                  {/* 여기에 ai 응답기능 넣으면 됨 */}
-                  <p>"{query}"{t('search.aiResult')}</p>
-                  <div className="ai-loading">
-                    <span>{t('search.aiAnalyzing')}</span>
+          {/* AI 답변 섹션 */}
+          {query && (
+              <div className="ai-answer-section">
+                <div className="ai-answer-header">
+                  <h3 className="ai-answer-title">🤖 AI 요약</h3>
+                </div>
+                <div className="ai-answer-content">
+                  <div className="ai-answer-placeholder">
+                    {aiSummary ? (
+                        <p>{aiSummary}</p>  // ✅ 여기 값 출력됨
+                    ) : isLoading ? (
+                        <p>AI가 뉴스를 분석하고 있습니다...</p>
+                    ) : (
+                        <p>"{query}"에 대한 AI 분석 결과가 없습니다.</p>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
           )}
-          
+
+
+
+
           {/* 언론사별 카테고리 버튼 */}
           {/* <div className="news-sources-section">
             <h3 className="sources-title">📰 언론사별 뉴스</h3>
@@ -418,6 +433,14 @@ const SearchPage: React.FC = () => {
                       // 오래된순 정렬
                       } else if (selectedFilter === 'oldest') {
                         return new Date(a.time).getTime() - new Date(b.time).getTime();
+                      // 제목순 정렬
+                      } else if (selectedFilter === 'title') {
+                        console.log("제목 정렬 누름")
+                        return (b.headlineScore || 0) - (a.headlineScore || 0);
+                        // 내용순 정렬
+                      } else if (selectedFilter === 'content') {
+                        console.log("내용 정렬 누름")
+                        return (b.contentScore || 0) - (a.contentScore || 0);
                       }
                       // 정렬 없음
                       return 0;

@@ -15,6 +15,8 @@ interface NewsArticle {
   url: string;
   imageUrl?: string;
   img?: string;
+  headlineScore?: number; // 제목 점수
+  contentScore?: number;  // 내용 점수
 }
 
 interface ExpandableNewsCardProps {
