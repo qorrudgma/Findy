@@ -132,13 +132,6 @@ public class ElasticService {
 		long totalHits = resp.hits().total() != null ? resp.hits().total().value() : 0;
 		int totalPages = (int) Math.ceil((double) totalHits / size);
 
-		// 6. 점수 기반 추정값 포함해서 결과 생성
-		double headlineBoost = 5.0;
-		double textrankBoost = 3.0;
-		double summaryBoost = 1.0;
-		double contentBoost = 0.5;
-		double totalBoost = headlineBoost + textrankBoost + summaryBoost + contentBoost;
-
 		List<Map<String, Object>> content = resp.hits().hits().stream().map(hit -> {
 			Map<String, Object> doc = new HashMap<>(hit.source());
 			double score = hit.score() != null ? hit.score() : 0.0;
@@ -146,17 +139,21 @@ public class ElasticService {
 			double headlineScore = extractScoreFromExplanation(hit.explanation(), "headline");
 			double contentScore = extractScoreFromExplanation(hit.explanation(), "content");
 
-//			double headlineScore = score * (headlineBoost / totalBoost);
-//			double contentScore = score * (contentBoost / totalBoost);
-
-			log.info("----------headlineScore => {}", headlineScore);
-			log.info("contentScore => {}", contentScore);
+//			log.info("----------headlineScore => {}", headlineScore);
+//			log.info("contentScore => {}", contentScore);
 
 			doc.put("score", score);
 			doc.put("headlineScore", headlineScore);
 			doc.put("contentScore", contentScore);
 			return doc;
 		}).toList();
+
+		// 변환된 키워드로 결과가 없으면 원본으로 재시도
+//		if (totalHits == 0 && !originalKeyword.equals(keyword)) {
+//			log.info("변환된 키워드 결과 없음, 원래 키워드로 재검색 시도");
+//
+//			return searchWithPagination(originalKeyword, category, page, size, true);
+//		}
 
 		// 7. 최종 응답 리턴
 		Map<String, Object> result = new HashMap<>();
@@ -166,6 +163,10 @@ public class ElasticService {
 		result.put("currentPage", page);
 		result.put("originalKeyword", originalKeyword);
 		result.put("convertedKeyword", keyword);
+
+//		log.info(originalKeyword);
+//		log.info(keyword);
+
 		return result;
 	}
 

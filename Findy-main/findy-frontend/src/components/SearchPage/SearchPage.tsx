@@ -168,9 +168,10 @@ const SearchPage: React.FC = () => {
           setSearchResults(transformedNews);
           // 기사 점수 리스트 뽑아보기
           // console.log('정렬 대상 기사 리스트:', searchResults);
-          searchResults.forEach(article => {
-            console.log(`기사 제목: ${article.headline}, \n제목 점수: ${article.headlineScore}, \n내용 점수: ${article.contentScore}`);
-          });
+          // 기사 점수 목록 넣기
+          // searchResults.forEach(article => {
+          //   console.log(`기사 제목: ${article.headline}, \n제목 점수: ${article.headlineScore}, \n내용 점수: ${article.contentScore}`);
+          // });
           setTotalResults(data.totalElements || 0);
           setTotalPages(data.totalPages || 0);
         } else {
@@ -292,13 +293,13 @@ const SearchPage: React.FC = () => {
           {convertedKeyword && originalKeyword !== convertedKeyword ? (
             // 변환된 경우
             <h1 className="search-request-title">
-              <strong>{convertedKeyword}</strong>로 검색한 결과입니다.{' '}
-              <strong className="re-search" onClick={handleReSearch}>{originalKeyword}</strong>로 검색하시겠습니까?
+              <strong>'{convertedKeyword}'</strong>로 검색한 결과입니다.{' '}
+              <strong className="re-search" onClick={handleReSearch}>'{originalKeyword}'</strong>로 검색하시겠습니까?
             </h1>
           ) : (
             // 변환되지 않았거나 동일한 경우
             <h1 className="search-request-title">
-              <strong>{originalKeyword}</strong>로 검색한 결과입니다.
+              <strong>'{originalKeyword}'</strong>로 검색한 결과입니다.
             </h1>
           )}
 
