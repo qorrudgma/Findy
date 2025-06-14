@@ -74,6 +74,7 @@ def fetch_article_content(article_url):
         # 보도시간 추출
         date_items = soup.select('span[aria-hidden="true"]')
         last_time = date_items[-1].text.strip()
+        print(last_time)
 
         if clean_text:
             # print(f"내용: {clean_text}\n")
@@ -127,13 +128,13 @@ category_mapping = {
 # category_list = ["70040100000001","70040100000009","70040100000002","70040100000019","70040100000278","70040100000034","70010000000260"]
 # categories = ["Economy", "Series", "Society", "Health", "Sports", "Culture", "Entertainment"]
 
-categories = ["Economy", "Series", "Society/70040100000001", "Society/70040100000009", "Society/70040100000002", "Society/70040100000019", "Society/70040100000278", "Society/70040100000034", "Society/70010000000260", "Health", "Sports", "Culture", "Entertainment"]
-# categories = ["Series/70040100000019"]
+# categories = ["Economy", "Series", "Society/70040100000001", "Society/70040100000009", "Society/70040100000002", "Society/70040100000019", "Society/70040100000278", "Society/70040100000034", "Society/70010000000260", "Health", "Sports", "Culture", "Entertainment"]
+categories = ["Economy"]
 data = []
 for category in categories:
     print("donga - ", category)
     # 반복할 페이지 수
-    for i in range(10):
+    for i in range(1):
         headlines = fetch_headlines(category, i)
 
         if headlines:

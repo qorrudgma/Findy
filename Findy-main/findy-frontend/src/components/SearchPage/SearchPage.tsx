@@ -35,6 +35,9 @@ const SearchPage: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState<'latest' | 'oldest' | 'title' | 'content' | null>(null);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [originalKeyword, setOriginalKeyword] = useState('');
+  const [convertedKeyword, setConvertedKeyword] = useState('');
+
 
   const query = searchParams.get('q') || '';
   const category = searchParams.get('category') || '';
@@ -108,7 +111,7 @@ const SearchPage: React.FC = () => {
   }, [query, category, source, currentPage]);
 
   // 여기서 검색어 받아서 뭐로 할지 적음
-  const performSearch = async () => {
+  const performSearch = async (researchMode: boolean = false) => {
     try {
       setIsLoading(true);
       
@@ -117,6 +120,10 @@ const SearchPage: React.FC = () => {
       if (category) params.append('category', category);
       params.append('page', currentPage.toString());
       params.append('size', '10');
+
+      if (researchMode) {
+        params.append('research', 'true');
+      }
 
       // 통합된 검색 엔드포인트 사용
       const url = `http://localhost:8485/api/search?${params.toString()}`;
@@ -127,6 +134,10 @@ const SearchPage: React.FC = () => {
       if (response.ok) {
         const data: any = await response.json();
         console.log('API 응답 데이터:', data);
+
+        // 입력키워드와 실제 검색 키워드 가져옴
+        setOriginalKeyword(data.originalKeyword || '');
+        setConvertedKeyword(data.convertedKeyword || '');
         
         // API 응답 데이터를 NewsArticle 형태로 변환
         if (data.content && data.content.length > 0) {
@@ -175,6 +186,10 @@ const SearchPage: React.FC = () => {
     }
   };
   
+  const handleReSearch = () => {
+    performSearch(true); // 🔹 researchMode: true
+  };
+
   const handleNewsClick = (article: NewsArticle) => {
     if (article.url && article.url !== '#') {
       window.open(article.url, '_blank', 'noopener,noreferrer');
@@ -259,8 +274,21 @@ const SearchPage: React.FC = () => {
     <div className={`search-page ${isNewsExpanded ? 'news-expanded' : ''}`}>
       <div className="search-content">
         <div className="search-header">
-          {/* 오탈자 수정 (오타) */}
-          <h1 className="search-request-title">{t(getSearchTitle())}</h1>
+          {/* 검색어 보여주기 */}
+          {/* <h1 className="search-request-title">{t(getSearchTitle())}</h1> */}
+          {convertedKeyword && originalKeyword !== convertedKeyword ? (
+            // 변환된 경우
+            <h1 className="search-request-title">
+              <strong>{convertedKeyword}</strong>로 검색한 결과입니다.{' '}
+              <strong className="re-search" onClick={handleReSearch}>{originalKeyword}</strong>로 검색하시겠습니까?
+            </h1>
+          ) : (
+            // 변환되지 않았거나 동일한 경우
+            <h1 className="search-request-title">
+              <strong>{originalKeyword}</strong>로 검색한 결과입니다.
+            </h1>
+          )}
+
           {/* 언론사별 검색 시에만 제목 표시 */}
           {source && (
             <h1 className="search-title">

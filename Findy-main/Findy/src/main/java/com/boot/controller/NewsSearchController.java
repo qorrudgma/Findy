@@ -27,8 +27,9 @@ public class NewsSearchController {
 	public ResponseEntity<?> searchNews(@RequestParam(value = "q", required = false) String keyword,
 			@RequestParam(value = "category", required = false) String category,
 			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size) throws IOException {
-		Map<String, Object> result = elasticService.searchWithPagination(keyword, category, page, size);
+			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "research", defaultValue = "false") boolean isResearch) throws IOException {
+		Map<String, Object> result = elasticService.searchWithPagination(keyword, category, page, size, isResearch);
 		return ResponseEntity.ok(result);
 	}
 }
