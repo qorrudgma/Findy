@@ -113,6 +113,22 @@ body.dark-mode .category-select-inner {
     color: #E2E8F0;
 }
 
+/* 카테고리 셀렉트박스 옵션 다크모드 스타일 */
+body.dark-mode .category-select-inner option {
+    background-color: #4A5568;
+    color: #E2E8F0;
+    border: none;
+}
+
+body.dark-mode .category-select-inner option:hover {
+    background-color: #2D3748;
+}
+
+body.dark-mode .category-select-inner option:checked {
+    background-color: #1a73e8;
+    color: white;
+}
+
 .search-divider {
     width: 1px;
     height: 1.8rem;

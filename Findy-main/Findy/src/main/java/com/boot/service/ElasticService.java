@@ -34,13 +34,15 @@ public class ElasticService {
 	private final ElasticsearchOperations operations;
 	private final KeyboardMapper keyboardMapper;
 	private final HangulComposer hangulComposer;
+	private final GeminiService geminiService;
 
 	public ElasticService(ElasticsearchClient client, ElasticsearchOperations operations, KeyboardMapper keyboardMapper,
-			HangulComposer hangulComposer) {
+			HangulComposer hangulComposer, GeminiService geminiService) {
 		this.client = client;
 		this.operations = operations;
 		this.keyboardMapper = keyboardMapper;
 		this.hangulComposer = hangulComposer;
+		this.geminiService = geminiService;
 	}
 
 	private List<Map<String, Object>> extractHits(SearchResponse<Map> response) {
@@ -164,6 +166,8 @@ public class ElasticService {
 //
 //			return searchWithPagination(originalKeyword, category, page, size, true);
 //		}
+//		Gemini AI 요약 결과 가져오기
+//		String aiSummary = Gemini(keyword);
 
 		// 7. 최종 응답 리턴
 		Map<String, Object> result = new HashMap<>();
@@ -173,6 +177,8 @@ public class ElasticService {
 		result.put("currentPage", page);
 		result.put("originalKeyword", originalKeyword);
 		result.put("convertedKeyword", keyword);
+		// result에 AI 요약 결과 포함시켜서 프론트에 함께 전달
+//		result.put("aiSummary", aiSummary); // 프론트에서 사용: data.aiSummary
 
 //		log.info(originalKeyword);
 //		log.info(keyword);
@@ -181,6 +187,14 @@ public class ElasticService {
 		logPopularNewsAndKeywords(content);
 
 		return result;
+	}
+
+//	Gemini AI 요약 결과 가져오기
+	private String Gemini(String keyword) {
+		String aiSummary = geminiService.getSummary(keyword);
+		log.info(" Gemini 요약 결과: {}", aiSummary);
+
+		return aiSummary;
 	}
 
 	// 검색결과 우선순위 위한 메소드
@@ -335,5 +349,4 @@ public class ElasticService {
 
 		return result;
 	}
-
 }

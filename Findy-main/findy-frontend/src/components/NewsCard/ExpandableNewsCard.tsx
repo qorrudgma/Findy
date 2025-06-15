@@ -237,19 +237,19 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
           <div className="expandable-card-footer">
             <span className="news-date">{formatDate(article.time)}</span>
           </div>
+          
+          {/* 토글 버튼을 별도 줄에 중앙 배치 */}
+          <div className="toggle-button-container">
+            <button 
+              className="toggle-btn"
+              onClick={handleToggle}
+              aria-label={isExpanded ? "닫기" : "펼치기"}
+            >
+              <FontAwesomeIcon icon={faExpand} />
+              <span className="toggle-text">자세히</span>
+            </button>
+          </div>
         </div>
-      </div>
-      
-      {/* 토글 버튼을 카드 하단 중앙에 배치 */}
-      <div className="toggle-button-container">
-        <button 
-          className="toggle-btn"
-          onClick={handleToggle}
-          aria-label={isExpanded ? "닫기" : "펼치기"}
-        >
-          <FontAwesomeIcon icon={faExpand} />
-          <span className="toggle-text">자세히</span>
-        </button>
       </div>
     </div>
   );
