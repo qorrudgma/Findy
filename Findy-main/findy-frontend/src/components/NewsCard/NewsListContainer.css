@@ -16,8 +16,10 @@
 
 .news-list-container.has-expanded {
   flex-direction: row; /* 확장 시 가로 배치 */
-  align-items: flex-start;
-  height: auto;
+  align-items: flex-start; /* 상단 정렬로 복원 */
+  height: auto; /* 콘텐츠에 맞춰 높이 자동 조정 */
+  min-height: 100vh; /* 최소 높이는 뷰포트 높이 */
+  overflow-x: hidden; /* 가로 스크롤바 방지 */
 }
 
 /* 왼쪽 리스트 영역 */
@@ -26,23 +28,27 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem; /* 간격 줄임 */
+  padding-top: 0.2rem; 
 }
 
 .news-list-container.has-expanded .news-list-sidebar {
   flex: 0 0 45%; /* 폭 조정 */
   max-width: 45%;
-  height: 100vh; /* 전체 높이 */
+  min-width: 0; /* flex item이 축소될 수 있도록 */
+  /* height는 JavaScript에서 동적으로 설정 */
   overflow-y: auto; /* 스크롤 가능 */
   padding-right: 1rem; /* 오른쪽 패딩 추가 */
+  transition: height 0.3s ease; /* 높이 변화 애니메이션 */
 }
 
 /* 오른쪽 확장된 콘텐츠 영역 */
 .expanded-news-content {
   flex: 1;
-  position: sticky;
-  top: 2rem;
-  max-height: calc(100vh - 4rem);
-  overflow-y: auto;
+  min-width: 0; /* flex item이 축소될 수 있도록 */
+  /* position: sticky 제거 */
+  /* top: 2.2rem 제거 */
+  /* max-height 제거 */
+  /* overflow-y 제거 */
 }
 
 /* 확장된 상태에서 리스트 아이템 스타일 조정 */
@@ -56,6 +62,7 @@
   margin-bottom: 0.4rem; /* 마진 줄임 */
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -78,30 +85,30 @@
   font-size: 0.7rem; /* 텍스트 크기 더 줄임 */
 }
 
-/* 스크롤바 스타일 */
-.expanded-news-content::-webkit-scrollbar {
+/* 왼쪽 리스트 스크롤바 스타일 */
+.news-list-container.has-expanded .news-list-sidebar::-webkit-scrollbar {
   width: 6px;
 }
 
-.expanded-news-content::-webkit-scrollbar-track {
+.news-list-container.has-expanded .news-list-sidebar::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 3px;
 }
 
-body.dark-mode .expanded-news-content::-webkit-scrollbar-track {
+body.dark-mode .news-list-container.has-expanded .news-list-sidebar::-webkit-scrollbar-track {
   background: #4A5568;
 }
 
-.expanded-news-content::-webkit-scrollbar-thumb {
+.news-list-container.has-expanded .news-list-sidebar::-webkit-scrollbar-thumb {
   background: var(--primary-blue);
   border-radius: 3px;
 }
 
-.expanded-news-content::-webkit-scrollbar-thumb:hover {
+.news-list-container.has-expanded .news-list-sidebar::-webkit-scrollbar-thumb:hover {
   background: var(--light-blue);
 }
 
-body.dark-mode .expanded-news-content::-webkit-scrollbar-thumb {
+body.dark-mode .news-list-container.has-expanded .news-list-sidebar::-webkit-scrollbar-thumb {
   background: #90CDF4;
 }
 

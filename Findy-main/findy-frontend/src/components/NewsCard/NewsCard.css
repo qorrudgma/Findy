@@ -276,6 +276,7 @@ body.dark-mode .side-news-card:hover {
     display: -webkit-box;
     margin-top: 5px;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;

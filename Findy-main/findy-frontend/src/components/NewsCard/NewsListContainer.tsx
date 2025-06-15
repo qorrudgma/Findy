@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ExpandableNewsCard from './ExpandableNewsCard';
 import './NewsListContainer.css';
 
@@ -26,6 +26,8 @@ interface NewsListContainerProps {
 
 const NewsListContainer: React.FC<NewsListContainerProps> = ({ articles, onArticleClick, onExpandedChange }) => {
   const [expandedArticleId, setExpandedArticleId] = useState<string | null>(null);
+  const expandedContentRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = (articleId: string) => {
     const newExpandedId = expandedArticleId === articleId ? null : articleId;
@@ -47,6 +49,43 @@ const NewsListContainer: React.FC<NewsListContainerProps> = ({ articles, onArtic
     }
   }, [expandedArticleId, onExpandedChange]);
 
+  // 오른쪽 콘텐츠 높이에 맞춰 왼쪽 사이드바 높이 조정
+  useEffect(() => {
+    const adjustSidebarHeight = () => {
+      if (expandedContentRef.current && sidebarRef.current && expandedArticleId) {
+        const expandedHeight = expandedContentRef.current.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        
+        // 확장된 콘텐츠가 뷰포트보다 높으면 뷰포트 높이로, 아니면 콘텐츠 높이로 설정
+        const targetHeight = Math.max(expandedHeight, viewportHeight);
+        sidebarRef.current.style.height = `${targetHeight}px`;
+      } else if (sidebarRef.current && !expandedArticleId) {
+        // 확장된 콘텐츠가 없으면 기본 높이로 복원
+        sidebarRef.current.style.height = 'auto';
+      }
+    };
+
+    // 초기 조정
+    adjustSidebarHeight();
+
+    // ResizeObserver로 콘텐츠 크기 변화 감지
+    let resizeObserver: ResizeObserver | null = null;
+    if (expandedContentRef.current) {
+      resizeObserver = new ResizeObserver(adjustSidebarHeight);
+      resizeObserver.observe(expandedContentRef.current);
+    }
+
+    // 윈도우 리사이즈 이벤트 리스너
+    window.addEventListener('resize', adjustSidebarHeight);
+
+    return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      window.removeEventListener('resize', adjustSidebarHeight);
+    };
+  }, [expandedArticleId]);
+
   const expandedArticle = expandedArticleId 
     ? articles.find(article => (article.id || `article-${articles.indexOf(article)}`) === expandedArticleId)
     : null;
@@ -54,7 +93,7 @@ const NewsListContainer: React.FC<NewsListContainerProps> = ({ articles, onArtic
   return (
     <div className={`news-list-container ${expandedArticleId ? 'has-expanded' : ''}`}>
       {/* 왼쪽 리스트 영역 */}
-      <div className="news-list-sidebar">
+      <div className="news-list-sidebar" ref={sidebarRef}>
         {articles.map((article, index) => {
           // id가 없는 경우 인덱스를 사용
           const articleId = article.id || `article-${index}`;
@@ -73,7 +112,7 @@ const NewsListContainer: React.FC<NewsListContainerProps> = ({ articles, onArtic
 
       {/* 오른쪽 확장된 콘텐츠 영역 */}
       {expandedArticle && (
-        <div className="expanded-news-content">
+        <div className="expanded-news-content" ref={expandedContentRef}>
           <ExpandableNewsCard
             article={expandedArticle}
             onClick={onArticleClick}

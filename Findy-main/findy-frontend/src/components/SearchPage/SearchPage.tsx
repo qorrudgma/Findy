@@ -40,6 +40,7 @@ const SearchPage: React.FC = () => {
   const [originalKeyword, setOriginalKeyword] = useState('');
   const [convertedKeyword, setConvertedKeyword] = useState('');
   const [aiSummary, setAiSummary] = useState<string>(''); // ai 상태변수 추가
+  const [isAiExpanded, setIsAiExpanded] = useState(false); // AI 답변 펼침 상태
 
 
   const query = searchParams.get('q') || '';
@@ -116,23 +117,26 @@ const SearchPage: React.FC = () => {
     performSearch();
   }, [query, category, source, currentPage]);
 
-  // 여기서 검색어 받아서 뭐로 할지 적음
-  const performSearch = async (researchMode: boolean = false) => {
-    try {
-      setIsLoading(true);
+     // 여기서 검색어 받아서 뭐로 할지 적음
+   const performSearch = async (researchMode: boolean = false) => {
+     if (!query && !category && !source) return; // 파라미터가 없으면 검색하지 않음
+     
+     try {
+       setIsLoading(true);
       
-      const params = new URLSearchParams();
-      if (query) params.append('q', query);
-      if (category) params.append('category', category);
-      params.append('page', currentPage.toString());
-      params.append('size', '10');
+           const params = new URLSearchParams();
+     if (query) params.append('q', query);
+     if (category) params.append('category', category);
+     // source 파라미터는 백엔드에서 인식하지 못하므로 제거하고 프론트엔드에서 필터링
+     params.append('page', currentPage.toString());
+     params.append('size', source ? '3000' : '10'); // 언론사 필터링 시 더 많은 데이터 요청
 
-      if (researchMode) {
-        params.append('research', 'true');
-      }
+     if (researchMode) {
+       params.append('research', 'true');
+     }
 
-      // 통합된 검색 엔드포인트 사용
-      const url = `http://localhost:8485/api/search?${params.toString()}`;
+     // 통합된 검색 엔드포인트 사용
+     const url = `http://localhost:8485/api/search?${params.toString()}`;
       
       
       const response = await fetch(url);
@@ -150,25 +154,61 @@ const SearchPage: React.FC = () => {
         
         // API 응답 데이터를 NewsArticle 형태로 변환
         if (data.content && data.content.length > 0) {
-          const transformedNews = data.content.map((item: any) => ({
-            id: item.id || item.url || Math.random().toString(),
-            category: item.category || "기타",
-            // category: categoryMap[item.category] || item.category, // 영어 카테고리를 한글로 변환
-            headline: item.headline || "제목 없음",
-            content: item.content || "내용 없음",
-            // summary: item.summary || item.content?.substring(0, 100) + '...',
-            preview: item.content?.substring(0, 100) + '...',
-            time: item.time || "날짜 없음",
-            source: item.source || '기타',
-            tags: item.tags || [],
-            url: item.url || "#",
-            img: item.img || null, // MongoDB의 img 필드 추가
-            keywords: item.keywords || [], // keywords 필드도 추가
-            headlineScore: item.headlineScore || 0,  // 제목 점수
-            contentScore: item.contentScore || 0     // 내용 점수
-          }));
-          
-          setSearchResults(transformedNews);
+                     let transformedNews = data.content.map((item: any) => ({
+             id: item.id || item.url || Math.random().toString(),
+             category: item.category || "기타",
+             // category: categoryMap[item.category] || item.category, // 영어 카테고리를 한글로 변환
+             headline: item.headline || "제목 없음",
+             content: item.content || "내용 없음",
+             // summary: item.summary || item.content?.substring(0, 100) + '...',
+             preview: item.content?.substring(0, 100) + '...',
+             time: item.time || "날짜 없음",
+             source: item.source || '기타',
+             tags: item.tags || [],
+             url: item.url || "#",
+             img: item.img || null, // MongoDB의 img 필드 추가
+             keywords: item.keywords || [], // keywords 필드도 추가
+             headlineScore: item.headlineScore || 0,  // 제목 점수
+             contentScore: item.contentScore || 0     // 내용 점수
+           }));
+           
+           // 클라이언트 사이드에서 언론사 필터링
+           if (source) {
+             console.log('🔍 언론사 필터링 시작');
+             console.log('선택된 source:', source);
+             
+             // 필터링 전 데이터 확인
+             console.log('필터링 전 뉴스 개수:', transformedNews.length);
+             console.log('필터링 전 언론사들:', Array.from(new Set(transformedNews.map((article: NewsArticle) => article.source))));
+             
+             transformedNews = transformedNews.filter((article: NewsArticle) => {
+               // 실제 데이터에서는 source 필드가 영어 코드로 저장되어 있음
+               // 예: 'hankyung', 'donga', 'khan', 'hani' 등
+               const matches = article.source === source;
+               
+               if (matches) {
+                 console.log(`✅ 매칭됨: ${article.source} === ${source}`);
+               }
+               return matches;
+             });
+             
+             console.log('필터링 후 뉴스 개수:', transformedNews.length);
+             
+             // 언론사 필터링 시 페이지네이션 재계산
+             const itemsPerPage = 10;
+             const startIndex = currentPage * itemsPerPage;
+             const endIndex = startIndex + itemsPerPage;
+             const paginatedNews = transformedNews.slice(startIndex, endIndex);
+             
+             setSearchResults(paginatedNews);
+             setTotalResults(transformedNews.length);
+             setTotalPages(Math.ceil(transformedNews.length / itemsPerPage));
+           } else {
+             // 일반 검색 결과
+             setSearchResults(transformedNews);
+             setTotalResults(data.totalElements || 0);
+             setTotalPages(data.totalPages || 0);
+           }
           // 기사 점수 리스트 뽑아보기
           // console.log('정렬 대상 기사 리스트:', searchResults);
           // 기사 점수 목록 넣기
@@ -269,6 +309,8 @@ const SearchPage: React.FC = () => {
     // 종료 날짜가 선택되면 검색 실행
     if (start && end) {
       setShowDatePicker(false);
+      // 날짜 필터 선택 시 다른 필터 해제
+      setSelectedFilter(null);
       // 날짜 필터링과 함께 검색 재실행
       setCurrentPage(0);
     }
@@ -281,30 +323,55 @@ const SearchPage: React.FC = () => {
     setCurrentPage(0);
   };
 
+  // 날짜 선택기 토글 핸들러
+  const handleDatePickerToggle = () => {
+    if (!showDatePicker) {
+      // 날짜 선택기를 열 때 다른 필터 해제
+      setSelectedFilter(null);
+    }
+    setShowDatePicker(!showDatePicker);
+  };
+
   // 필터 변경 핸들러 (하나만 선택 가능)
   const handleFilterChange = (filter: 'latest' | 'oldest' | 'title' | 'content') => {
     setSelectedFilter(prevFilter => prevFilter === filter ? null : filter);
+    // 다른 필터 선택 시 날짜 필터 해제
+    setStartDate(null);
+    setEndDate(null);
     setCurrentPage(0);
+  };
+
+  // AI 답변 토글 핸들러
+  const handleAiToggle = () => {
+    setIsAiExpanded(!isAiExpanded);
+  };
+
+  // AI 답변 미리보기 텍스트 생성 (200자로 제한)
+  const getAiPreviewText = (text: string) => {
+    return text.length > 100 ? text.substring(0, 100) + '...' : text;
   };
 
   return (
     <div className={`search-page ${isNewsExpanded ? 'news-expanded' : ''}`}>
       <div className="search-content">
-        <div className="search-header">
-          {/* 검색어 보여주기 */}
-          {/* <h1 className="search-request-title">{t(getSearchTitle())}</h1> */}
-          {convertedKeyword && originalKeyword !== convertedKeyword ? (
-            // 변환된 경우
-            <h1 className="search-request-title">
-              <strong>'{convertedKeyword}'</strong>로 검색한 결과입니다.{' '}
-              <strong className="re-search" onClick={handleReSearch}>'{originalKeyword}'</strong>로 검색하시겠습니까?
-            </h1>
-          ) : (
-            // 변환되지 않았거나 동일한 경우
-            <h1 className="search-request-title">
-              <strong>'{originalKeyword}'</strong>로 검색한 결과입니다.
-            </h1>
-          )}
+                 <div className="search-header">
+           {/* 검색어 보여주기 - 헤더에서 검색했을 때만 표시 */}
+           {query && (
+             <>
+               {convertedKeyword && originalKeyword !== convertedKeyword ? (
+                 // 변환된 경우
+                 <h1 className="search-request-title">
+                   <strong>'{convertedKeyword}'</strong>로 검색한 결과입니다.{' '}
+                   <strong className="re-search" onClick={handleReSearch}>'{originalKeyword}'</strong>로 검색하시겠습니까?
+                 </h1>
+               ) : (
+                 // 변환되지 않았거나 동일한 경우
+                 <h1 className="search-request-title">
+                   <strong>'{originalKeyword}'</strong>로 검색한 결과입니다.
+                 </h1>
+               )}
+             </>
+           )}
 
           {/* 언론사별 검색 시에만 제목 표시 */}
           {source && (
@@ -314,22 +381,44 @@ const SearchPage: React.FC = () => {
           )}
           
           {/* AI 답변 섹션 */}
-          {/* AI 답변 섹션 */}
           {query && (
               <div className="ai-answer-section">
                 <div className="ai-answer-header">
                   <h3 className="ai-answer-title">🤖 AI 요약</h3>
                 </div>
                 <div className="ai-answer-content">
-                  <div className="ai-answer-placeholder">
-                    {aiSummary ? (
-                        <p>{aiSummary}</p>  // ✅ 여기 값 출력됨
-                    ) : isLoading ? (
-                        <p>AI가 뉴스를 분석하고 있습니다...</p>
-                    ) : (
-                        <p>"{query}"에 대한 AI 분석 결과가 없습니다.</p>
-                    )}
-                  </div>
+                  {aiSummary ? (
+                    <div className="ai-answer-text">
+                      <div className="ai-answer-body">
+                        {isAiExpanded ? aiSummary : getAiPreviewText(aiSummary)}
+                      </div>
+                      
+                      {aiSummary.length > 120 && (
+                        <div className="ai-toggle-container">
+                          <button 
+                            className="ai-toggle-btn"
+                            data-expanded={isAiExpanded}
+                            onClick={handleAiToggle}
+                          >
+                            <span className="toggle-text">
+                              {isAiExpanded ? '접기' : '더보기'}
+                            </span>
+                            <span className="ai-toggle-icon">
+                              ▼
+                            </span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : isLoading ? (
+                    <div className="ai-answer-placeholder">
+                      <p>AI가 뉴스를 분석하고 있습니다...</p>
+                    </div>
+                  ) : (
+                    <div className="ai-answer-placeholder">
+                      <p>"{query}"에 대한 AI 분석 결과가 없습니다.</p>
+                    </div>
+                  )}
                 </div>
               </div>
           )}
@@ -381,7 +470,7 @@ const SearchPage: React.FC = () => {
                 <div className="date-picker-container">
                   <button
                     className={`source-btn ${startDate && endDate ? 'active' : ''}`}
-                    onClick={() => setShowDatePicker(!showDatePicker)}
+                    onClick={handleDatePickerToggle}
                   >
                     {startDate && endDate 
                       ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`

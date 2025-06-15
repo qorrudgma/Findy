@@ -194,32 +194,49 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
   // 축소된 상태일 때는 기존 레이아웃
   return (
     <div className="expandable-news-card" onClick={handleCardClick}>
-      <div className="list-news-content">
-        <div className="list-news-main">
-          <div className="expandable-card-header">
-            <div className="news-source">
-              <img 
-                src={getSourceIcon(article.source || 'default')} 
-                alt={getSourceName(article.source || 'default')} 
-                className="source-icon"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/sources/default-news.svg';
-                }}
-              />
-              <span className="source-name">{getSourceName(article.source || 'default')}</span>
+      <div className="expandable-card-layout">
+        {/* 왼쪽 이미지 영역 */}
+        {(article.img || article.imageUrl) && (
+          <div className="expandable-card-image">
+            <img 
+              src={article.img || article.imageUrl} 
+              alt={article.headline}
+              className="expandable-news-image"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+        
+        {/* 오른쪽 콘텐츠 영역 */}
+        <div className="list-news-content">
+          <div className="list-news-main">
+            <div className="expandable-card-header">
+              <div className="news-source">
+                <img 
+                  src={getSourceIcon(article.source || 'default')} 
+                  alt={getSourceName(article.source || 'default')} 
+                  className="source-icon"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/images/sources/default-news.svg';
+                  }}
+                />
+                <span className="source-name">{getSourceName(article.source || 'default')}</span>
+              </div>
+              <span className="news-category-badge">{article.category}</span>
             </div>
-            <span className="news-category-badge">{article.category}</span>
+            
+            <h3 className="list-news-title">
+              {article.headline}
+            </h3>
+            
+            <p className="list-news-preview">{article.preview}</p>
           </div>
           
-          <h3 className="list-news-title">
-            {article.headline}
-          </h3>
-          
-          <p className="list-news-preview">{article.preview}</p>
-        </div>
-        
-        <div className="expandable-card-footer">
-          <span className="news-date">{formatDate(article.time)}</span>
+          <div className="expandable-card-footer">
+            <span className="news-date">{formatDate(article.time)}</span>
+          </div>
         </div>
       </div>
       

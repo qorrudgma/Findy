@@ -4,13 +4,18 @@
 
 .search-page {
     width: 100%;
+    max-width: 100%;
     min-height: 100vh;
     transition: all 0.3s ease;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
 }
 
 .search-page.news-expanded {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
+    width: 100%;
+    max-width: 100%;
+    /* width: 100vw 제거 */
+    /* margin-left: calc(-50vw + 50%) 제거 */
+    overflow-x: hidden; /* 가로 스크롤 방지 */
 }
 
 .search-content {
@@ -18,11 +23,13 @@
     margin: 0 auto;
     padding: 2rem;
     transition: all 0.3s ease;
+    box-sizing: border-box; /* 패딩 포함 계산 */
 }
 
 .search-page.news-expanded .search-content {
     max-width: 95%;
     padding: 1rem 2rem;
+    box-sizing: border-box; /* 패딩 포함 계산 */
 }
 
 .search-header {
@@ -145,6 +152,82 @@ body.dark-mode .ai-loading::before {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* AI 답변 토글 버튼 */
+.ai-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #f8f9ff, #e3f2fd);
+    border: 1px solid #e3f2fd;
+    color: #1a73e8;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
+}
+
+body.dark-mode .ai-toggle-btn {
+    background: linear-gradient(135deg, #2D3748, #4A5568);
+    border-color: #4A5568;
+    color: #90CDF4;
+    box-shadow: 0 2px 4px rgba(144, 205, 244, 0.1);
+}
+
+.ai-toggle-btn:hover {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-color: #1a73e8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(26, 115, 232, 0.2);
+}
+
+body.dark-mode .ai-toggle-btn:hover {
+    background: linear-gradient(135deg, #4A5568, #5A6578);
+    border-color: #90CDF4;
+    box-shadow: 0 4px 8px rgba(144, 205, 244, 0.2);
+}
+
+.ai-toggle-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
+}
+
+.ai-toggle-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.ai-toggle-btn:hover::before {
+    left: 100%;
+}
+
+.ai-toggle-icon {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.ai-toggle-btn[data-expanded="true"] .ai-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.ai-toggle-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
 }
 
 /* 언론사별 카테고리 섹션 */
@@ -584,5 +667,15 @@ body.dark-mode .react-datepicker__day--in-range {
   .date-picker-dropdown {
     left: auto;
     right: 0;
+  }
+  
+  .ai-toggle-btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 16px;
+  }
+  
+  .ai-toggle-icon {
+    font-size: 0.7rem;
   }
 } 

@@ -54,6 +54,11 @@ body.dark-mode .fixed-header {
     transition: all 0.3s ease;
 }
 
+/* 다크모드에서 로고 색상 반전 */
+body.dark-mode .header-logo {
+    filter: invert(1) brightness(1.2);
+}
+
 .logo-container:hover .header-logo {
     transform: scale(1.02);
 }

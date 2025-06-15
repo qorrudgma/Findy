@@ -22,13 +22,9 @@ const RightSidebar: React.FC = () => {
     { name: '동아일보', code: 'donga', category: '종합', description: '정론직필의 언론정신' },
     { name: '경향신문', code: 'khan', category: '종합', description: '진보적 시각의 종합일간지' },
     { name: '한겨레', code: 'hani', category: '종합', description: '민주언론의 새로운 지평' },
+    { name: '한국경제', code: 'hankyung', category: '경제', description: '대한민국 대표 경제 신문' },
     { name: '이데일리', code: 'edaily', category: '경제', description: '경제전문 인터넷신문' },
     { name: '연합뉴스', code: 'yna', category: '통신', description: '대한민국 대표 뉴스통신사' },
-    { name: '한국경제', code: 'hankyung', category: '통신', description: '대한민국 대표 뉴스통신사' },
-    { name: '더미', code: '#', category: '#', description: '#' },
-    { name: '더미', code: '#', category: '#', description: '#' },
-    { name: '더미', code: '#', category: '#', description: '#' },
-    { name: '더미', code: '#', category: '#', description: '#' },
   ]);
   
   const [shouldStopAtFooter, setShouldStopAtFooter] = useState(false);// 스크롤 위치에 따른 사이드바 고정 상태

@@ -23,14 +23,15 @@
 }
 
 .settings-button:hover {
-  background: linear-gradient(135deg, #ffffff 10%, #667eea 90%);
-  transform: translateY(-2px) rotate(90deg); /* 호버 시 회전 효과 */
+  /* background: linear-gradient(135deg, #ffffff 10%, #667eea 90%); */
+  /* 호버 시 회전 효과 */
+  transform: translateY(-2px); 
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   opacity: 1;
 }
 
 .settings-button:active {
-  transform: translateY(0) rotate(90deg);
+  transform: translateY(0);
 }
 
 .settings-button:focus {
