@@ -107,8 +107,8 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
             keywords: article.keywords
           })
         });
-        console.log("클릭한 뉴스 => ", article.url);
-        console.log("클릭한 키워드 => ", article.keywords);
+        // console.log("클릭한 뉴스 => ", article.url);
+        // console.log("클릭한 키워드 => ", article.keywords);
       } catch (err) {
         console.error("뉴스 클릭 기록 실패:", err);
       }

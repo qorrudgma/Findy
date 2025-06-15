@@ -49,16 +49,28 @@ public class NewsSearchController {
 		return ResponseEntity.ok(result);
 	}
 
+	// test용
 	@GetMapping("/keywordRank")
 	public List<String> topKeywords(@RequestParam(value = "size") int size) throws IOException {
 
 		return elasticService.topKeywords(size);
 	}
 
+	// 뉴스 선택시 카운트 +1
 	@PostMapping("/news/click")
 	public void recordClick(@RequestBody ClickRequest request) throws IOException {
 		log.info("recordClick()");
 //		log.info("클릭 요청 수신 => url={}, keywords={}", request.getUrl(), request.getKeywords());
 		elasticService.logPopularNewsAndKeywordsByUrlAndKeywords(request.getUrl(), request.getKeywords());
 	}
+
+	// url top5
+	@GetMapping("/news/top5")
+	public ResponseEntity<?> getTop5Urls() throws IOException {
+		List<String> urls = elasticService.getTop5NewsUrls();
+		List<Map<String, Object>> detailedNews = elasticService.getNewsDetail(urls);
+		log.info("detailedNews => {}", detailedNews);
+		return ResponseEntity.ok(detailedNews);
+	}
+
 }

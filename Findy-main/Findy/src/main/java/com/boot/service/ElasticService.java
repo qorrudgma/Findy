@@ -18,6 +18,7 @@ import com.boot.elasticsearch.HangulComposer;
 import com.boot.elasticsearch.KeyboardMapper;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient; // Elasticsearch 클라이언트 클래스
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest; // 검색 요청 객체
 import co.elastic.clients.elasticsearch.core.SearchResponse; // 검색 응답 객체
@@ -25,6 +26,7 @@ import co.elastic.clients.elasticsearch.core.explain.Explanation;
 import co.elastic.clients.elasticsearch.core.explain.ExplanationDetail;
 import co.elastic.clients.elasticsearch.core.search.Hit; // 검색 결과의 단일 항목 표현
 import co.elastic.clients.json.JsonData;
+import co.elastic.clients.util.NamedValue;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -332,4 +334,39 @@ public class ElasticService {
 
 		log.info("뉴스 및 키워드 자동 삭제 완료");
 	}
+
+	// Top5 뉴스 url 가져오기
+	public List<String> getTop5NewsUrls() throws IOException {
+		SearchResponse<Void> response = client.search(
+				s -> s.index("popular_news_logs").size(0).aggregations("top_urls",
+						agg -> agg.terms(
+								t -> t.field("url").size(5).order(List.of(NamedValue.of("_count", SortOrder.Desc))))),
+				Void.class);
+
+		return response.aggregations().get("top_urls").sterms().buckets().array().stream()
+				.map(bucket -> bucket.key().stringValue()).toList();
+	}
+
+	// url로 뉴스 내용 가져오기
+	public List<Map<String, Object>> getNewsDetail(List<String> urls) throws IOException {
+		List<Map<String, Object>> result = new ArrayList<>();
+
+		for (String url : urls) {
+			SearchResponse<Map> resp = client.search(s -> s.index("newsdata.newsdata")
+					.query(q -> q.term(t -> t.field("url.keyword").value(url))).size(1), Map.class);
+
+			List<Hit<Map>> hits = resp.hits().hits();
+			if (!hits.isEmpty()) {
+				Map src = hits.get(0).source();
+				Map<String, Object> news = new HashMap<>();
+				news.put("url", url);
+				news.put("headline", src.get("headline"));
+				news.put("source", src.get("source"));
+				result.add(news);
+			}
+		}
+
+		return result;
+	}
+
 }
