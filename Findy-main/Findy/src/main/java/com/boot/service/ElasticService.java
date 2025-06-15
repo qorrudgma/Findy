@@ -46,11 +46,12 @@ public class ElasticService {
 		return results;
 	}
 
-	// 페이징처리를 위한 메소드
+	// 검색을 위한 메소드
 	public Map<String, Object> searchWithPagination(String keyword, String category, int page, int size,
 			boolean skipProcessing) throws IOException {
 		log.info("입력받은 keyword => " + keyword);
 		String originalKeyword = keyword;
+		String convertedKeyword = "";
 
 		// 1. 키워드가 없을 경우 전체 검색
 		if (keyword == null || keyword.isBlank()) {
@@ -83,6 +84,7 @@ public class ElasticService {
 				log.info("한영키 변환 => {}", converted);
 				log.info("한글 패치 => {}", patched);
 				keyword = patched;
+				convertedKeyword = patched;
 			}
 		}
 
@@ -138,6 +140,8 @@ public class ElasticService {
 
 			double headlineScore = extractScoreFromExplanation(hit.explanation(), "headline");
 			double contentScore = extractScoreFromExplanation(hit.explanation(), "content");
+			// 내용우선순위 일때 그냥 안에 내용 빈도수로 점수로 하는건 좀 무리일 듯 싶어 추가적으로 조건이 들어가야할 듯
+//			contentScore = contentScore + headlineScore;
 
 //			log.info("----------headlineScore => {}", headlineScore);
 //			log.info("contentScore => {}", contentScore);

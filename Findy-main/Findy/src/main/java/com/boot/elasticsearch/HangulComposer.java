@@ -115,7 +115,7 @@ public class HangulComposer {
 						cho = jung = jong = 0;
 					}
 				} else {
-					// 종성 없음 -> 초성+중성만 결합
+					// 종성 없음 -> 초성 + 중성만 결합
 					char syllable = (char) (0xAC00 + cho * 21 * 28 + jung * 28);
 					result.append(syllable);
 					state = choIndex != -1 ? 1 : 0;
