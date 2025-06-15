@@ -24,7 +24,9 @@ import co.elastic.clients.elasticsearch.core.SearchRequest; // 검색 요청 객
 import co.elastic.clients.elasticsearch.core.SearchResponse; // 검색 응답 객체
 import co.elastic.clients.elasticsearch.core.explain.Explanation;
 import co.elastic.clients.elasticsearch.core.explain.ExplanationDetail;
+import co.elastic.clients.elasticsearch.core.search.CompletionSuggestOption;
 import co.elastic.clients.elasticsearch.core.search.Hit; // 검색 결과의 단일 항목 표현
+import co.elastic.clients.elasticsearch.core.search.Suggestion;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
 import lombok.extern.slf4j.Slf4j;
@@ -367,6 +369,20 @@ public class ElasticService {
 		}
 
 		return result;
+	}
+
+	// 자동완성
+	public List<String> getAutocompleteSuggestions(String prefix) throws IOException {
+		SearchResponse<Void> response = client.search(
+				s -> s.index("unique_keywords")
+						.suggest(sg -> sg.suggesters("suggestion",
+								st -> st.prefix(prefix).completion(c -> c.field("keyword_suggest").size(10)))),
+				Void.class);
+
+		List<Suggestion<Void>> suggestions = response.suggest().get("suggestion");
+
+		return suggestions.stream().flatMap(suggestion -> suggestion.completion().options().stream())
+				.map(CompletionSuggestOption::text).collect(Collectors.toList());
 	}
 
 }

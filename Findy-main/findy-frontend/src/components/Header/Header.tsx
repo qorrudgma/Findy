@@ -13,7 +13,9 @@ interface SearchSuggestion {
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  // const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [popularSearches, setPopularSearches] = useState<string[]>([]);
@@ -24,13 +26,33 @@ const Header: React.FC = () => {
   const { t } = useLanguage();
 
   // URL에서 검색어를 읽어와서 검색창에 표시
+  // useEffect(() => {
+  //   const searchParams = new URLSearchParams(location.search);
+  //   const urlQuery = searchParams.get('q');
+  //   if (urlQuery && urlQuery !== searchQuery) {
+  //     setSearchQuery(urlQuery);
+  //   }
+  // }, [location.search]);
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const urlQuery = searchParams.get('q');
-    if (urlQuery && urlQuery !== searchQuery) {
-      setSearchQuery(urlQuery);
+  const delay = setTimeout(() => {
+    if (inputValue.trim()) {
+      fetch(`/api/autocomplete?q=${encodeURIComponent(inputValue)}`)
+        .then(res => res.json())
+        .then(data => {
+          setSuggestions(data); // 예: ["정치", "정책", ...]
+        })
+        .catch(err => {
+          console.error("자동완성 오류:", err);
+          setSuggestions([]);
+        });
+    } else {
+      setSuggestions([]);
     }
-  }, [location.search]);
+  }, 200); // 200ms 딜레이
+
+  return () => clearTimeout(delay);
+}, [inputValue]);
+
 
   const categories = [
     { key: '전체', label: t('header.categories.all') },
@@ -187,7 +209,7 @@ const Header: React.FC = () => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedSuggestionIndex >= 0 && suggestions[selectedSuggestionIndex]) {
-        handleSearch(suggestions[selectedSuggestionIndex].query);
+        handleSearch(suggestions[selectedSuggestionIndex]);
       } else {
         handleSearch(searchQuery);
       }
@@ -334,11 +356,11 @@ const Header: React.FC = () => {
                         className={`suggestion-item ${
                           index === selectedSuggestionIndex ? 'selected' : ''
                         }`}
-                        onClick={() => handleSuggestionClick(suggestion.query)}
+                        onClick={() => handleSuggestionClick(suggestion)}
                       >
-                        <span className="suggestion-text">{suggestion.query}</span>
-                        {suggestion.count && (
-                          <span className="suggestion-count">{suggestion.count}</span>
+                        <span className="suggestion-text">{suggestion}</span>
+                        {suggestion && (
+                          <span className="suggestion-count">{suggestion}</span>
                         )}
                       </div>
                     ))}
