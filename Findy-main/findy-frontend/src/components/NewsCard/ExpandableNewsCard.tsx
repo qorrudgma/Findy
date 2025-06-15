@@ -94,9 +94,24 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
     return sourceNames[source] || source;
   };
 
-  const handleToggle = (e: React.MouseEvent) => {
+  const handleToggle = async  (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onToggle && article.id) {
+      // 클릭시 백엔드에 요청
+      try {
+        await fetch("/api/news/click", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url: article.url,
+            keywords: article.keywords
+          })
+        });
+        console.log("클릭한 뉴스 => ", article.url);
+        console.log("클릭한 키워드 => ", article.keywords);
+      } catch (err) {
+        console.error("뉴스 클릭 기록 실패:", err);
+      }
       onToggle(article.id);
     }
   };

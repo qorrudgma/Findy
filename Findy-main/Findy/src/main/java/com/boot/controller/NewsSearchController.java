@@ -6,12 +6,13 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.boot.dto.KeywordCountDto;
-import com.boot.dto.NewsCountDto;
+import com.boot.dto.ClickRequest;
 import com.boot.service.ElasticService;
 import com.boot.service.GeminiService; //  Gemini 서비스 import
 
@@ -41,19 +42,10 @@ public class NewsSearchController {
 		log.info(" 검색 요청: keyword={}, category={}, page={}, size={}, research={}", keyword, category, page, size,
 				isResearch);
 
-		// 1. ElasticService에서 뉴스 검색 결과 가져오기
+		// ElasticService에서 뉴스 검색 결과 가져오기
 		Map<String, Object> result = elasticService.searchWithPagination(keyword, category, page, size, isResearch);
 
-		// 2. Gemini AI 요약 결과 가져오기 (keyword가 있을 때만 요청)
-//		if (keyword != null && !keyword.isBlank()) {
-//			String aiSummary = geminiService.getSummary(keyword);
-//			log.info(" Gemini 요약 결과: {}", aiSummary);
-//
-//			// 3. result에 AI 요약 결과 포함시켜서 프론트에 함께 전달
-//			result.put("aiSummary", aiSummary); // 👉 프론트에서 사용: data.aiSummary
-//		}
-
-		// 4. 최종 JSON 응답 반환
+		// 최종 JSON 응답 반환
 		return ResponseEntity.ok(result);
 	}
 
@@ -63,19 +55,10 @@ public class NewsSearchController {
 		return elasticService.topKeywords(size);
 	}
 
-	// 오늘의 인기 키워드 Top 30
-	@GetMapping("/keywordsCount")
-//	public List<KeywordCountDto> getPopularKeywords(@RequestParam(defaultValue = "30") int size) throws IOException {
-	public List<KeywordCountDto> getPopularKeywords() throws IOException {
-		int size = 30;
-		return elasticService.getTopPopularKeywordsOfToday(size);
-	}
-
-	// 오늘의 인기 뉴스 Top 30
-	@GetMapping("/newsCount")
-//	public List<NewsCountDto> getPopularNews(@RequestParam(defaultValue = "30") int size) throws IOException {
-	public List<NewsCountDto> getPopularNews() throws IOException {
-		int size = 30;
-		return elasticService.getTopPopularNewsOfToday(size);
+	@PostMapping("/news/click")
+	public void recordClick(@RequestBody ClickRequest request) throws IOException {
+		log.info("recordClick()");
+//		log.info("클릭 요청 수신 => url={}, keywords={}", request.getUrl(), request.getKeywords());
+		elasticService.logPopularNewsAndKeywordsByUrlAndKeywords(request.getUrl(), request.getKeywords());
 	}
 }

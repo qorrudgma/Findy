@@ -247,8 +247,22 @@ const SearchPage: React.FC = () => {
     performSearch(true); // researchMode: true
   };
 
-  const handleNewsClick = (article: NewsArticle) => {
+  const handleNewsClick = async (article: NewsArticle) => {
     if (article.url && article.url !== '#') {
+      // 클릭시 백엔드에 요청
+      try {
+        await fetch("/api/news/click", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url: article.url,
+            keywords: article.keywords
+          })
+        });
+        console.log("클릭한 뉴스 키워드:", article.keywords);
+      } catch (err) {
+        console.error("뉴스 클릭 기록 실패:", err);
+      }
       window.open(article.url, '_blank', 'noopener,noreferrer');
     }
   };
