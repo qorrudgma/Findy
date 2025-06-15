@@ -208,13 +208,27 @@ const Header: React.FC = () => {
   };
 
   // 카테고리 클릭 처리 및 상단 스크롤
+  // const handleCategoryClick = (categoryKey: string) => {
+  //   if (categoryKey === 'all') {
+  //     navigate('/');
+  //   } else {
+  //     navigate(`/search?category=${encodeURIComponent(categoryKey)}`);
+  //   }
+  //   // 카테고리 클릭 후 상단으로 부드럽게 스크롤
+  //   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // };
   const handleCategoryClick = (categoryKey: string) => {
-    if (categoryKey === 'all') {
-      navigate('/');
-    } else {
-      navigate(`/search?category=${encodeURIComponent(categoryKey)}`);
+    const params = new URLSearchParams();
+
+    if (categoryKey !== '전체') {
+      params.append('category', categoryKey);
     }
-    // 카테고리 클릭 후 상단으로 부드럽게 스크롤
+
+    if (searchQuery.trim()) {
+      params.append('q', searchQuery.trim());
+    }
+
+    navigate(`/search?${params.toString()}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

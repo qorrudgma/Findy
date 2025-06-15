@@ -107,10 +107,13 @@ const SearchPage: React.FC = () => {
   }, [query, category, source]);
 
   // 검색 실행 (페이지 변경 포함)
+  // useEffect(() => {
+  //   if (query || category || source) {
+  //     performSearch();
+  //   }
+  // }, [query, category, source, currentPage]);
   useEffect(() => {
-    if (query || category || source) {
-      performSearch();
-    }
+    performSearch();
   }, [query, category, source, currentPage]);
 
   // 여기서 검색어 받아서 뭐로 할지 적음

@@ -2,14 +2,18 @@ package com.boot.service; // 서비스 클래스가 포함된 패키지 선언
 
 import java.io.IOException; // 입출력 예외 처리를 위한 클래스
 import java.util.ArrayList; // 리스트 객체 생성을 위한 클래스
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List; // 리스트 타입 사용을 위한 인터페이스
 import java.util.Map; // 결과 데이터를 키-값 형태로 다루기 위한 Map 인터페이스
+import java.util.stream.Collectors;
 
 import org.openkoreantext.processor.OpenKoreanTextProcessorJava;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
+import com.boot.dto.KeywordCountDto;
+import com.boot.dto.NewsCountDto;
 import com.boot.elasticsearch.HangulComposer;
 import com.boot.elasticsearch.KeyboardMapper;
 
@@ -20,6 +24,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse; // 검색 응답 �
 import co.elastic.clients.elasticsearch.core.explain.Explanation;
 import co.elastic.clients.elasticsearch.core.explain.ExplanationDetail;
 import co.elastic.clients.elasticsearch.core.search.Hit; // 검색 결과의 단일 항목 표현
+import co.elastic.clients.json.JsonData;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -136,6 +141,7 @@ public class ElasticService {
 
 		List<Map<String, Object>> content = resp.hits().hits().stream().map(hit -> {
 			Map<String, Object> doc = new HashMap<>(hit.source());
+			doc.put("id", hit.id());
 			double score = hit.score() != null ? hit.score() : 0.0;
 
 			double headlineScore = extractScoreFromExplanation(hit.explanation(), "headline");
@@ -171,9 +177,13 @@ public class ElasticService {
 //		log.info(originalKeyword);
 //		log.info(keyword);
 
+		// 인기 뉴스/키워드 로그 저장 (Top 30 기준)
+		logPopularNewsAndKeywords(content);
+
 		return result;
 	}
 
+	// 검색결과 우선순위 위한 메소드
 	private double extractScoreFromExplanation(Explanation explanation, String field) {
 		if (explanation == null) {
 			return 0.0;
@@ -193,6 +203,7 @@ public class ElasticService {
 		return sum;
 	}
 
+	// 검색결과 우선순위 위한 메소드
 	private double extractScoreFromExplanationDetail(ExplanationDetail detail, String field) {
 		double sum = 0.0;
 
@@ -207,6 +218,122 @@ public class ElasticService {
 		}
 
 		return sum;
+	}
+
+	// 키워드 순위
+	public List<String> topKeywords(int size) throws IOException {// terms 집계 두 개 요청 (전체 문서 대상)
+		SearchRequest req = new SearchRequest.Builder().index("newsdata.newsdata") // 인덱스명 맞추기
+				.size(0)
+				// 전체 문서
+				.query(q -> q.matchAll(m -> m))
+				// 조건 필요하면적기 시간으로 하기엔 시간 이 일정한게 아니라 형식이 보류해둠
+//		      .query(q -> q
+//		          .range(r -> r.field("time").gte(JsonData.of("now-" + days + "d/d")).lte(JsonData.of("now"))))
+				.aggregations("top_keywords", agg -> agg.terms(t -> t.field("textrank_keywords.keyword").size(size)))
+				.aggregations("top_tfidf", agg -> agg.terms(t -> t.field("tfidf_keywords.keyword").size(size))).build();
+
+		SearchResponse<Void> res = client.search(req, Void.class);
+
+		// 각 집계
+		Map<String, Long> textrankMap = res.aggregations().get("top_keywords").sterms().buckets().array().stream()
+				.collect(Collectors.toMap(b -> b.key().stringValue(), b -> b.docCount()));
+
+		Map<String, Long> tfidfMap = res.aggregations().get("top_tfidf").sterms().buckets().array().stream()
+				.collect(Collectors.toMap(b -> b.key().stringValue(), b -> b.docCount()));
+
+		// 교집합 만들기
+		List<String> common = textrankMap.keySet().stream().filter(tfidfMap::containsKey) // 교집합
+				.sorted(Comparator.comparingLong((String k) -> textrankMap.get(k) + tfidfMap.get(k)).reversed())
+				.limit(size) // 최종 size개
+				.toList();
+
+		return common; // List<String> (키워드만) 반환
+	}
+
+	// 인기 뉴스/키워드 로그 저장 (Top 30 기준)
+	public void logPopularNewsAndKeywords(List<Map<String, Object>> content) throws IOException {
+		List<Map<String, Object>> topNews = content.stream().limit(30).toList();
+		String now = java.time.Instant.now().toString();
+
+		for (Map<String, Object> doc : topNews) {
+			// 하나 문제 생겨도 강행
+			if (!doc.containsKey("id") || !doc.containsKey("url") || doc.get("id") == null || doc.get("url") == null) {
+				continue;
+			}
+			String newsId = doc.get("id").toString();
+			String url = doc.get("url").toString();
+
+			// popular_news_logs 인덱스에 저장
+			client.index(i -> i.index("popular_news_logs")
+					.document(Map.of("news_id", newsId, "url", url, "timestamp", now)));
+
+			// textrank_keywords, tfidf_keywords 필드에서 키워드 추출
+			Object textrankObj = doc.get("textrank_keywords");
+			Object tfidfObj = doc.get("tfidf_keywords");
+
+			List<String> textrankKeywords = textrankObj instanceof List<?>
+					? ((List<?>) textrankObj).stream().map(Object::toString).toList()
+					: List.of();
+			List<String> tfidfKeywords = tfidfObj instanceof List<?>
+					? ((List<?>) tfidfObj).stream().map(Object::toString).toList()
+					: List.of();
+
+			// [3] 중복 제거 후 각 키워드별로 popular_keywords_logs 저장
+			List<String> combinedKeywords = new ArrayList<>();
+			combinedKeywords.addAll(textrankKeywords);
+			combinedKeywords.addAll(tfidfKeywords);
+			combinedKeywords = combinedKeywords.stream().distinct().toList();
+
+			for (String kw : combinedKeywords) {
+				client.index(i -> i.index("popular_keywords_logs").document(Map.of("keyword", kw, "timestamp", now)));
+			}
+		}
+	}
+
+	// 오늘 하루 기준, 인기 키워드 Top size
+	public List<KeywordCountDto> getTopPopularKeywordsOfToday(int size) throws IOException {
+		String today = java.time.LocalDate.now(java.time.ZoneOffset.UTC) + "T00:00:00Z";
+
+		SearchRequest req = new SearchRequest.Builder().index("popular_keywords_logs").size(0)
+				.query(q -> q.range(r -> r.field("timestamp").gte(JsonData.of(today))))
+				.aggregations("top_keywords", agg -> agg.terms(t -> t.field("keyword").size(size))).build();
+
+		SearchResponse<Void> res = client.search(req, Void.class);
+
+		return res.aggregations().get("top_keywords").sterms().buckets().array().stream()
+				.map(b -> new KeywordCountDto(b.key().stringValue(), b.docCount())).toList();
+	}
+
+	// 오늘 하루 기준, 인기 뉴스 Top size
+	public List<NewsCountDto> getTopPopularNewsOfToday(int size) throws IOException {
+		String today = java.time.LocalDate.now(java.time.ZoneOffset.UTC) + "T00:00:00Z";
+
+		SearchRequest req = new SearchRequest.Builder().index("popular_news_logs").size(0)
+				.query(q -> q.range(r -> r.field("timestamp").gte(JsonData.of(today))))
+				.aggregations("top_news", agg -> agg.terms(t -> t.field("news_id").size(size))).build();
+
+		SearchResponse<Void> res = client.search(req, Void.class);
+
+		List<NewsCountDto> result = new ArrayList<>();
+
+		for (var bucket : res.aggregations().get("top_news").sterms().buckets().array()) {
+			String newsId = bucket.key().stringValue();
+			long count = bucket.docCount();
+
+			// news_id 기준으로 URL 하나 가져오기 (최신 1건)
+			SearchResponse<Map> sub = client.search(s -> s.index("popular_news_logs").size(1)
+					.query(q -> q.term(t -> t.field("news_id").value(newsId)))
+					.sort(srt -> srt.field(
+							f -> f.field("timestamp").order(co.elastic.clients.elasticsearch._types.SortOrder.Desc))),
+					Map.class);
+
+			var hits = sub.hits().hits();
+			String url = sub.hits().hits().isEmpty() ? "" : sub.hits().hits().get(0).source().get("url").toString();
+
+			result.add(new NewsCountDto(newsId, url, count));
+		}
+
+		return result;
 	}
 
 }

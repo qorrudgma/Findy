@@ -1,6 +1,7 @@
 package com.boot.controller;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.boot.dto.KeywordCountDto;
+import com.boot.dto.NewsCountDto;
 import com.boot.service.ElasticService;
 import com.boot.service.GeminiService; //  Gemini 서비스 import
 
@@ -52,5 +55,27 @@ public class NewsSearchController {
 
 		// 4. 최종 JSON 응답 반환
 		return ResponseEntity.ok(result);
+	}
+
+	@GetMapping("/keywordRank")
+	public List<String> topKeywords(@RequestParam(value = "size") int size) throws IOException {
+
+		return elasticService.topKeywords(size);
+	}
+
+	// 오늘의 인기 키워드 Top 30
+	@GetMapping("/keywordsCount")
+//	public List<KeywordCountDto> getPopularKeywords(@RequestParam(defaultValue = "30") int size) throws IOException {
+	public List<KeywordCountDto> getPopularKeywords() throws IOException {
+		int size = 30;
+		return elasticService.getTopPopularKeywordsOfToday(size);
+	}
+
+	// 오늘의 인기 뉴스 Top 30
+	@GetMapping("/newsCount")
+//	public List<NewsCountDto> getPopularNews(@RequestParam(defaultValue = "30") int size) throws IOException {
+	public List<NewsCountDto> getPopularNews() throws IOException {
+		int size = 30;
+		return elasticService.getTopPopularNewsOfToday(size);
 	}
 }
