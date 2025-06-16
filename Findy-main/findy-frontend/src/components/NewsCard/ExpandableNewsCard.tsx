@@ -187,7 +187,7 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
         </div>
         
         {/* 키워드 태그 */}
-        {article.keywords && article.keywords.length > 0 && (
+        {/* {article.keywords && article.keywords.length > 0 && (
           <div className="expanded-keywords">
             <h4 className="keywords-title">관련 키워드</h4>
             <div className="keywords-list">
@@ -198,7 +198,7 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
               ))}
             </div>
           </div>
-        )}
+        )} */}
         
         {/* 원문 링크 */}
         <div className="expanded-actions">
