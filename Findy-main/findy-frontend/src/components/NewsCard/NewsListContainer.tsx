@@ -33,9 +33,21 @@ const NewsListContainer: React.FC<NewsListContainerProps> = ({ articles, onArtic
     const newExpandedId = expandedArticleId === articleId ? null : articleId;
     setExpandedArticleId(newExpandedId);
     
-    // 토글 시 스크롤을 상단으로 이동
+    // 토글 시 news-sources-grid까지 스크롤 이동
     if (newExpandedId !== null) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        const newsSourcesGrid = document.querySelector('.news-sources-grid');
+        if (newsSourcesGrid) {
+          const rect = newsSourcesGrid.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const targetPosition = rect.top + scrollTop - 80; // 헤더 높이 고려하여 100px 여유 공간
+          
+          window.scrollTo({ 
+            top: Math.max(0, targetPosition), 
+            behavior: 'smooth' 
+          });
+        }
+      }, 100); // DOM 업데이트 후 스크롤
     }
     
     if (onExpandedChange) {
