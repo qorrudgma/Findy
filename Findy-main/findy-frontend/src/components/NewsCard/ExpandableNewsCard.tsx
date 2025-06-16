@@ -100,6 +100,7 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
   const handleToggle = async  (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onToggle && article.id) {
+      onToggle(article.id);
       // 클릭시 백엔드에 요청
       try {
         await fetch("http://localhost:8485/api/news/click", {
@@ -117,11 +118,9 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
         setTimeout(() => {
           refreshSidebar();
         }, 500);
-        
       } catch (err) {
         console.error("뉴스 클릭 기록 실패:", err);
       }
-      onToggle(article.id);
     }
   };
 
