@@ -69,8 +69,8 @@ public class ElasticService {
 			SearchRequest.Builder requestBuilder = new SearchRequest.Builder().index("newsdata.newsdata")
 					.from(page * size).size(size);
 
-			if (category != null && !category.isBlank()) {
-				requestBuilder.query(q -> q.term(t -> t.field("category.keyword").value(category)));
+			if (category != null && !category.isBlank() && !category.equals("전체")) {
+				requestBuilder.query(q -> q.term(t -> t.field("category").value(category)));
 			} else {
 				requestBuilder.query(q -> q.matchAll(m -> m));
 			}

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.boot.dto.ClickRequest;
 import com.boot.service.ElasticService;
-import com.boot.service.GeminiService; //  Gemini 서비스 import
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,12 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 public class NewsSearchController {
 
 	private final ElasticService elasticService;
-	private final GeminiService geminiService; // GeminiService ㅎㅇ
 
-	// 생성자에 GeminiService 주입
-	public NewsSearchController(ElasticService elasticService, GeminiService geminiService) {
+	public NewsSearchController(ElasticService elasticService) {
 		this.elasticService = elasticService;
-		this.geminiService = geminiService;
 	}
 
 	@GetMapping("/search")
@@ -38,6 +34,7 @@ public class NewsSearchController {
 			@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "size", defaultValue = "10") int size,
 			@RequestParam(value = "research", defaultValue = "false") boolean isResearch) throws IOException {
+		log.info("!@#$@!#$" + category);
 
 		log.info(" 검색 요청: keyword={}, category={}, page={}, size={}, research={}", keyword, category, page, size,
 				isResearch);
@@ -73,4 +70,10 @@ public class NewsSearchController {
 		return ResponseEntity.ok(detailedNews);
 	}
 
+	// 자동완성
+	@GetMapping("/autocomplete")
+	public List<String> autocomplete(@RequestParam("q") String prefix) throws IOException {
+		log.info("!@#${}", elasticService.getAutocompleteSuggestions(prefix));
+		return elasticService.getAutocompleteSuggestions(prefix);
+	}
 }

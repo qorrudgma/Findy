@@ -23,6 +23,16 @@ interface NewsArticle {
   contentScore?: number;  // 내용 점수
 }
 
+// 한글 -> 영문 매핑
+const reverseCategoryMap: { [key: string]: string } = {
+  '경제': 'economy',
+  '오피니언': 'opinion',
+  '사회': 'society',
+  '건강': 'health',
+  '연예/문화': 'entertainment',
+  '스포츠': 'sports'
+};
+
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [searchResults, setSearchResults] = useState<NewsArticle[]>([]);
@@ -107,37 +117,38 @@ const SearchPage: React.FC = () => {
     setCurrentPage(0);
   }, [query, category, source]);
 
-  // 검색 실행 (페이지 변경 포함)
-  // useEffect(() => {
-  //   if (query || category || source) {
-  //     performSearch();
-  //   }
-  // }, [query, category, source, currentPage]);
+  // 쿼리 / 카테고리 / 소스 바뀌었을 때 첫 검색 수행
   useEffect(() => {
     performSearch();
-  }, [query, category, source, currentPage]);
+  }, [query, category, source]);
+
+  // 페이지 이동 시 검색 수행
+  useEffect(() => {
+    performSearch();
+  }, [currentPage]);
 
      // 여기서 검색어 받아서 뭐로 할지 적음
-   const performSearch = async (researchMode: boolean = false) => {
-     if (!query && !category && !source) return; // 파라미터가 없으면 검색하지 않음
+    const performSearch = async (researchMode: boolean = false) => {
+      if (!query && !category && !source) return; // 파라미터가 없으면 검색하지 않음
      
-     try {
-       setIsLoading(true);
-      
-           const params = new URLSearchParams();
-     if (query) params.append('q', query);
-     if (category) params.append('category', category);
-     // source 파라미터는 백엔드에서 인식하지 못하므로 제거하고 프론트엔드에서 필터링
-     params.append('page', currentPage.toString());
-     params.append('size', source ? '3000' : '10'); // 언론사 필터링 시 더 많은 데이터 요청
+      try {
+      setIsLoading(true);
 
-     if (researchMode) {
-       params.append('research', 'true');
-     }
+      const params = new URLSearchParams();
+      if (query) params.append('q', query);
+      if (category) params.append('category', category);
 
-     // 통합된 검색 엔드포인트 사용
-     const url = `http://localhost:8485/api/search?${params.toString()}`;
-      
+      // source 파라미터는 백엔드에서 인식하지 못하므로 제거하고 프론트엔드에서 필터링
+      params.append('page', currentPage.toString());
+      params.append('size', source ? '3000' : '10'); // 언론사 필터링 시 더 많은 데이터 요청
+
+      if (researchMode) {
+      params.append('research', 'true');
+      }
+
+      // 통합된 검색 엔드포인트 사용
+      const url = `http://localhost:8485/api/search?${params.toString()}`;
+        
       
       const response = await fetch(url);
       
@@ -154,22 +165,23 @@ const SearchPage: React.FC = () => {
         
         // API 응답 데이터를 NewsArticle 형태로 변환
         if (data.content && data.content.length > 0) {
-                     let transformedNews = data.content.map((item: any) => ({
-             id: item.id || item.url || Math.random().toString(),
-             category: item.category || "기타",
-             // category: categoryMap[item.category] || item.category, // 영어 카테고리를 한글로 변환
-             headline: item.headline || "제목 없음",
-             content: item.content || "내용 없음",
-             // summary: item.summary || item.content?.substring(0, 100) + '...',
-             preview: item.content?.substring(0, 100) + '...',
-             time: item.time || "날짜 없음",
-             source: item.source || '기타',
-             tags: item.tags || [],
-             url: item.url || "#",
-             img: item.img || null, // MongoDB의 img 필드 추가
-             keywords: item.keywords || [], // keywords 필드도 추가
-             headlineScore: item.headlineScore || 0,  // 제목 점수
-             contentScore: item.contentScore || 0     // 내용 점수
+              let transformedNews = data.content.map((item: any) => ({
+                id: item.id || item.url || Math.random().toString(),
+                category: item.category || "기타",
+                // category: categoryMap[item.category?.toLowerCase()] || item.category || "기타",
+                // category: categoryMap[item.category] || item.category, // 영어 카테고리를 한글로 변환
+                headline: item.headline || "제목 없음",
+                content: item.content || "내용 없음",
+                // summary: item.summary || item.content?.substring(0, 100) + '...',
+                preview: item.content?.substring(0, 100) + '...',
+                time: item.time || "날짜 없음",
+                source: item.source || '기타',
+                tags: item.tags || [],
+                url: item.url || "#",
+                img: item.img || null, // MongoDB의 img 필드 추가
+                keywords: item.keywords || [], // keywords 필드도 추가
+                headlineScore: item.headlineScore || 0,  // 제목 점수
+                contentScore: item.contentScore || 0     // 내용 점수
            }));
            
            // 클라이언트 사이드에서 언론사 필터링
