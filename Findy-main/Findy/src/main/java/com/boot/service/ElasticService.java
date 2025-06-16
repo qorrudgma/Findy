@@ -354,8 +354,9 @@ public class ElasticService {
 		List<Map<String, Object>> result = new ArrayList<>();
 
 		for (String url : urls) {
-			SearchResponse<Map> resp = client.search(s -> s.index("newsdata.newsdata")
-					.query(q -> q.term(t -> t.field("url.keyword").value(url))).size(1), Map.class);
+			SearchResponse<Map> resp = client.search(
+					s -> s.index("newsdata.newsdata").query(q -> q.term(t -> t.field("url").value(url))).size(1),
+					Map.class);
 
 			List<Hit<Map>> hits = resp.hits().hits();
 			if (!hits.isEmpty()) {

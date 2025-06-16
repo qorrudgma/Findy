@@ -25,34 +25,24 @@ const Header: React.FC = () => {
   const location = useLocation();
   const { t } = useLanguage();
 
-  // URL에서 검색어를 읽어와서 검색창에 표시
-  // useEffect(() => {
-  //   const searchParams = new URLSearchParams(location.search);
-  //   const urlQuery = searchParams.get('q');
-  //   if (urlQuery && urlQuery !== searchQuery) {
-  //     setSearchQuery(urlQuery);
-  //   }
-  // }, [location.search]);
+  // URL에서 검색어와 카테고리를 읽어와서 검색창과 셀렉트 박스에 표시
   useEffect(() => {
-  const delay = setTimeout(() => {
-    if (inputValue.trim()) {
-      fetch(`/api/autocomplete?q=${encodeURIComponent(inputValue)}`)
-        .then(res => res.json())
-        .then(data => {
-          setSuggestions(data); // 예: ["정치", "정책", ...]
-        })
-        .catch(err => {
-          console.error("자동완성 오류:", err);
-          setSuggestions([]);
-        });
-    } else {
-      setSuggestions([]);
+    const searchParams = new URLSearchParams(location.search);
+    const urlQuery = searchParams.get('q');
+    const urlCategory = searchParams.get('category');
+    
+    if (urlQuery && urlQuery !== searchQuery) {
+      setSearchQuery(urlQuery);
     }
-  }, 200); // 200ms 딜레이
-
-  return () => clearTimeout(delay);
-}, [inputValue]);
-
+    
+    // URL의 카테고리를 셀렉트 박스에 반영
+    if (urlCategory && urlCategory !== selectedCategory) {
+      setSelectedCategory(urlCategory);
+    } else if (!urlCategory && selectedCategory) {
+      // URL에 카테고리가 없으면 셀렉트 박스도 초기화
+      setSelectedCategory('');
+    }
+  }, [location.search]);
 
   const categories = [
     { key: '전체', label: t('header.categories.all') },
@@ -230,27 +220,18 @@ const Header: React.FC = () => {
   };
 
   // 카테고리 클릭 처리 및 상단 스크롤
-  // const handleCategoryClick = (categoryKey: string) => {
-  //   if (categoryKey === 'all') {
-  //     navigate('/');
-  //   } else {
-  //     navigate(`/search?category=${encodeURIComponent(categoryKey)}`);
-  //   }
-  //   // 카테고리 클릭 후 상단으로 부드럽게 스크롤
-  //   window.scrollTo({ top: 0, behavior: 'smooth' });
-  // };
   const handleCategoryClick = (categoryKey: string) => {
-    const params = new URLSearchParams();
-
-    if (categoryKey !== '전체') {
-      params.append('category', categoryKey);
+    if (categoryKey === 'all') {
+      navigate('/');
+      // 전체 카테고리 클릭시 검색어와 셀렉트 박스 초기화
+      setSearchQuery('');
+      setSelectedCategory('');
+    } else {
+      navigate(`/search?category=${encodeURIComponent(categoryKey)}`);
+      // 선택된 카테고리를 셀렉트 박스에 반영
+      setSelectedCategory(categoryKey);
     }
-
-    if (searchQuery.trim()) {
-      params.append('q', searchQuery.trim());
-    }
-
-    navigate(`/search?${params.toString()}`);
+    // 카테고리 클릭 후 상단으로 부드럽게 스크롤
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -283,6 +264,9 @@ const Header: React.FC = () => {
 
   const handleLogoClick = () => {
     navigate('/');
+    // 로고 클릭시 검색어와 셀렉트 박스 초기화
+    setSearchQuery('');
+    setSelectedCategory('');
     // 홈으로 이동 후 상단으로 부드럽게 스크롤
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -339,7 +323,7 @@ const Header: React.FC = () => {
                     value={searchQuery}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    onFocus={() => searchQuery.length >= 1 && setShowSuggestions(true)}
+                    onFocus={() => searchQuery?.length >= 1 && setShowSuggestions(true)}
                     autoComplete="off"
                   />
                 <button type="submit" className="search-btn">

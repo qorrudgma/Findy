@@ -26,6 +26,7 @@ public class AutocompleteController {
 
 	@GetMapping
 	public List<String> autocomplete(@RequestParam("q") String prefix) throws IOException {
+		log.info("!@#${}", elasticService.getAutocompleteSuggestions(prefix));
 		return elasticService.getAutocompleteSuggestions(prefix);
 	}
 

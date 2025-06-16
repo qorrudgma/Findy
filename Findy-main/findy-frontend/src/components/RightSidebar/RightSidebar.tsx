@@ -76,6 +76,8 @@ const RightSidebar: React.FC = () => {
   }, []);
 
   const handleSourceClick = (source: NewsSource) => {
+    console.log('🔘 RightSidebar - 언론사 버튼 클릭:', source.name, '코드:', source.code);
+    console.log('🔘 네비게이트 URL:', `/search?source=${source.code}`);
     navigate(`/search?source=${source.code}`);
   };
 

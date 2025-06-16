@@ -3,7 +3,7 @@ import json
 
 ELASTIC_URL = "https://localhost:9200"
 INDEX = "unique_keywords"
-AUTH = ('elastic', '1234')
+AUTH = ('elastic', 'qwer1234')
 VERIFY_SSL = False
 
 # newsdata.newsdata에서 키워드 추출
