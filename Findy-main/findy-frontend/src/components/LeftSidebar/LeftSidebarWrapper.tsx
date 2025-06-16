@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useSidebar } from '../../contexts/SidebarContext';
 import './LeftSidebar.css';
 
 interface NewsArticle {
@@ -18,21 +19,26 @@ interface NewsArticle {
 }
 
 /**
- * 왼쪽 사이드바 컴포넌트
+ * 왼쪽 사이드바 Wrapper 컴포넌트
+ * - SidebarProvider로 감싸서 Context 제공
  * - 실시간 인기기사 표시
  * - 스크롤에 따른 위치 조정 (90% 스크롤 시 고정)
  * - 언론사명 한글 매핑 기능
  */
-const LeftSidebar: React.FC = () => {
+const LeftSidebarWrapper: React.FC = () => {
   const [popularArticles, setPopularArticles] = useState<NewsArticle[]>([]);
   const [popularSearches, setPopularSearches] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [shouldStopAtFooter, setShouldStopAtFooter] = useState(false); // 스크롤 위치에 따른 사이드바 고정 상태
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { setRefreshFunction } = useSidebar();
 
   useEffect(() => {
     loadPopularContent();
+    
+    // 새로고침 함수를 Context에 등록
+    setRefreshFunction(loadPopularArticles);
 
     // 스크롤에 따른 사이드바 위치 조정 로직 (90% 스크롤 시 고정)
     const handleScroll = () => {
@@ -75,7 +81,7 @@ const LeftSidebar: React.FC = () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, []);
+  }, [setRefreshFunction]);
 
   // 실시간 인기기사 로드 (언론사명 한글 매핑 포함)
   const loadPopularArticles = async () => {
@@ -133,21 +139,6 @@ const LeftSidebar: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-  // 인기 검색어 로드 (현재 사용하지 않음)
-  // const loadPopularSearches = async () => {
-  //   try {
-  //     const response = await fetch('/api/search/popular');
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setPopularSearches(data.slice(0, 10));
-  //     } else {
-  //       throw new Error('API 호출 실패');
-  //     }
-  //   } catch (error) {
-  //     console.error('인기 검색어 로드 오류:', error);
-  //   }
-  // };
 
   const loadPopularContent = () => {
     loadPopularArticles();
@@ -242,28 +233,9 @@ const LeftSidebar: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* 인기검색어 섹션 (현재 주석처리) */}
-        {/*
-        <div className="sidebar-section">
-          <h3 className="sidebar-title">실시간 인기검색어</h3>
-          <div className="popular-searches">
-            {popularSearches.slice(0, 5).map((searchTerm, index) => (
-              <div 
-                key={index}
-                className="popular-search-item"
-                onClick={() => handleSearchClick(searchTerm)}
-              >
-                <div className="search-rank">{index + 1}</div>
-                <div className="search-term">{searchTerm}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-        */}
       </div>
     </div>
   );
 };
 
-export default LeftSidebar; 
+export default LeftSidebarWrapper; 

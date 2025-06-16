@@ -106,26 +106,6 @@ body.dark-mode .popular-article-item:hover {
   border-color: #718096;
 }
 
-.article-rank {
-  background: #1a73e8;
-  color: white;
-  font-size: 0.8rem;
-  font-weight: 600;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.3s ease;
-}
-
-body.dark-mode .article-rank {
-  background: #90CDF4;
-  color: #1A202C;
-}
-
 .article-content {
   flex: 1;
   min-width: 0;
@@ -136,7 +116,7 @@ body.dark-mode .article-rank {
   font-weight: 500;
   color: #333;
   line-height: 1.3;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -149,31 +129,29 @@ body.dark-mode .article-headline {
   color: #E2E8F0;
 }
 
-.article-meta {
+/* 새로운 언론사 컨테이너 스타일 */
+.article-source-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 0.7rem;
-  color: #666;
+  gap: 0.5rem;
+}
+
+.source-logo {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .article-source {
   font-weight: 500;
   color: #1a73e8;
+  font-size: 0.75rem;
   transition: color 0.3s ease;
 }
 
 body.dark-mode .article-source {
   color: #90CDF4;
-}
-
-.article-time {
-  color: #999;
-  transition: color 0.3s ease;
-}
-
-body.dark-mode .article-time {
-  color: #A0AEC0;
 }
 
 /* 인기검색어 스타일 (현재 사용하지 않음) */

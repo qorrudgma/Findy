@@ -84,9 +84,9 @@ const RightSidebar: React.FC = () => {
   const getSourceLogo = (sourceCode: string) => {
     // 언론사별 로고 이미지 경로
     const logoMap: { [key: string]: string } = {
-      'chosun': '/images/sources/chosun.jpg',
+      'chosun': '/images/sources/chosun.png',
       'joongang': '/images/sources/joongang.svg',
-      'donga': '/images/sources/donga.jpg',
+      'donga': '/images/sources/donga.png',
       'khan': '/images/sources/khan.jpg',
       'hani': '/images/sources/hani.svg',
       'edaily': '/images/sources/edaily.png',

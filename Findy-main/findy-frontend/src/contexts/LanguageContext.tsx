@@ -52,7 +52,7 @@ const translations = {
     'search.filters.close': '닫기',
     
     // Sidebar
-    'sidebar.popularArticles': '인기 기사',
+    'sidebar.popularArticles': '많이 본 기사',
     'sidebar.newsSources': '언론사',
     'sidebar.loading': '로딩 중...',
     

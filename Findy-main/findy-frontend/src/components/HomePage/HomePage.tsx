@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { useSidebar } from '../../contexts/SidebarContext';
 import NewsCard from '../NewsCard/NewsCard';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import { useLanguage } from '../../contexts/LanguageContext';
 import './HomePage.css';
 
 interface NewsArticle {
@@ -25,6 +26,7 @@ const HomePage: React.FC = () => {
   const [popularSearches, setPopularSearches] = useState<string[]>([]);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { refreshSidebar } = useSidebar();
 
   // 주요 언론사 목록 (표시용 한글명)
   const newsSources = [
@@ -47,7 +49,6 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     loadLatestNews();
-    loadPopularSearches();
   }, []);
 
   // 최신 뉴스 로드
@@ -95,25 +96,11 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // 인기 검색어 로드
-  const loadPopularSearches = async () => {
-    try {
-      const response = await fetch('/api/search/popular');
-      if (response.ok) {
-        const data = await response.json();
-        setPopularSearches(data.slice(0, 5));
-      }
-    } catch (error) {
-      console.error('인기 검색어 로드 오류:', error);
-      setPopularSearches(['경제', '정치', '사회', 'AI', '스포츠']);
-    }
-  };
-
   const handleNewsClick = async (article: NewsArticle) => {
     if (article.url && article.url !== '#') {
       // 클릭시 백엔드에 요청
       try {
-        await fetch("/api/news/click", {
+        await fetch("http://localhost:8485/api/news/click", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -121,7 +108,13 @@ const HomePage: React.FC = () => {
             keywords: article.keywords
           })
         });
-        // console.log("클릭한 뉴스 키워드:", article.keywords);
+        console.log("클릭한 뉴스 키워드:", article.keywords);
+        
+        // 클릭 후 사이드바 새로고침
+        setTimeout(() => {
+          refreshSidebar();
+        }, 500);
+        
       } catch (err) {
         console.error("뉴스 클릭 기록 실패:", err);
       }

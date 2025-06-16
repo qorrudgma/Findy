@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faChevronDown, faTimes, faExpand } from '@fortawesome/free-solid-svg-icons';
+import { useSidebar } from '../../contexts/SidebarContext';
 import './ExpandableNewsCard.css';
 
 interface NewsArticle {
@@ -32,6 +33,8 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
   isExpanded = false,
   onToggle 
 }) => {
+  const { refreshSidebar } = useSidebar();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
@@ -49,9 +52,9 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
       'mbc': '/images/sources/mbc.png',
       'sbs': '/images/sources/sbs.png',
       'jtbc': '/images/sources/jtbc.svg',
-      'chosun': '/images/sources/chosun.jpg',
+      'chosun': '/images/sources/chosun.png',
       'joongang': '/images/sources/joongang.svg',
-      'donga': '/images/sources/donga.jpg',
+      'donga': '/images/sources/donga.png',
       'hani': '/images/sources/hani.svg',
       'khan': '/images/sources/khan.jpg',
       'edaily': '/images/sources/edaily.png',
@@ -61,9 +64,9 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
       'MBC': '/images/sources/mbc.png',
       'SBS': '/images/sources/sbs.png',
       'JTBC': '/images/sources/jtbc.svg',
-      '조선일보': '/images/sources/chosun.jpg',
+      '조선일보': '/images/sources/chosun.png',
       '중앙일보': '/images/sources/joongang.svg',
-      '동아일보': '/images/sources/donga.jpg',
+      '동아일보': '/images/sources/donga.png',
       '한겨레': '/images/sources/hani.svg',
       '경향신문': '/images/sources/khan.jpg',
       '이데일리': '/images/sources/edaily.png',
@@ -99,7 +102,7 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
     if (onToggle && article.id) {
       // 클릭시 백엔드에 요청
       try {
-        await fetch("/api/news/click", {
+        await fetch("http://localhost:8485/api/news/click", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -107,8 +110,14 @@ const ExpandableNewsCard: React.FC<ExpandableNewsCardProps> = ({
             keywords: article.keywords
           })
         });
-        // console.log("클릭한 뉴스 => ", article.url);
-        // console.log("클릭한 키워드 => ", article.keywords);
+        console.log("클릭한 뉴스 => ", article.url);
+        console.log("클릭한 키워드 => ", article.keywords);
+        
+        // 클릭 후 사이드바 새로고침
+        setTimeout(() => {
+          refreshSidebar();
+        }, 500);
+        
       } catch (err) {
         console.error("뉴스 클릭 기록 실패:", err);
       }

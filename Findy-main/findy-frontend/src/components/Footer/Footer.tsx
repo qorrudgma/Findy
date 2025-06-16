@@ -33,7 +33,21 @@ const Footer: React.FC = () => {
       <div className="footer-container">
         <div className="footer-content">
           <div className="footer-section">
-            <h3 className="footer-title">{t('footer.findyNews')}</h3>
+            <div className="brand-section">
+              <h3 className="footer-title">
+                <div className="brand-icon">
+                  <div className="search-icon">
+                    <div className="search-circle"></div>
+                    <div className="search-handle"></div>
+                  </div>
+                </div>
+                <span className="brand-text">{t('footer.findyNews')}</span>
+                <span className="brand-accent">.</span>
+              </h3>
+              <div className="brand-tagline">
+                <span className="tagline-text">Smart News Discovery</span>
+              </div>
+            </div>
             <p className="footer-description">
               {t('footer.description1')}
             </p>
@@ -42,10 +56,26 @@ const Footer: React.FC = () => {
             </p>
             {/*  소셜 미디어 링크  */}
             <div className="footer-social">
-                <a href="#" className="social-btn" title="페이스북" onClick={() => handleLinkClick('#')} target="_blank">📘</a>
-                <a href="#" className="social-btn" title="트위터" onClick={() => handleLinkClick('#')} target="_blank">🐦</a>
-                <a href="#" className="social-btn" title="인스타그램" onClick={() => handleLinkClick('#')} target="_blank">📷</a>
-                <a href="#" className="social-btn" title="유튜브" onClick={() => handleLinkClick('#')} target="_blank">📺</a>
+                <div className="social-row">
+                  <a href="#" className="social-btn facebook" title="페이스북" onClick={() => handleLinkClick('#')} target="_blank">
+                    <span className="social-icon">f</span>
+                    <span className="social-label">Facebook</span>
+                  </a>
+                  <a href="#" className="social-btn twitter" title="트위터" onClick={() => handleLinkClick('#')} target="_blank">
+                    <span className="social-icon">𝕏</span>
+                    <span className="social-label">Twitter</span>
+                  </a>
+                </div>
+                <div className="social-row">
+                  <a href="#" className="social-btn instagram" title="인스타그램" onClick={() => handleLinkClick('#')} target="_blank">
+                    <span className="social-icon">📷</span>
+                    <span className="social-label">Instagram</span>
+                  </a>
+                  <a href="#" className="social-btn youtube" title="유튜브" onClick={() => handleLinkClick('#')} target="_blank">
+                    <span className="social-icon">▶</span>
+                    <span className="social-label">YouTube</span>
+                  </a>
+                </div>
             </div>
           </div>
           

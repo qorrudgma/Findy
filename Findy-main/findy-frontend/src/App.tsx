@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { SidebarProvider } from './contexts/SidebarContext';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import HomePage from './components/HomePage/HomePage';
@@ -15,7 +16,7 @@ import FAQDetail from './components/FAQDetail/FAQDetail';
 import ContactForm from './components/ContactForm/ContactForm';
 import ScrollToTopButton from './components/ScrollToTopButton/ScrollToTopButton';
 import SettingsButton from './components/SettingsButton/SettingsButton';
-import LeftSidebar from './components/LeftSidebar/LeftSidebar';
+import LeftSidebarWrapper from './components/LeftSidebar/LeftSidebarWrapper';
 import RightSidebar from './components/RightSidebar/RightSidebar';
 import './styles/common.css';
 import './styles/App.css';
@@ -32,34 +33,36 @@ function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <Router>
-        <div className="App">
-          <Header />
-          
-          {/* 왼쪽 사이드바 - 실시간 인기기사 */}
-          <LeftSidebar />
-          
-          {/* 오른쪽 사이드바 - 언론사 목록 */}
-          <RightSidebar />
-          
-          <main className="main-container">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/terms" element={<TermsOfService />} />
-              <Route path="/copyright" element={<CopyrightPolicy />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/ad-policy" element={<AdPolicy />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/faq/detail/:id" element={<FAQDetail />} />
-              <Route path="/contact" element={<ContactForm />} />
-            </Routes>
-          </main>
-          <Footer />
-          <ScrollToTopButton />
-          <SettingsButton />
-        </div>
-      </Router>
+        <SidebarProvider>
+          <Router>
+          <div className="App">
+            <Header />
+            
+            {/* 왼쪽 사이드바 - 실시간 인기기사 */}
+            <LeftSidebarWrapper />
+            
+            {/* 오른쪽 사이드바 - 언론사 목록 */}
+            <RightSidebar />
+            
+            <main className="main-container">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/copyright" element={<CopyrightPolicy />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/ad-policy" element={<AdPolicy />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/faq/detail/:id" element={<FAQDetail />} />
+                <Route path="/contact" element={<ContactForm />} />
+              </Routes>
+            </main>
+            <Footer />
+            <ScrollToTopButton />
+            <SettingsButton />
+          </div>
+        </Router>
+        </SidebarProvider>
       </LanguageProvider>
     </ThemeProvider>
   );
