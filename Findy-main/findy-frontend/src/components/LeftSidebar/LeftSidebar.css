@@ -258,8 +258,38 @@ body.dark-mode .popular-articles::-webkit-scrollbar-thumb:hover {
   }
 }
 
+/* 태블릿 및 모바일에서 사이드바 완전히 숨김 */
 @media (max-width: 1024px) {
   .left-sidebar-container {
-    display: none; /* 태블릿 이하에서 숨김 */
+    display: none !important; /* 태블릿 이하에서 완전히 숨김 */
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+/* 모바일 환경에서 추가 보장 */
+@media (max-width: 768px) {
+  .left-sidebar-container {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+  }
+}
+
+/* 작은 모바일 화면에서도 확실히 숨김 */
+@media (max-width: 480px) {
+  .left-sidebar-container {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 } 

@@ -30,11 +30,24 @@ const LeftSidebarWrapper: React.FC = () => {
   const [popularSearches, setPopularSearches] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [shouldStopAtFooter, setShouldStopAtFooter] = useState(false); // 스크롤 위치에 따른 사이드바 고정 상태
+  const [isMobile, setIsMobile] = useState(false); // 모바일 환경 감지
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { setRefreshFunction } = useSidebar();
 
   useEffect(() => {
+    // 모바일 환경 감지 함수
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth <= 1024;
+      setIsMobile(isMobileDevice);
+      return isMobileDevice;
+    };
+
+    // 초기 모바일 체크
+    if (checkMobile()) {
+      return; // 모바일이면 나머지 로직 실행하지 않음
+    }
+
     loadPopularContent();
     
     // 새로고침 함수를 Context에 등록
@@ -42,6 +55,9 @@ const LeftSidebarWrapper: React.FC = () => {
 
     // 스크롤에 따른 사이드바 위치 조정 로직 (90% 스크롤 시 고정)
     const handleScroll = () => {
+      // 모바일에서는 스크롤 로직 실행하지 않음
+      if (window.innerWidth <= 1024) return;
+      
       const sidebar = document.querySelector('.left-sidebar-container') as HTMLElement;
       
       if (sidebar) {
@@ -71,15 +87,23 @@ const LeftSidebarWrapper: React.FC = () => {
       }
     };
 
+    // 리사이즈 핸들러 (모바일 감지 포함)
+    const handleResize = () => {
+      const isMobileNow = checkMobile();
+      if (!isMobileNow) {
+        handleScroll();
+      }
+    };
+
     // 초기 실행 및 이벤트 리스너 등록
     handleScroll();
     
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('resize', handleResize);
     };
   }, [setRefreshFunction]);
 
@@ -196,6 +220,11 @@ const LeftSidebarWrapper: React.FC = () => {
   const handleSearchClick = (searchTerm: string) => {
     navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
   };
+
+  // 모바일 환경에서는 사이드바를 렌더링하지 않음
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <div className={`left-sidebar-container ${shouldStopAtFooter ? 'stop-at-footer' : ''}`}>
