@@ -27,7 +27,6 @@ import co.elastic.clients.elasticsearch.core.explain.ExplanationDetail;
 import co.elastic.clients.elasticsearch.core.search.CompletionSuggestOption;
 import co.elastic.clients.elasticsearch.core.search.Hit; // 검색 결과의 단일 항목 표현
 import co.elastic.clients.elasticsearch.core.search.Suggestion;
-import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.NamedValue;
 import lombok.extern.slf4j.Slf4j;
 
@@ -151,8 +150,8 @@ public class ElasticService {
 			boolB.should(s -> s.match(m -> m.field("content").query(term).fuzziness("1").boost(0.5f)));
 		}
 
-		if (category != null && !category.isBlank()) {
-			boolB.filter(f -> f.term(t -> t.field("category.keyword").value(category)));
+		if (category != null && !category.isBlank() && !category.equals("전체")) {
+			boolB.filter(f -> f.term(t -> t.field("category").value(category)));
 		}
 
 		// 5. 검색 실행
@@ -206,7 +205,7 @@ public class ElasticService {
 //			return searchWithPagination(originalKeyword, category, page, size, true);
 //		}
 //		Gemini AI 요약 결과 가져오기
-//		String aiSummary = Gemini(keyword);
+		String aiSummary = Gemini(keyword);
 
 		// 7. 최종 응답 리턴
 		Map<String, Object> result = new HashMap<>();
@@ -217,7 +216,7 @@ public class ElasticService {
 		result.put("originalKeyword", originalKeyword);
 		result.put("convertedKeyword", keyword);
 		// result에 AI 요약 결과 포함시켜서 프론트에 함께 전달
-//		result.put("aiSummary", aiSummary); // 프론트에서 사용: data.aiSummary
+		result.put("aiSummary", aiSummary); // 프론트에서 사용: data.aiSummary
 
 //		log.info(originalKeyword);
 //		log.info(keyword);
@@ -324,15 +323,17 @@ public class ElasticService {
 
 	// 뉴스 및 키워드 자동 삭제
 //	@Scheduled(cron = "0 * * * * *") // 매일 (00:00)
-	@Scheduled(cron = "0 0 0 * * *") // 매일 (00:00)
+	@Scheduled(cron = "0 0 0 * * *")
 	public void deleteOldClickLogs() throws IOException {
 		// popular_keywords_logs 에서 하루 전 로그 삭제
-		client.deleteByQuery(r -> r.index("popular_keywords_logs")
-				.query(q -> q.range(rq -> rq.field("timestamp").lt(JsonData.of("now/d")))));
+		client.deleteByQuery(r -> r.index("popular_keywords_logs").query(q -> q.matchAll(m -> m)));
+//		client.deleteByQuery(r -> r.index("popular_keywords_logs")
+//				.query(q -> q.range(rq -> rq.field("timestamp").lt(JsonData.of("now/d")))));
 
 		// popular_news_logs 에서 하루 전 로그 삭제
-		client.deleteByQuery(r -> r.index("popular_news_logs")
-				.query(q -> q.range(rq -> rq.field("timestamp").lt(JsonData.of("now/d")))));
+		client.deleteByQuery(r -> r.index("popular_news_logs").query(q -> q.matchAll(m -> m)));
+//		client.deleteByQuery(r -> r.index("popular_news_logs")
+//				.query(q -> q.range(rq -> rq.field("timestamp").lt(JsonData.of("now/d")))));
 
 		log.info("뉴스 및 키워드 자동 삭제 완료");
 	}
