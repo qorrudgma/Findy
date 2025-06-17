@@ -1,6 +1,7 @@
 import requests
 import time
 
+from datetime import datetime
 from bs4 import BeautifulSoup
 from komoran import komoran # 형태소
 from tfidf import tf_idf # TF-IDF
@@ -66,6 +67,15 @@ def fetch_article_content(article_url):
                 if time_tag:
                     time_str = time_tag.text.strip()
 
+        last_time = time_str.replace('.','-')
+
+        try:
+            dt = datetime.strptime(last_time, "%Y-%m-%d %H:%M")
+            last_time = dt.strftime("%Y-%m-%dT%H:%M:00.000Z")
+            print(last_time)
+        except ValueError:
+            print("시간 형식 오류:", last_time)
+
         # 형태소
         nouns, pos_result = komoran(full_text)
         # TF-IDF
@@ -87,13 +97,19 @@ def fetch_article_content(article_url):
             "category": category,
             "source": "hani",
             "summary": summary_sentences,
-            "time": time_str
+            "time": last_time
         }
 
     except Exception as e:
         print(f"본문 크롤링 오류: {e}")
         return None
-    
+
+def convert_category(cat):
+    for key in category_mapping:
+        if key in cat:
+            return category_mapping[key]
+    return cat
+ 
 # hani 전용 매핑
 category_mapping = {
     "economy": "경제",
@@ -109,7 +125,7 @@ categories = ["economy", "opinion", "society", "health", "sports", "culture"]
 data = []
 for category in categories:
     print("hani - ", category)
-    for i in range(10):
+    for i in range(40):
         headlines = fetch_headlines(category, i + 1)
         if headlines:
             for idx, item in enumerate(headlines, start=1):
@@ -117,7 +133,7 @@ for category in categories:
                 article = fetch_article_content(item['url'])
                 if article:
                     # 출력전에 교체
-                    converted_category = category_mapping.get(category, category)
+                    converted_category = convert_category(category)
                     article["category"] = converted_category
 
                     print("결과 => ")

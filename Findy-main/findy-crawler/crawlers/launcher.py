@@ -1,15 +1,15 @@
-import subprocess  # 파이썬 파일(조선,동아,이데일리 등등)을 실행하기 위한 모듈
+import subprocess  # 파이썬 파일(조선,동아,이데일리 등등)을 실행하기 위한 모듈crawlers
 import datetime    # 현재 시간(타임스탬프) 기록
 import traceback   # 에러 발생 시 전체 예외 정보를 문자열로 출력하기 위한 모듈
 
 #실행목록
 crawler_files = [
-    "C:/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py",   
-    "C:/project/Findy/Findy-main/findy-crawler/crawlers/donga.py",    
-    "C:/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py",
-    "C:/project/Findy/Findy-main/findy-crawler/crawlers/hani.py",    
-    "C:/project/Findy/Findy-main/findy-crawler/crawlers/khan.py",
-    "C:/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py"
+    # "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/donga.py",
+    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/khan.py",
+    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py",
+    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py",
+    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py",
+    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/hani.py"
 ]
 
 log_path = "testlog.txt" # 크롤링 시작과 끝을 각각 로그로 저장장

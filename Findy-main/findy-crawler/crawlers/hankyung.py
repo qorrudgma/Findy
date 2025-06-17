@@ -1,6 +1,7 @@
 import requests
 import time
 
+from datetime import datetime
 from bs4 import BeautifulSoup
 from komoran import komoran # 형태소
 from tfidf import tf_idf # TF-IDF
@@ -69,6 +70,15 @@ def fetch_article_content(article_url):
         date_items = soup.select_one("span.txt-date")
         last_time = date_items.get_text(separator=' ', strip=True)
 
+        last_time = last_time.replace('.','-')
+
+        try:
+            dt = datetime.strptime(last_time, "%Y-%m-%d %H:%M")
+            last_time = dt.strftime("%Y-%m-%dT%H:%M:00.000Z")
+            print(last_time)
+        except ValueError:
+            print("시간 형식 오류:", last_time)
+
         if clean_text:
             # print(f"내용: {clean_text}\n")
             # 형태소
@@ -104,6 +114,12 @@ def fetch_article_content(article_url):
     except Exception as e:
         print(f"본문 크롤링 오류: {e}")
         return None
+    
+def convert_category(cat):
+    for key in category_mapping:
+        if key in cat:
+            return category_mapping[key]
+    return cat
 
 # 실행 흐름
 # hankyung 전용 매핑
@@ -168,7 +184,7 @@ data = []
 for category in categories:
     print("hankyung - ", category)
     # 반복할 페이지 수
-    for i in range(10):
+    for i in range(20):
         headlines = fetch_headlines(category, i)
 
         if headlines:
@@ -177,7 +193,7 @@ for category in categories:
 
                 if article:
                     # 출력전에 교체
-                    converted_category = category_mapping.get(category, category)
+                    converted_category = convert_category(category)
                     article["category"] = converted_category
 
                     print("결과 => ")

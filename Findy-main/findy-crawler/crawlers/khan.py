@@ -1,6 +1,7 @@
 import requests
 import time
 
+from datetime import datetime
 from bs4 import BeautifulSoup
 from komoran import komoran # 형태소
 from tfidf import tf_idf # TF-IDF
@@ -67,6 +68,15 @@ def fetch_article_content(article_url):
         date_tag = soup.select_one("div.date p")
         published_time = date_tag.get_text(strip=True) if date_tag else "시간 없음"
         time = clean_datetime(published_time)
+
+        last_time = time.replace('.','-')
+
+        try:
+            dt = datetime.strptime(last_time, "%Y-%m-%d %H:%M")
+            last_time = dt.strftime("%Y-%m-%dT%H:%M:00.000Z")
+            print(last_time)
+        except ValueError:
+            print("시간 형식 오류:", last_time)
         
         # 형태소
         nouns, pos_result = komoran(content)
@@ -89,7 +99,7 @@ def fetch_article_content(article_url):
             "category": category,
             "source": "khan",
             "summary": summary_sentences,
-            "time": time
+            "time": last_time
         }
 
     except Exception as e:
@@ -100,6 +110,12 @@ def clean_datetime(text):
     text = text.replace("입력 ", "")
     time = text.replace(".", "-")
     return time
+    
+def convert_category(cat):
+    for key in category_mapping:
+        if key in cat:
+            return category_mapping[key]
+    return cat
 
 # 실행 흐름
 # khan 전용 매핑(스포츠 없음)
@@ -116,7 +132,7 @@ data = []
 for category in categories:
     print("khan - ", category)
     # 반복할 페이지 수
-    for i in range(10):
+    for i in range(40):
         headlines = fetch_headlines(category, i+1)
 
         if headlines:
@@ -126,7 +142,7 @@ for category in categories:
 
                 if article:
                     # 출력전에 교체
-                    converted_category = category_mapping.get(category, category)
+                    converted_category = convert_category(category)
                     article["category"] = converted_category
 
                     print("결과 => ")
