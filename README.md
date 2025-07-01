@@ -96,9 +96,8 @@ Findy-main/
 
 
 ## MongoDB
+<img src="MongoDB.png" alt="MongoDB"/>
 
 
-## Elasticsearch 인덱스
-
-
-
+## Elasticsearch
+<img src="Elasticsearch.png" alt="Elasticsearch"/>
