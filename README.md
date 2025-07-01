@@ -1,7 +1,6 @@
 # 🕵️‍♂️ Findy: 뉴스 검색 엔진
 
-<img src="Findy_logo.png" alt="Findy 로고" width="200"/>
-<img src="Findy_logo.png" alt="Findy 로고" width="200" color="white"/>
+<img src="Findy_logo.png" alt="Findy 로고" width="200"/> <img src="Findy_logo.png" alt="Findy 로고" width="200" color="white"/>
 
 **Findy**는 다양한 뉴스 플랫폼에서 수집한 기사 데이터를 기반으로,  
 📡 실시간 수집 + 🧠 형태소 분석 + 🔍 고속 검색 + 📊 랭킹 정렬 기능을 제공하는 **뉴스 검색 엔진**입니다.
