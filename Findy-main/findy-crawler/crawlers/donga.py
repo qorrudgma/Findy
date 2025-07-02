@@ -150,7 +150,7 @@ data = []
 for category in categories:
     print("donga - ", category)
     # 반복할 페이지 수
-    for i in range(30):
+    for i in range(1):
         headlines = fetch_headlines(category, i)
 
         if headlines:

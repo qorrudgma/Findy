@@ -132,7 +132,7 @@ data = []
 for category in categories:
     print("khan - ", category)
     # 반복할 페이지 수
-    for i in range(40):
+    for i in range(1):
         headlines = fetch_headlines(category, i+1)
 
         if headlines:

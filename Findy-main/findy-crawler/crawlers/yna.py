@@ -94,7 +94,7 @@ for category in categories:
     headlines = fetch_headlines(category, 1)  # 첫 페이지만
 
     if headlines:
-        print(f"  ✓ {len(headlines)}개 기사 링크 발견")
+        print(f"  {len(headlines)}개 기사 링크 발견")
         for idx, item in enumerate(headlines[:5], start=1):  # 각 카테고리당 5개만
             print(f"  기사 {idx}/5 수집 중...")
             article = fetch_article_content(item['url'])
@@ -107,13 +107,13 @@ for category in categories:
                 converted_category = category_mapping.get(category, category)
                 article['category'] = category
                 data.append(article)
-                print(f"    ✓ 제목: {article['headline'][:50]}...")
+                print(f"     제목: {article['headline'][:50]}...")
             else:
-                print(f"    ✗ 본문 수집 실패")
+                print(f"     본문 수집 실패")
 
             time.sleep(0.5)
     else:
-        print(f"  ✗ 기사 목록 수집 실패")
+        print(f"   기사 목록 수집 실패")
 
 print(f"\n=== 수집 완료: 총 {len(data)}개 기사 ===")
 

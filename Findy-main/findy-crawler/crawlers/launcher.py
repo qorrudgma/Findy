@@ -4,12 +4,18 @@ import traceback   # 에러 발생 시 전체 예외 정보를 문자열로 출�
 
 #실행목록
 crawler_files = [
+    # "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py",
+    # "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py",
     # "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/donga.py",
-    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/khan.py",
-    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py",
-    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py",
-    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py",
-    "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/hani.py"
+    # "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/khan.py",
+    # "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py",
+    # "C:/develop/project/Findy/Findy-main/findy-crawler/crawlers/hani.py"
+    # "C:/project/Findy/Findy-main/findy-crawler/crawlers/chosun.py",
+    # "C:/project/Findy/Findy-main/findy-crawler/crawlers/edaily.py",
+    "C:/project/Findy/Findy-main/findy-crawler/crawlers/donga.py",
+    "C:/project/Findy/Findy-main/findy-crawler/crawlers/khan.py",
+    "C:/project/Findy/Findy-main/findy-crawler/crawlers/hankyung.py",
+    "C:/project/Findy/Findy-main/findy-crawler/crawlers/hani.py"
 ]
 
 log_path = "testlog.txt" # 크롤링 시작과 끝을 각각 로그로 저장장

@@ -203,7 +203,7 @@ if __name__ == "__main__":
     lock = threading.Lock()  # 동기화용 락 객체
 
     def process_category(cat_url):  # 각 카테고리 처리 함수
-        articles = collect_articles_from_category(cat_url, max_pages=3)
+        articles = collect_articles_from_category(cat_url, max_pages=10)
         print(f"  {cat_url} → {len(articles)}건 수집됨")
         with lock:  # 동기화된 리스트 접근
             total_articles.extend(articles)
