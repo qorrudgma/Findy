@@ -20,6 +20,7 @@ import com.boot.elasticsearch.KeyboardMapper;
 import co.elastic.clients.elasticsearch.ElasticsearchClient; // Elasticsearch 클라이언트 클래스
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionBoostMode;
 import co.elastic.clients.elasticsearch.core.SearchRequest; // 검색 요청 객체
 import co.elastic.clients.elasticsearch.core.SearchResponse; // 검색 응답 객체
 import co.elastic.clients.elasticsearch.core.explain.Explanation;
@@ -54,6 +55,37 @@ public class ElasticService {
 			results.add(hit.source());
 		}
 		return results;
+	}
+
+	public Map<String, Object> searchMainNews() throws IOException {
+		// 1) 쿼리 빌드 (match_all + random_score)
+		SearchRequest req = SearchRequest.of(b -> b.index("newsdata.newsdata").size(10)
+				.query(q -> q.functionScore(fs -> fs.query(sub -> sub.matchAll(m -> m)) // match_all
+						.functions(fn -> fn.randomScore(rs -> rs))// random_score
+						.boostMode(FunctionBoostMode.Replace))));
+
+		log.info(" Random 10 docs query ready => {}", req);
+
+		// 2) 실행
+		SearchResponse<Map> resp = client.search(req, Map.class);
+
+		// 3) 결과 가공
+		List<Map<String, Object>> docs = resp.hits().hits().stream().map(hit -> (Map<String, Object>) hit.source()) // 캐스팅
+				.collect(Collectors.toList());
+
+		long total = resp.hits().total() != null ? resp.hits().total().value() : 0;
+
+		log.info("총 문서 수 => {}", total);
+		docs.forEach(d -> log.info("headline => {}", d.get("headline")));
+
+//		Map<String, Object> result = new HashMap<>();
+//		result.put("content", content);
+//		result.put("totalElements", totalHits);
+//		result.put("totalPages", totalPages);
+//		result.put("currentPage", page);
+//		result.put("originalKeyword", originalKeyword);
+
+		return Map.of("content", docs, "total", total);
 	}
 
 	// 검색을 위한 메소드
@@ -170,10 +202,10 @@ public class ElasticService {
 			double headlineScore = extractScoreFromExplanation(hit.explanation(), "headline");
 			double contentScore = extractScoreFromExplanation(hit.explanation(), "content");
 			// 내용우선순위 일때 그냥 안에 내용 빈도수로 점수로 하는건 좀 무리일 듯 싶어 추가적으로 조건이 들어가야할 듯
-//			contentScore = contentScore + headlineScore;
+//         contentScore = contentScore + headlineScore;
 
-//			log.info("----------headlineScore => {}", headlineScore);
-//			log.info("contentScore => {}", contentScore);
+//         log.info("----------headlineScore => {}", headlineScore);
+//         log.info("contentScore => {}", contentScore);
 
 			doc.put("score", score);
 			doc.put("headlineScore", headlineScore);
@@ -199,12 +231,12 @@ public class ElasticService {
 		}).toList();
 
 		// 변환된 키워드로 결과가 없으면 원본으로 재시도
-//		if (totalHits == 0 && !originalKeyword.equals(keyword)) {
-//			log.info("변환된 키워드 결과 없음, 원래 키워드로 재검색 시도");
+//      if (totalHits == 0 && !originalKeyword.equals(keyword)) {
+//         log.info("변환된 키워드 결과 없음, 원래 키워드로 재검색 시도");
 //
-//			return searchWithPagination(originalKeyword, category, page, size, true);
-//		}
-//		Gemini AI 요약 결과 가져오기
+//         return searchWithPagination(originalKeyword, category, page, size, true);
+//      }
+//      Gemini AI 요약 결과 가져오기
 		String aiSummary = Gemini(keyword);
 
 		// 7. 최종 응답 리턴
@@ -218,13 +250,13 @@ public class ElasticService {
 		// result에 AI 요약 결과 포함시켜서 프론트에 함께 전달
 		result.put("aiSummary", aiSummary); // 프론트에서 사용: data.aiSummary
 
-//		log.info(originalKeyword);
-//		log.info(keyword);
+//      log.info(originalKeyword);
+//      log.info(keyword);
 
 		return result;
 	}
 
-//	Gemini AI 요약 결과 가져오기
+//   Gemini AI 요약 결과 가져오기
 	private String Gemini(String keyword) {
 		String aiSummary = geminiService.getSummary(keyword);
 		log.info(" Gemini 요약 결과: {}", aiSummary);
@@ -276,8 +308,8 @@ public class ElasticService {
 				// 전체 문서
 				.query(q -> q.matchAll(m -> m))
 				// 조건 필요하면적기 시간으로 하기엔 시간 이 일정한게 아니라 형식이 보류해둠
-//		      .query(q -> q
-//		          .range(r -> r.field("time").gte(JsonData.of("now-" + days + "d/d")).lte(JsonData.of("now"))))
+//            .query(q -> q
+//                .range(r -> r.field("time").gte(JsonData.of("now-" + days + "d/d")).lte(JsonData.of("now"))))
 				.aggregations("top_keywords", agg -> agg.terms(t -> t.field("textrank_keywords.keyword").size(size)))
 				.aggregations("top_tfidf", agg -> agg.terms(t -> t.field("tfidf_keywords.keyword").size(size))).build();
 
@@ -314,26 +346,26 @@ public class ElasticService {
 		}
 
 		// 키워드들 저장
-//		if (keywords != null) {
+//      if (keywords != null) {
 		for (String kw : keywords.stream().distinct().toList()) {
 			client.index(i -> i.index("popular_keywords_logs").document(Map.of("keyword", kw, "timestamp", now)));
 		}
-//		}
+//      }
 	}
 
 	// 뉴스 및 키워드 자동 삭제
-//	@Scheduled(cron = "0 * * * * *") // 매일 (00:00)
+//   @Scheduled(cron = "0 * * * * *") // 매일 (00:00)
 	@Scheduled(cron = "0 0 0 * * *")
 	public void deleteOldClickLogs() throws IOException {
 		// popular_keywords_logs 에서 하루 전 로그 삭제
 		client.deleteByQuery(r -> r.index("popular_keywords_logs").query(q -> q.matchAll(m -> m)));
-//		client.deleteByQuery(r -> r.index("popular_keywords_logs")
-//				.query(q -> q.range(rq -> rq.field("timestamp").lt(JsonData.of("now/d")))));
+//      client.deleteByQuery(r -> r.index("popular_keywords_logs")
+//            .query(q -> q.range(rq -> rq.field("timestamp").lt(JsonData.of("now/d")))));
 
 		// popular_news_logs 에서 하루 전 로그 삭제
 		client.deleteByQuery(r -> r.index("popular_news_logs").query(q -> q.matchAll(m -> m)));
-//		client.deleteByQuery(r -> r.index("popular_news_logs")
-//				.query(q -> q.range(rq -> rq.field("timestamp").lt(JsonData.of("now/d")))));
+//      client.deleteByQuery(r -> r.index("popular_news_logs")
+//            .query(q -> q.range(rq -> rq.field("timestamp").lt(JsonData.of("now/d")))));
 
 		log.info("뉴스 및 키워드 자동 삭제 완료");
 	}

@@ -46,6 +46,18 @@ public class NewsSearchController {
 		return ResponseEntity.ok(result);
 	}
 
+	@GetMapping("/main")
+	public ResponseEntity<?> mainNews() throws IOException {
+		log.info("mainNews()");
+
+		// ElasticService에서 뉴스 검색 결과 가져오기
+		Map<String, Object> result = elasticService.searchMainNews();
+
+		log.info("^^^^^ {}", result);
+		// 최종 JSON 응답 반환
+		return ResponseEntity.ok(result);
+	}
+
 	// test용
 	@GetMapping("/keywordRank")
 	public List<String> topKeywords(@RequestParam(value = "size") int size) throws IOException {
@@ -57,7 +69,7 @@ public class NewsSearchController {
 	@PostMapping("/news/click")
 	public void recordClick(@RequestBody ClickRequest request) throws IOException {
 		log.info("recordClick()");
-//		log.info("클릭 요청 수신 => url={}, keywords={}", request.getUrl(), request.getKeywords());
+//      log.info("클릭 요청 수신 => url={}, keywords={}", request.getUrl(), request.getKeywords());
 		elasticService.logPopularNewsAndKeywordsByUrlAndKeywords(request.getUrl(), request.getKeywords());
 	}
 

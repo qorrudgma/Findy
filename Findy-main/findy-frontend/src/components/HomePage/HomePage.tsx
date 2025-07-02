@@ -57,7 +57,8 @@ const HomePage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch("http://localhost:8485/api/search?page=0&size=10000");
+      // const response = await fetch("http://localhost:8485/api/search?page=0&size=10000");
+      const response = await fetch("http://localhost:8485/api/main");
 
       if (response.ok) {
         const rawData = await response.json();
