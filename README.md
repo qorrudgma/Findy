@@ -25,8 +25,8 @@
 | 기능명 | 설명 | 진행 상황 |
 |--------|------|-----------|
 | **모바일지원** | 분석된 뉴스 데이터를 빠르게 검색할 수 있도록 색인 처리 | 중 ★ |
-| **인기 키워드 트렌드 차트** | 현재 시점 기준 인기 키워드 시각화 | 중 ★ |
-| **개인화 뉴스 추천** | 사용자 검색 이력을 바탕으로 맞춤형 뉴스 추천 제공 | 하 ☆ |
+| **개인화 뉴스 추천** | 사용자 검색 이력을 바탕으로 맞춤형 뉴스 추천 제공 |
+| **인기 키워드 트렌드 차트** | 현재 시점 기준 인기 키워드 시각화 |
 
 
 ---
@@ -37,8 +37,7 @@
 <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black" height="25" /> <img src="https://img.shields.io/badge/React--61DAFB?style=flat&logo=react" height="25" />
 
 - 🔧 Backend<br>
-<img src="https://img.shields.io/badge/Java-17-007396?style=flat&logo=java&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=springboot&logoColor=white" height="25" />
-<img src="https://img.shields.io/badge/AJAX-0054A6?style=flat&logo=code&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/Fetch-00A9E0?style=flat&logo=javascript&logoColor=white" height="25" />
+<img src="https://img.shields.io/badge/Java-17-007396?style=flat&logo=java&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=springboot&logoColor=white" height="25" /> <img src="https://img.shields.io/badge/Fetch-00A9E0?style=flat&logo=javascript&logoColor=white" height="25" />
 
 - 🔍 수집 및 처리 <br>
    <details>
@@ -101,3 +100,21 @@ Findy-main/
 
 ## Elasticsearch
 <img src="Elasticsearch.png" alt="Elasticsearch"/>
+
+
+## 화면 설명
+
+### 구현기능 설명 - 메인 페이지
+![image](https://github.com/user-attachments/assets/bd349718-87dc-4998-9bb3-a76ce15a3054)
+
+당일 뉴스 10가지 랜덤 표시
+ - 뉴스 데이터들 당일의 뉴스 중 10개를 랜덤으로 표시하였습니다.
+ - 뉴스는 이미지 또한 포함하고있습니다.
+ - 뉴스 선택시 해당 뉴스를 가져온 사이트로 넘어갈 수 있습니다.
+
+![image](https://github.com/user-attachments/assets/0d2776b1-1c98-4bfb-913e-2e46de1427f6)
+
+코드 설명
+ - 오늘 날짜를 구합니다.
+ - 오늘 날짜인 뉴스들 중 랜덤으로 10개의 뉴스를 가져옵니다.
+
