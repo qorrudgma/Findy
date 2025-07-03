@@ -104,17 +104,33 @@ Findy-main/
 
 ## 화면 설명
 
-### 구현기능 설명 - 메인 페이지
+### 구현기능 설명
+
+- 메인 페이지
 <img src="README_img/main_img.png"/>
 
-당일 뉴스 10가지 랜덤 표시
- - 뉴스 데이터들 당일의 뉴스 중 10개를 랜덤으로 표시하였습니다.
- - 뉴스는 이미지 또한 포함하고있습니다.
- - 뉴스 선택시 해당 뉴스를 가져온 사이트로 넘어갈 수 있습니다.
+- 다크모드
+<img src="README_img/dark_img.png"/>
 
-<img src="README_img/main_code.png"/>
+- 왼쪽 사이드
+<img src="README_img/left_img.png"/>
 
-코드 설명
- - 오늘 날짜를 구합니다.
- - 오늘 날짜인 뉴스들 중 랜덤으로 10개의 뉴스를 가져옵니다.
+- 오른쪽 사이드
+<img src="README_img/right_img.png"/>
+
+- 언론사 선택
+<img src="README_img/media_img.png"/>
+
+- 카테고리별 뉴스
+<img src="README_img/category_img.png"/>
+
+- 자동완성 기능
+<img src="README_img/auto_img.png"/>
+
+- ai 검색 결과
+<img src="README_img/ai_img.png"/>
+
+- 뉴스 더보기 클릭
+<img src="README_img/news_img.png"/>
+
 
