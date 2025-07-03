@@ -115,6 +115,7 @@ const SearchPage: React.FC = () => {
 
   // 페이지 이동 시 검색 수행
   useEffect(() => {
+    if (currentPage === 0) return; // 이미 0페이지에서 검색한 경우 중복 막기
     performSearch();
   }, [currentPage]);
 
@@ -129,15 +130,22 @@ const SearchPage: React.FC = () => {
      if (query) params.append('q', query);
      if (category) params.append('category', category);
      // source 파라미터는 백엔드에서 인식하지 못하므로 제거하고 프론트엔드에서 필터링
-     params.append('page', currentPage.toString());
-     params.append('size', source ? '3000' : '10'); // 언론사 필터링 시 더 많은 데이터 요청
-
+       params.append('page', currentPage.toString());
+       if (source) params.append('source', source); // 🔧 이 줄 추가
+       // params.append('size', source ? '3000' : '10'); // 언론사 필터링 시 더 많은 데이터 요청 3000개 읽어오는건 에바참치임 안쓸 로직임
+       params.append('size', '10'); // 항상 고정된 페이지 사이즈로, 10개만 뽑아옴. 백엔드에서 처리해서 보낸댜
      if (researchMode) {
        params.append('research', 'true');
      }
 
      // 통합된 검색 엔드포인트 사용
-     const url = `http://localhost:8485/api/search?${params.toString()}`;
+    //  const url = `http://localhost:8485/api/search?${params.toString()}`;
+     let url = `http://localhost:8485/api/`;
+     if (source) {
+      url = `http://localhost:8485/api/source?${params.toString()}`;
+     } else {
+      url = `http://localhost:8485/api/search?${params.toString()}`;
+     }
       
       
       const response = await fetch(url);
@@ -172,38 +180,39 @@ const SearchPage: React.FC = () => {
              headlineScore: item.headlineScore || 0,  // 제목 점수
              contentScore: item.contentScore || 0     // 내용 점수
            }));
+
            
            // 클라이언트 사이드에서 언론사 필터링
            if (source) {
-             console.log('🔍 언론사 필터링 시작');
-             console.log('선택된 source:', source);
-             
-             // 필터링 전 데이터 확인
-             console.log('필터링 전 뉴스 개수:', transformedNews.length);
-             console.log('필터링 전 언론사들:', Array.from(new Set(transformedNews.map((article: NewsArticle) => article.source))));
-             
-             transformedNews = transformedNews.filter((article: NewsArticle) => {
-               // 실제 데이터에서는 source 필드가 영어 코드로 저장되어 있음
-               // 예: 'hankyung', 'donga', 'khan', 'hani' 등
-               const matches = article.source === source;
-               
-               if (matches) {
-                 console.log(`✅ 매칭됨: ${article.source} === ${source}`);
-               }
-               return matches;
-             });
-             
-             console.log('필터링 후 뉴스 개수:', transformedNews.length);
-             
-             // 언론사 필터링 시 페이지네이션 재계산
-             const itemsPerPage = 10;
-             const startIndex = currentPage * itemsPerPage;
-             const endIndex = startIndex + itemsPerPage;
-             const paginatedNews = transformedNews.slice(startIndex, endIndex);
-             
-             setSearchResults(paginatedNews);
-             setTotalResults(transformedNews.length);
-             setTotalPages(Math.ceil(transformedNews.length / itemsPerPage));
+             // console.log('🔍 언론사 필터링 시작');
+             // console.log('선택된 source:', source);
+             //
+             // // 필터링 전 데이터 확인
+             // console.log('필터링 전 뉴스 개수:', transformedNews.length);
+             // console.log('필터링 전 언론사들:', Array.from(new Set(transformedNews.map((article: NewsArticle) => article.source))));
+             //
+             // transformedNews = transformedNews.filter((article: NewsArticle) => {
+             //   // 실제 데이터에서는 source 필드가 영어 코드로 저장되어 있음
+             //   // 예: 'hankyung', 'donga', 'khan', 'hani' 등
+             //   const matches = article.source === source;
+             //
+             //   if (matches) {
+             //     console.log(`✅ 매칭됨: ${article.source} === ${source}`);
+             //   }
+             //   return matches;
+             // });
+             //
+             // console.log('필터링 후 뉴스 개수:', transformedNews.length);
+             //
+             // // 언론사 필터링 시 페이지네이션 재계산
+             // const itemsPerPage = 10;
+             // const startIndex = currentPage * itemsPerPage;
+             // const endIndex = startIndex + itemsPerPage;
+             // const paginatedNews = transformedNews.slice(startIndex, endIndex);
+             //
+             // setSearchResults(paginatedNews);
+             // setTotalResults(transformedNews.length);
+             // setTotalPages(Math.ceil(transformedNews.length / itemsPerPage));
            } else {
              // 일반 검색 결과
              setSearchResults(transformedNews);
@@ -218,7 +227,12 @@ const SearchPage: React.FC = () => {
           // });
           setTotalResults(data.totalElements || 0);
           setTotalPages(data.totalPages || 0);
-        } else {
+          setSearchResults(transformedNews);
+          // setTotalResults(transformedNews.length);
+          // setTotalPages(Math.ceil(transformedNews.length / 10));
+        }
+
+        else {
           setSearchResults([]);
           setTotalResults(0);
           setTotalPages(0);
@@ -281,8 +295,9 @@ const SearchPage: React.FC = () => {
 
   const handleSourceClick = (selectedSource: string) => {
     // 한글 언론사명을 영어 코드로 변환
-    const sourceCode = sourceCodeMap[selectedSource] || selectedSource;
-    let searchUrl = `/search?source=${encodeURIComponent(sourceCode)}`;
+    // const sourceCode = sourceCodeMap[selectedSource] || selectedSource;
+    // let searchUrl = `/search?source=${encodeURIComponent(sourceCode)}`;
+    let searchUrl = `/search?source=${encodeURIComponent(selectedSource)}`;
     if (query) {
       searchUrl += `&q=${encodeURIComponent(query)}`;
     }

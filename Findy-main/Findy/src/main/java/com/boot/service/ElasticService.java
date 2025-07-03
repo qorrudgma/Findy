@@ -2,6 +2,9 @@ package com.boot.service; // 서비스 클래스가 포함된 패키지 선언
 
 import java.io.IOException; // 입출력 예외 처리를 위한 클래스
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList; // 리스트 객체 생성을 위한 클래스
 import java.util.Comparator;
 import java.util.HashMap;
@@ -58,32 +61,25 @@ public class ElasticService {
 	}
 
 	public Map<String, Object> searchMainNews() throws IOException {
-		// 1) 쿼리 빌드 (match_all + random_score)
-		SearchRequest req = SearchRequest.of(b -> b.index("newsdata.newsdata").size(10)
-				.query(q -> q.functionScore(fs -> fs.query(sub -> sub.matchAll(m -> m)) // match_all
-						.functions(fn -> fn.randomScore(rs -> rs))// random_score
-						.boostMode(FunctionBoostMode.Replace))));
+		LocalDate todayKst = LocalDate.now(ZoneId.of("Asia/Seoul"));
+		String datePrefix = todayKst.format(DateTimeFormatter.ISO_LOCAL_DATE);
+		SearchRequest req = SearchRequest.of(b -> b.index("newsdata.newsdata").size(10).query(
+				q -> q.functionScore(fs -> fs.query(sub -> sub.bool(bq -> bq.filter(f -> f.prefix(p -> p.field("time")
+//								.value(datePrefix)))
+						.value("2025-07-02"))).must(m -> m.matchAll(ma -> ma))))
+						.functions(fn -> fn.randomScore(rs -> rs)).boostMode(FunctionBoostMode.Replace))));
 
 		log.info(" Random 10 docs query ready => {}", req);
 
-		// 2) 실행
 		SearchResponse<Map> resp = client.search(req, Map.class);
 
-		// 3) 결과 가공
-		List<Map<String, Object>> docs = resp.hits().hits().stream().map(hit -> (Map<String, Object>) hit.source()) // 캐스팅
+		List<Map<String, Object>> docs = resp.hits().hits().stream().map(hit -> (Map<String, Object>) hit.source())
 				.collect(Collectors.toList());
 
 		long total = resp.hits().total() != null ? resp.hits().total().value() : 0;
 
 		log.info("총 문서 수 => {}", total);
 		docs.forEach(d -> log.info("headline => {}", d.get("headline")));
-
-//		Map<String, Object> result = new HashMap<>();
-//		result.put("content", content);
-//		result.put("totalElements", totalHits);
-//		result.put("totalPages", totalPages);
-//		result.put("currentPage", page);
-//		result.put("originalKeyword", originalKeyword);
 
 		return Map.of("content", docs, "total", total);
 	}
@@ -128,6 +124,13 @@ public class ElasticService {
 
 				return map;
 			}).toList();
+
+//			Map<String, Object> result = new HashMap<>();
+//			result.put("content", content);
+//			result.put("totalElements", totalHits);
+//			result.put("totalPages", totalPages);
+//			result.put("currentPage", page);
+//			return result;
 
 			return Map.of("content", content, "totalElements", totalHits, "totalPages", totalPages, "currentPage",
 					page);
@@ -262,6 +265,35 @@ public class ElasticService {
 		log.info(" Gemini 요약 결과: {}", aiSummary);
 
 		return aiSummary;
+	}
+
+	// 언론사별 뉴스기사
+	public Map<String, Object> sourceNews(String source, int page, int size) throws IOException {
+
+		if (source == null || source.isBlank()) {
+			throw new IllegalArgumentException("source 파라미터는 필수입니다.");
+		}
+
+		SearchRequest req = SearchRequest.of(b -> b.index("newsdata.newsdata").from(page * size).size(size)
+				.query(q -> q.term(t -> t.field("source").value(source)))
+				.sort(s -> s.field(f -> f.field("time").order(SortOrder.Desc))));
+
+		SearchResponse<Map> resp = client.search(req, Map.class);
+
+		long totalHits = resp.hits().total() != null ? resp.hits().total().value() : 0;
+		int totalPages = (int) Math.ceil((double) totalHits / size);
+
+		List<Map<String, Object>> content = resp.hits().hits().stream()
+				.map(hit -> (Map<String, Object>) new HashMap<>(hit.source())).toList();
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("content", content);
+		result.put("totalElements", totalHits);
+		result.put("totalPages", totalPages);
+		result.put("currentPage", page);
+		result.put("source", source);
+
+		return result;
 	}
 
 	// 검색결과 우선순위 위한 메소드

@@ -46,6 +46,19 @@ public class NewsSearchController {
 		return ResponseEntity.ok(result);
 	}
 
+	@GetMapping("/source")
+	public ResponseEntity<?> sourceNews(@RequestParam(value = "source", required = false) String source,
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size) throws IOException {
+		log.info("source => " + source);
+
+		// ElasticService에서 뉴스 검색 결과 가져오기
+		Map<String, Object> result = elasticService.sourceNews(source, page, size);
+
+		// 최종 JSON 응답 반환
+		return ResponseEntity.ok(result);
+	}
+
 	@GetMapping("/main")
 	public ResponseEntity<?> mainNews() throws IOException {
 		log.info("mainNews()");
@@ -53,7 +66,6 @@ public class NewsSearchController {
 		// ElasticService에서 뉴스 검색 결과 가져오기
 		Map<String, Object> result = elasticService.searchMainNews();
 
-		log.info("^^^^^ {}", result);
 		// 최종 JSON 응답 반환
 		return ResponseEntity.ok(result);
 	}

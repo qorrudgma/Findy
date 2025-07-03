@@ -16,7 +16,6 @@ def test():
 def save_to_mongodb(articles):
     # 연결 확인되면 아래 두줄 주석
     # print("----------------디비 연결 시작----------------")
-    test()    
     print("==================디비 저장 시작==================")
     try:
         # client = MongoClient("mongodb://localhost:27017")  # MongoDB 연결
@@ -34,7 +33,6 @@ def save_to_mongodb(articles):
         skipped = 0
 
         for article in articles:
-            # print(f" !@#$ url: {article['url']}\n")
             url = article.get('url')
             if not url:
                 skipped += 1
