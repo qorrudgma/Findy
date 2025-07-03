@@ -105,14 +105,14 @@ Findy-main/
 ## 화면 설명
 
 ### 구현기능 설명 - 메인 페이지
-![image](https://github.com/user-attachments/assets/bd349718-87dc-4998-9bb3-a76ce15a3054)
+<img src="README_img/main_img.png"/>
 
 당일 뉴스 10가지 랜덤 표시
  - 뉴스 데이터들 당일의 뉴스 중 10개를 랜덤으로 표시하였습니다.
  - 뉴스는 이미지 또한 포함하고있습니다.
  - 뉴스 선택시 해당 뉴스를 가져온 사이트로 넘어갈 수 있습니다.
 
-![image](https://github.com/user-attachments/assets/0d2776b1-1c98-4bfb-913e-2e46de1427f6)
+<img src="README_img/main_code.png"/>
 
 코드 설명
  - 오늘 날짜를 구합니다.
