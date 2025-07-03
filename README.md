@@ -107,27 +107,27 @@ Findy-main/
 ### 구현기능 설명
 
 - 메인 페이지 <br>
-<img src="README_img/main_img.png"/>
+   <img src="README_img/main_img.png"/>
 
 - 다크모드 <br>
-<img src="README_img/dark_img.png"/>
+   <img src="README_img/dark_img.png"/>
 
 - 좌/우 사이드 <br>
 <img src="README_img/left_img.png"/> <img src="README_img/right_img.png"/>
 
 - 언론사 선택 <br>
-<img src="README_img/media_img.png"/>
+   <img src="README_img/media_img.png"/>
 
 - 카테고리별 뉴스 <br>
-<img src="README_img/category_img.png"/>
+   <img src="README_img/category_img.png"/>
 
 - 자동완성 기능 <br>
-<img src="README_img/auto_img.png"/>
+   <img src="README_img/auto_img.png"/>
 
 - ai 검색 결과 <br>
-<img src="README_img/ai_img.png"/>
+   <img src="README_img/ai_img.png"/>
 
 - 뉴스 더보기 클릭 <br>
-<img src="README_img/news_img.png"/>
+   <img src="README_img/news_img.png"/>
 
 
