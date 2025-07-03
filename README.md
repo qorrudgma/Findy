@@ -112,11 +112,8 @@ Findy-main/
 - 다크모드
 <img src="README_img/dark_img.png"/>
 
-- 왼쪽 사이드
-<img src="README_img/left_img.png"/>
-
-- 오른쪽 사이드
-<img src="README_img/right_img.png"/>
+- 좌/우 사이드
+<img src="README_img/left_img.png"/> <img src="README_img/right_img.png"/>
 
 - 언론사 선택
 <img src="README_img/media_img.png"/>
