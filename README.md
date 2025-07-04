@@ -110,6 +110,9 @@ Findy-main/
 - 메인 페이지 <br><br>
    <img src="README_img/main_img.png"/>
 
+   Findy화면의 메인 페이지로 당일의 뉴스 기사들중 랜덤으로 10가지의 뉴스 기사들을 가져와 메인에 보여줍니다.
+   메인 화면이 새로고침 되면 기사들이 다시 랜덤으로 10가지의 기사를 다시 가져옵니다.
+
 - 다크모드 <br><br>
    <img src="README_img/dark_img.png"/>
 
