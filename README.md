@@ -105,9 +105,7 @@ Findy-main/
 
 ## 화면 설명
 
-### 구현기능 설명
-
-- # 📰 당일 뉴스 랜덤 셀렉션 (메인 페이지) <br><br>
+- ### 📰 당일 뉴스 랜덤 셀렉션 (메인 페이지) <br><br>
    <img src="README_img/main_img.png"/><br><br>
   
    페이지를 새로 고침할 때마다 기사 조합이 바뀌어, 같은 뉴스 페이지라도 늘 새로운 첫인상을 경험할 수 있습니다.<br>
@@ -121,8 +119,8 @@ Findy-main/
    단순한 색상 반전이 아닌, 전체 UI 전반에 걸쳐 일관된 스타일과 분위기를 유지하로고 설계되었습니다.<br>
    또한, 로컬 스토리지(LocalStorage)를 통해 해당설정이 저장됩니다.
 
-- # 🧭사이드 위젯기능 (좌/우 사이드) <br><br>
-<img src="README_img/left_img.png"/> <img src="README_img/right_img.png"/><br><br>
+- ### 🧭사이드 위젯기능 (좌/우 사이드) <br><br>
+   <img src="README_img/left_img.png"/> <img src="README_img/right_img.png"/><br><br>
   
    📈 왼쪽 사이드 - 실시간 TOP 5 뉴스
      - 당일 뉴스중 가장 조회수가 높은 기사 5개를 실시간으로 집계해 보여줍니다.<br>
