@@ -108,30 +108,35 @@ Findy-main/
 ### 구현기능 설명
 
 - 메인 페이지 <br><br>
-   <img src="README_img/main_img.png"/>
+   <img src="README_img/main_img.png"/><br><br>
 
-   Findy화면의 메인 페이지로 당일의 뉴스 기사들중 랜덤으로 10가지의 뉴스 기사들을 가져와 메인에 보여줍니다.
+   Findy화면의 메인 페이지로 당일의 뉴스 기사들중 랜덤으로 10가지의 뉴스 기사들을 가져와 메인에 보여줍니다.<br>
    메인 화면이 새로고침 되면 기사들이 다시 랜덤으로 10가지의 기사를 다시 가져옵니다.
 
 - 다크모드 <br><br>
-   <img src="README_img/dark_img.png"/>
+   <img src="README_img/dark_img.png"/><br><br>
+
+   해당 화면은 다크모드를 적용한 화면입니다.<br>
+   사용자의 눈을 보호하고, 세련된 사용자 경험을 제공하기 위해 다크모드 기능을 도입헀습니다.<br>
+   단순한 색상 반전이 아닌, 전체 UI 전반에 걸쳐 일관된 스타일과 분위기를 유지하로고 설계되었습니다.<br>
+   또한, 로컬 스토리지(LocalStorage)를 통해 해당설정이 저장됩니다.
 
 - 좌/우 사이드 <br><br>
-<img src="README_img/left_img.png"/> <img src="README_img/right_img.png"/>
+<img src="README_img/left_img.png"/> <img src="README_img/right_img.png"/><br><br>
 
 - 언론사 선택 <br><br>
-   <img src="README_img/media_img.png"/>
+   <img src="README_img/media_img.png"/><br><br>
 
 - 카테고리별 뉴스 <br><br>
-   <img src="README_img/category_img.png"/>
+   <img src="README_img/category_img.png"/><br><br>
 
 - 자동완성 기능 <br><br>
-   <img src="README_img/auto_img.png"/>
+   <img src="README_img/auto_img.png"/><br><br>
 
 - ai 검색 결과 <br><br>
-   <img src="README_img/ai_img.png"/>
+   <img src="README_img/ai_img.png"/><br><br>
 
 - 뉴스 더보기 클릭 <br><br>
-   <img src="README_img/news_img.png"/>
+   <img src="README_img/news_img.png"/><br><br>
 
 
