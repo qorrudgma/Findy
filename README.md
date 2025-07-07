@@ -108,7 +108,7 @@ Findy-main/
 ### 📰 당일 뉴스 랜덤 셀렉션 (메인 페이지) <br><br>
    <img src="README_img/main_img.png"/><br><br>
 
-   🔄 사용자에게 다양한 새로운 뉴스 제공!
+   🔄 사용자에게 다양한 새로운 뉴스 제공!<br>
 &nbsp;&nbsp;&nbsp;&nbsp;- 페이지를 새로 고침할 때마다 기사 조합이 바뀌어, 같은 뉴스 페이지라도 늘 새로운 첫인상을 경험할 수 있습니다.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;- 수많은 기사중, 오늘 뉴스들로만 쏙쏙 골라주는 스마트한 메인입니다.<br><br><br>
 
@@ -123,7 +123,7 @@ Findy-main/
 ### 🧭사이드 위젯기능 (좌/우 사이드) <br><br>
    <img src="README_img/left_img.png"/> <img src="README_img/right_img.png"/><br><br>
   
-   📈 왼쪽 사이드 - 실시간 TOP 5 뉴스!
+   📈 왼쪽 사이드 - 실시간 TOP 5 뉴스!<br>
 &nbsp;&nbsp;&nbsp;&nbsp;- 당일 뉴스중 가장 조회수가 높은 기사 5개를 실시간으로 집계해 보여줍니다.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;- 매일 00:00 기준으로 초기화 되어, 새로운 하루의 인기 기사를 제공합니다.<br>
    🗞 오른쪽 사이드 - 언론사별 뉴스 보기!
@@ -133,7 +133,7 @@ Findy-main/
 ### 🗂️카테고리별 뉴스 <br><br>
    <img src="README_img/category_img.png"/><br><br>
 
-   🔍 검색어 입력 전, 카테고리 선택!
+   🔍 검색어 입력 전, 카테고리 선택!<br>
 &nbsp;&nbsp;&nbsp;&nbsp;- 검색어 입력 전 카테고리를 클릭하면, 해당 카테고리에 속한 뉴스 기사들만 선별하여 보여줍니다.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;- 카테고리를 선택하고 검색어 입력하여 검색하면 해당 카테고리 안에서 검색이 가능합니다.<br><br><br>
 
