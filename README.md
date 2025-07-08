@@ -195,13 +195,13 @@ python-dotenv>=0.19.0
 schedule>=1.1.0 
 </details>
 
-**React 프론트엔드:**
+**React 프론트엔드**
 ```bash
 cd findy-frontend
 npm install
 ```
-## 실행
-1. **MongoDB 시작**
+**백엔드**
+1. **MongoDB, Elasticsearch, Monstache시작**
 2. **백엔드 실행:**
    ```bash
    cd Findy
